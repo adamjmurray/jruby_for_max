@@ -30,6 +30,10 @@ public class numseq extends MaxObject {
 		setOutletAssist(new String[] { "value", "index", "iteration", "list" });
 	}
 
+	/*******************************************************************************************************************
+	 * List Definition Functions
+	 ******************************************************************************************************************/
+
 	public void queue(int[] list) {
 		queue.add(list);
 	}
@@ -61,25 +65,63 @@ public class numseq extends MaxObject {
 		vals = list;
 	}
 
+	// todo: make public, but how should the output work?
 	protected void dequeue() {
 		if (!queue.isEmpty()) {
 			setVals(queue.removeFirst());
 			valsChanged = true;
 		}
-
 	}
 
-	public void bang() {
-		output();
+	// TODO: need to handle empty list (at least with numseq, maybe not rhythm)
+	// think about using append to record something from scratch
+
+	// TODO: maybe this is better with a List? But less efficient?
+	public void append(int[] newVals) {
+		int[] oldVals = vals;
+		vals = new int[oldVals.length + newVals.length];
+		int i;
+		for (i = 0; i < oldVals.length; i++) {
+			vals[i] = oldVals[i];
+		}
+		for (int j = 0; j < newVals.length; j++) {
+			vals[i + j] = newVals[j];
+		}
+		outlet(OUT_LIST, vals);
 	}
 
-	public void increment(int n) {
-		increment = n;
+	public void prepend(int[] newVals) {
+		int[] oldVals = vals;
+		vals = new int[oldVals.length + newVals.length];
+		int i;
+		for (i = 0; i < newVals.length; i++) {
+			vals[i] = newVals[i];
+		}
+		for (int j = 0; j < oldVals.length; j++) {
+			vals[i + j] = oldVals[j];
+		}
+		outlet(OUT_LIST, vals);
 	}
 
-	public void direction() {
-		increment *= -1;
+	public void repeat() {
+		append(vals);
 	}
+
+	public void repeat(int n) {
+		if (n > 0) {
+			int[] newVals = new int[n * vals.length];
+			for (int i = 0; i < newVals.length; i++) {
+				newVals[i] = vals[i % vals.length];
+			}
+			append(newVals);
+		}
+	}
+
+	// TODO: insert (list), delete (index or range)
+
+	/*******************************************************************************************************************
+	 * List Manipulation Functions
+	 ******************************************************************************************************************/
 
 	public void reverse() {
 		reverseVals(0, vals.length - 1);
@@ -112,15 +154,7 @@ public class numseq extends MaxObject {
 	}
 
 	public void rotate(int n) {
-		/*
-		 * while (n < 0) n += vals.length; while (n >= vals.length) n -= vals.length;
-		 * 
-		 * if (n != 0) { // This is not the fastest rotate algorithm, but it is the easiest to understand reverseVals(0,
-		 * n - 1); reverseVals(n, vals.length - 1); reverseVals(0, vals.length - 1); }
-		 * 
-		 * outlet(OUT_LIST, vals);
-		 */
-		rotate(0, 0, vals.length);
+		rotate(n, 0, vals.length - 1);
 	}
 
 	public void rotate(int n, int left, int right) {
@@ -129,38 +163,87 @@ public class numseq extends MaxObject {
 			left = right;
 			right = tmp;
 		}
-		int segmentLen = right - left;
+		if (left < 0)
+			left = 0;
+		if (right >= vals.length)
+			right = vals.length - 1;
 
+		int segmentLen = right - left;
+		n = left + n;
 		while (n < left)
 			n += segmentLen;
 		while (n >= right)
 			n -= segmentLen;
 
-		if (n != 0) {
+		if (n != left) {
 			// This is not the fastest rotate algorithm, but it is the easiest to understand
 			reverseVals(left, n - 1);
-			reverseVals(n, right - 1);
-			reverseVals(0, right - 1);
+			reverseVals(n, right);
+			reverseVals(left, right);
 		}
 
 		outlet(OUT_LIST, vals);
 	}
 
 	public void add(int n) {
-		for (int i = 0; i < vals.length; i++) {
+		add(n, 0, vals.length - 1);
+	}
+
+	public void add(int n, int left, int right) {
+		if (left > right) {
+			int tmp = left;
+			left = right;
+			right = tmp;
+		}
+		if (left < 0)
+			left = 0;
+		if (right >= vals.length)
+			right = vals.length - 1;
+
+		for (int i = left; i <= right; i++) {
 			vals[i] += n;
 		}
 		outlet(OUT_LIST, vals);
 	}
 
 	public void multiply(int n) {
-		for (int i = 0; i < vals.length; i++) {
+		multiply(n, 0, vals.length - 1);
+	}
+
+	public void multiply(int n, int left, int right) {
+		if (left > right) {
+			int tmp = left;
+			left = right;
+			right = tmp;
+		}
+		if (left < 0)
+			left = 0;
+		if (right >= vals.length)
+			right = vals.length - 1;
+
+		for (int i = left; i <= right; i++) {
 			vals[i] += n;
 		}
 		outlet(OUT_LIST, vals);
 	}
 
 	// todo: arbitrary expression? can I eval javascript?
+
+	/*******************************************************************************************************************
+	 * Value Access ("Iteration") Functions
+	 ******************************************************************************************************************/
+
+	public void bang() {
+		output();
+	}
+
+	public void increment(int n) {
+		increment = n;
+	}
+
+	public void direction() {
+		increment *= -1;
+	}
 
 	public void advance(int n) {
 		setIndex(index + n);

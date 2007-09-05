@@ -1,6 +1,8 @@
 package ajm;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -17,32 +19,60 @@ public class seqTest extends TestCase {
 
 		// Sending outlet will not work inside jUnit tests:
 		@Override
-		protected void output(OUTLET outlet, Atom data) {}
+		protected void output(OUTLET outlet, Atom data) {
+			outputData.put(outlet, data);
+		}
 
 		@Override
-		protected void output(OUTLET outlet, Atom[] data) {}
+		protected void output(OUTLET outlet, Atom[] data) {
+			outputData.put(outlet, data);
+		}
 
 		@Override
-		protected void output(OUTLET outlet, int data) {}
+		protected void output(OUTLET outlet, int data) {
+			outputData.put(outlet, data);
+		}
+
+		public Map<OUTLET, Object> outputData = new HashMap<OUTLET, Object>();
+
+		public String getLastStringValue() {
+			return ((Atom) outputData.get(OUTLET.CURRENT_VAL)).toString();
+		}
 	}
 
 
-	protected seq makeSeq(String... vals) {
-		seq s = new seqStub(Atom.emptyArray);
+	protected seqStub makeSeq(String... vals) {
+		seqStub s = new seqStub(Atom.emptyArray);
 		s.set(Atom.newAtom(vals));
 		return s;
 	}
 
+	protected seqStub makeSeq(int... vals) {
+		seqStub s = new seqStub(Atom.emptyArray);
+		s.set(Atom.newAtom(vals));
+		return s;
+	}
 
-	protected seq makeSeq() {
-		return makeSeq("A", "B", "C", "D", "E");
+	public String[] DEFAULT_VALS = new String[] { "A", "B", "C", "D", "E" };
+
+	protected seqStub makeSeq() {
+		return makeSeq(DEFAULT_VALS);
 	}
 
 
-	protected seq emptySeq() {
+	protected seqStub emptySeq() {
 		return makeSeq(new String[] {});
 	}
 
+	public void testBasicIteration() {
+		seqStub s = makeSeq();
+		for (String val : DEFAULT_VALS) {
+			s.bang();
+			assertEquals(val, s.getLastStringValue());
+		}
+		s.bang();
+		assertEquals(DEFAULT_VALS[0], s.getLastStringValue());
+	}
 
 	public void testReverse() throws Exception {
 		seq s = makeSeq();
@@ -101,5 +131,22 @@ public class seqTest extends TestCase {
 		s.reverse();
 		s.sort();
 		assertEquals(makeSeq(), s);
+	}
+
+	// It was possible to get an IndexOutOfBoundsException
+	public void testShortenList() throws Exception {
+		seq s = makeSeq(1, 2);
+		s.increment = 0;
+		s.next();
+		s.values(Atom.newAtom(new int[] { 1 }));
+		s.output();
+	}
+
+	public void testAttributeOrder() throws Exception {
+		seq s = emptySeq();
+		s.index(2);
+		assertEquals(2, s.getindex());
+		s.values(Atom.newAtom(new int[] { 1, 2, 3 }));
+		assertEquals(2, s.getindex());
 	}
 }

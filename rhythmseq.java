@@ -4,14 +4,20 @@ import com.cycling74.max.Atom;
 
 public class rhythmseq extends intseq {
 
-	protected int count = 0;
+	// TODO: figure out how to unit test this stuff
 
-	// protected boolean countChanged = false;
+	protected int count = 0;
+	protected int duration = 0;
+	protected int tick = 0;
+	protected boolean countChanged = false;
 
 	public rhythmseq(Atom[] args) {
 		super(args);
+		declareIO(1, 5);
+		setOutletAssist(new String[] { "value", "index", "iteration", "list", "tick" });
 	}
 
+	@Override
 	public void set(Atom[] list) {
 		boolean allZeros = true;
 		for (int i = 0; i < list.length; i++) {
@@ -35,31 +41,40 @@ public class rhythmseq extends intseq {
 				autoIncrement = true;
 			}
 
-			/*
-			 * if (countChanged) { output(); } else {
-			 */
+			output(OUTLET.TICK, tick);
+			tick++;
 
-			count--;
-			if (count <= 0) {
-				setIndex(index + increment);
+			if (count == 0) {
 				output();
-				if (count == 0) {
+			}
+			count++;
+			if (count >= duration) {
+				setIndex(index + increment);
+				if (duration == 0) {
 					bang(); // infinite loops prevented by setVals()
 				}
 			}
 		}
 	}
 
+	@Override
 	protected void setIndex(int idx) {
 		if (values.size() > 0) {
 			super.setIndex(idx);
-			count = Math.abs(values.get(index).toInt());
-			// countChanged = true;
-			// I'm not sure this count changed system is really approparite
-			// how should it work with advance, etc? Should those bang right away
-			// or on the next incoming bang?
-			// The way I adjusted things with advance and index(), it won't even bang
-			// at all until the next count is reached. I think this is good.
+			duration = Math.abs(values.get(index).toInt());
+			count = 0;
+			if (wrap) {
+				tick = 0;
+			}
 		}
 	}
+
+	@Override
+	public void reset() {
+		count = 0;
+		tick = 0;
+		super.reset();
+	}
+
+
 }

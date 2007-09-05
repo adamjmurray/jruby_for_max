@@ -2,6 +2,11 @@ package ajm;
 
 import com.cycling74.max.Atom;
 
+/**
+ * 
+ * @author adam
+ * @nodoc
+ */
 public abstract class numericseq extends seq {
 
 	public numericseq(Atom[] args) {

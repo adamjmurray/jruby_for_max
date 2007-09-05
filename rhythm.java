@@ -2,6 +2,11 @@ package ajm;
 
 import com.cycling74.max.Atom;
 
+/**
+ * 
+ * @deprecated - TODO: convert existing GUI objects and patches
+ * 
+ */
 public class rhythm extends numseq {
 
 	protected int count = 0;
@@ -37,7 +42,8 @@ public class rhythm extends numseq {
 
 		if (countChanged) {
 			output();
-		} else {
+		}
+		else {
 			count--;
 			if (count <= 0) {
 				setIndex(index + increment);

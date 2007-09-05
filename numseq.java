@@ -5,6 +5,11 @@ import java.util.LinkedList;
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 
+/**
+ * 
+ * @deprecated - TODO convert existing GUI objects and patches
+ * 
+ */
 public class numseq extends MaxObject {
 	protected int[] vals = new int[] { 1 };
 	protected int index = 0;
@@ -261,9 +266,11 @@ public class numseq extends MaxObject {
 		if ("goto".equals(msg)) {
 			if (args.length > 0 && args[0].isInt()) {
 				setIndex(args[0].getInt());
-			} else
+			}
+			else
 				post("invalid arguments for goto");
-		} else
+		}
+		else
 			post("doesn't understand " + msg);
 	}
 

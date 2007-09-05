@@ -52,7 +52,7 @@ import com.cycling74.max.MaxObject;
 public class seq extends MaxObject {
 
 	/**
-	 * ajm.seq suppots the following attributes:
+	 * ajm.seq does not take any arguments; the following attributes are supported:
 	 * <ul>
 	 * <li>{@link #values values}</li>
 	 * <li>{@link #index index}</li>
@@ -60,7 +60,7 @@ public class seq extends MaxObject {
 	 * <li>{@link #increment increment}</li>
 	 * </ul>
 	 * 
-	 * ajm.seq does not take any arguments.
+	 * 
 	 */
 	public seq(Atom[] args) {
 		declareIO(1, 4);
@@ -71,6 +71,9 @@ public class seq extends MaxObject {
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("iteration");
 		declareAttribute("increment");
+
+		defaultIndex = Atom.newAtom(getAttr("index").toString()).toInt();
+		defaultIteration = Atom.newAtom(getAttr("iteration").toString()).toInt();
 	}
 
 	/**
@@ -96,21 +99,47 @@ public class seq extends MaxObject {
 	 * <dt><code>index <i>int</i></code></dt>
 	 * <dd>set the current index.</dd>
 	 * <dt>{@code getvalues}</dt>
-	 * <dd>send the current list of symbols out the rightmost outlet.</dd>
+	 * <dd>send the current index out the rightmost outlet.</dd>
 	 * </dl>
 	 * 
 	 * @attribute
 	 */
 	protected int index = 0;
+
+	/**
+	 * The current iteration. Supports attribute messages:
+	 * <dl>
+	 * <dt><code>iteration <i>int</i></code></dt>
+	 * <dd>set the current iteration.</dd>
+	 * <dt>{@code getiteration}</dt>
+	 * <dd>send the current iteration out the rightmost outlet.</dd>
+	 * </dl>
+	 * 
+	 * @attribute
+	 */
 	protected int iteration = 0;
+
+	/**
+	 * The increment. Supports attribute messages:
+	 * <dl>
+	 * <dt><code>increment <i>int</i></code></dt>
+	 * <dd>set the increment.</dd>
+	 * <dt>{@code getiteration}</dt>
+	 * <dd>send the increment out the rightmost outlet.</dd>
+	 * </dl>
+	 * 
+	 * @attribute
+	 */
 	protected int increment = 1;
 
 	// Other internal state:
 	protected boolean wrap = true;
 	protected boolean autoIncrement = false;
+	protected int defaultIndex = 0;
+	protected int defaultIteration = 0;
 
 	protected enum OUTLET {
-		CURRENT_VAL(0), INDEX(1), ITERATION(2), VALUES(3);
+		CURRENT_VAL(0), INDEX(1), ITERATION(2), VALUES(3), TICK(4);
 
 		private final int outletNumber;
 
@@ -134,16 +163,18 @@ public class seq extends MaxObject {
 	}
 
 	/**
+	 * Sets the list of symbols without triggering output or resetting the index.
+	 * 
 	 * @see #values
 	 * @param list
-	 * @nodoc
 	 */
 	public void values(Atom[] list) {
-		set(list);
+		values.clear();
+		Collections.addAll(values, list);
 	}
 
 	/**
-	 * Sets the list of symbols without triggering output. Identical to {@link #values <code>values <i>list</i></code>}.
+	 * Sets the list of symbols without triggering output.
 	 * 
 	 * @param list
 	 * @see #values
@@ -487,25 +518,12 @@ public class seq extends MaxObject {
 	}
 
 	protected void setIndex(int index) {
-		int len = values.size();
-		if (len == 0) {
-			this.index = 0;
-		}
-		else {
-			while (index >= len) {
-				wrap = true;
-				iteration++;
-				index -= len;
-			}
-			while (index < 0) {
-				wrap = true;
-				iteration--;
-				index += len;
-			}
-			this.index = index;
+		this.index = index;
+		if (!values.isEmpty()) {
+			// this check is needed so that attribute order won't matter
+			fixIndexBounds();
 		}
 	}
-
 
 	public void bang() {
 		/* Although it would be much easier to not keep track of autoIncrement, and
@@ -523,6 +541,20 @@ public class seq extends MaxObject {
 		}
 	}
 
+	private void fixIndexBounds() {
+		int size = values.size();
+		while (index >= size) {
+			wrap = true;
+			iteration++;
+			index -= size;
+		}
+		while (index < 0) {
+			wrap = true;
+			iteration--;
+			index += size;
+		}
+	}
+
 	/**
 	 * Send the current value out the first outlet, the current index out the second outlet, and if a wrap-around has
 	 * occurred since the last output (including those triggered by bangs) then send the current iteration out the third
@@ -530,6 +562,7 @@ public class seq extends MaxObject {
 	 */
 	public void output() {
 		if (!values.isEmpty()) {
+			fixIndexBounds();
 			if (wrap) {
 				wrap = false;
 				output(OUTLET.ITERATION, iteration);
@@ -577,9 +610,9 @@ public class seq extends MaxObject {
 
 
 	public void reset() {
-		// TODO! reset should reset to the passed in attributes if any (use getAttr in constructor?)
-		index = 0;
-		iteration = 0;
+		// todo: test!
+		index = defaultIndex;
+		iteration = defaultIteration;
 		wrap = true;
 		autoIncrement = false;
 	}

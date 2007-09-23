@@ -7,14 +7,19 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.MaxQelem;
 
 public class seqTest extends TestCase {
 
+	private boolean DEBUG = false;
 	private PrintStream out = System.out;
 
 	protected class seqStub extends seq {
 		public seqStub(Atom[] args) {
 			super(args);
+			if (DEBUG) {
+				setDebugOut(out);
+			}
 		}
 
 		// Sending outlet will not work inside jUnit tests:
@@ -37,6 +42,10 @@ public class seqTest extends TestCase {
 
 		public String getLastStringValue() {
 			return ((Atom) outputData.get(OUTLET.CURRENT_VAL)).toString();
+		}
+
+		protected MaxQelem getOutputValuesOnInit() {
+			return null;
 		}
 	}
 
@@ -94,34 +103,47 @@ public class seqTest extends TestCase {
 		seq s = makeSeq();
 		s.delete(0);
 		assertEquals(makeSeq("B", "C", "D", "E"), s);
-		s.delete(new int[] { 1, 2 });
-		assertEquals(makeSeq("B", "E"), s);
+		s.delete(-1);
+		assertEquals(makeSeq("B", "C", "D", "E"), s);
+		s.delete(5);
+		assertEquals(makeSeq("B", "C", "D", "E"), s);
+		s.delete(new int[] { 1, 3 });
+		assertEquals(makeSeq("B", "D"), s);
+		s.delete(new int[] { 0, 1, 2, -1 });
+		assertEquals(emptySeq(), s);
+		s.delete(0);
+		s.delete(new int[] { 1, 2, 3 });
+		assertEquals(emptySeq(), s);
 	}
 
 
-	public void testDelrange() throws Exception {
+	public void testDeleteRange() throws Exception {
 		seq s = makeSeq();
-		s.delrange(1, 3);
+		s.deleterange(1, 3);
 		assertEquals(makeSeq("A", "E"), s);
 
 		s = makeSeq();
-		s.delrange(3, 1);
+		s.deleterange(3, 1);
 		assertEquals(makeSeq("A", "E"), s);
 
 		s = makeSeq();
-		s.delrange(10, 1);
+		s.deleterange(10, 1);
 		assertEquals(makeSeq("A"), s);
 
 		s = makeSeq();
-		s.delrange(-1, 3);
+		s.deleterange(-1, 3);
 		assertEquals(makeSeq("E"), s);
 
 		s = makeSeq();
-		s.delrange(-1, -5);
+		s.deleterange(-1, -5);
 		assertEquals(makeSeq(), s);
 
 		s = makeSeq();
-		s.delrange(10, -5);
+		s.deleterange(10, -5);
+		assertEquals(emptySeq(), s);
+
+		s = emptySeq();
+		s.deleterange(0, 1);
 		assertEquals(emptySeq(), s);
 	}
 
@@ -143,10 +165,77 @@ public class seqTest extends TestCase {
 	}
 
 	public void testAttributeOrder() throws Exception {
-		seq s = emptySeq();
+		seqStub s = emptySeq();
 		s.index(2);
-		assertEquals(2, s.getindex());
-		s.values(Atom.newAtom(new int[] { 1, 2, 3 }));
-		assertEquals(2, s.getindex());
+		// assertEquals(2, s.getindex());
+		s.values(Atom.newAtom(new String[] { "A", "B", "C" }));
+		// assertEquals(2, s.getindex());
+		s.bang();
+		assertEquals("C", s.getLastStringValue());
 	}
+
+	public void testRotate() throws Exception {
+		seq s = makeSeq();
+		s.rotate(1);
+		assertEquals(makeSeq("B", "C", "D", "E", "A"), s);
+		s.rotate(2);
+		assertEquals(makeSeq("D", "E", "A", "B", "C"), s);
+		s.rotate(5);
+		assertEquals(makeSeq("D", "E", "A", "B", "C"), s);
+		s.rotate(6);
+		assertEquals(makeSeq("E", "A", "B", "C", "D"), s);
+		s.rotate(4);
+		assertEquals(makeSeq("D", "E", "A", "B", "C"), s);
+		s.rotate(1);
+		s.rotate(-1);
+		assertEquals(makeSeq("D", "E", "A", "B", "C"), s);
+		s.rotate(-5);
+		assertEquals(makeSeq("D", "E", "A", "B", "C"), s);
+		s.rotate(-7);
+		assertEquals(makeSeq("B", "C", "D", "E", "A"), s);
+
+		s = emptySeq();
+		s.rotate(1);
+		assertEquals(emptySeq(), s);
+	}
+
+	public void testDeleteCurrent() {
+		seq s = makeSeq();
+		s.index = 2;
+		s.deletecurrent();
+		assertEquals(makeSeq("A", "B", "D", "E"), s);
+
+		s = emptySeq();
+		s.deletecurrent();
+	}
+
+	public void testSetIndex() {
+		seqStub s = makeSeq();
+		s.bang();
+		assertEquals("A", s.getLastStringValue());
+		s.index(0);
+		s.bang();
+		assertEquals("A", s.getLastStringValue());
+		s.bang();
+		assertEquals("B", s.getLastStringValue());
+		s.index(0);
+		s.index(4);
+		s.bang();
+		assertEquals("E", s.getLastStringValue());
+		s.bang();
+		assertEquals("A", s.getLastStringValue());
+		s.index(5);
+		s.bang();
+		assertEquals("A", s.getLastStringValue());
+		s.index(-1);
+		s.bang();
+		assertEquals("E", s.getLastStringValue());
+	}
+
+	public void testInsertNumberAndMaintainIndex() {
+	// what is the correct behavior in different situations?
+	// setting a new list vs
+
+	}
+
 }

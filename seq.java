@@ -1,5 +1,6 @@
 package ajm;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,7 +8,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
 import com.cycling74.max.MaxObject;
+import com.cycling74.max.MaxQelem;
 
 /**
  * <p>
@@ -74,7 +77,35 @@ public class seq extends MaxObject {
 
 		defaultIndex = Atom.newAtom(getAttr("index").toString()).toInt();
 		defaultIteration = Atom.newAtom(getAttr("iteration").toString()).toInt();
+
+		if (outputValuesOnInit != null) {
+			outputValuesOnInit.set();
+		}
 	}
+
+	private MaxQelem outputValuesOnInit = getOutputValuesOnInit();
+
+	protected MaxQelem getOutputValuesOnInit() {
+		// This is done this round about way so we can override this method and avoid an UnsatisfiedLinkError
+		// in the jUnit tests.
+		return new MaxQelem(new Executable() {
+			// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
+			// May need a Thread.sleep() or MaxClock if patches get too big and this doesn't initialize correctly
+			// but note using too long of a Thread.sleep() will make Max temporarily hang when opening a patch where
+			// many instances of this class are instantiated.
+			public void execute() {
+				if (!values.isEmpty()) {
+					outputVals();
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void notifyDeleted() {
+		outputValuesOnInit.release();
+	}
+
 
 	/**
 	 * The list of values stored by this sequence. Supports attribute messages:
@@ -106,6 +137,7 @@ public class seq extends MaxObject {
 	 */
 	protected int index = 0;
 
+
 	/**
 	 * The current iteration. Supports attribute messages:
 	 * <dl>
@@ -134,7 +166,7 @@ public class seq extends MaxObject {
 
 	// Other internal state:
 	protected boolean wrap = true;
-	protected boolean autoIncrement = false;
+	// protected boolean autoIncrement = false;
 	protected int defaultIndex = 0;
 	protected int defaultIteration = 0;
 
@@ -169,8 +201,7 @@ public class seq extends MaxObject {
 	 * @param list
 	 */
 	public void values(Atom[] list) {
-		values.clear();
-		Collections.addAll(values, list);
+		list(list);
 	}
 
 	/**
@@ -205,6 +236,42 @@ public class seq extends MaxObject {
 	}
 
 
+	/**
+	 * TODO: update this text Set the length of the sequence. If the sequence is currently shorter than the requested
+	 * length, it will be padded with 0s. If it is longer, it will be truncated.
+	 * 
+	 * @param length -
+	 *            the new length of the sequence.
+	 */
+	public void len(Atom[] args) {
+		if (args.length > 0) {
+			int length = args[0].getInt();
+			if (length <= 0) {
+				values.clear();
+			}
+			else {
+				if (values.size() > length) {
+					while (values.size() > length) {
+						values.remove(values.size() - 1);
+					}
+				}
+				else {
+					Atom pad;
+					if (args.length > 1) {
+						pad = args[1];
+					}
+					else {
+						pad = Atom.newAtom(0);
+					}
+					while (values.size() < length) {
+						values.add(pad);
+					}
+				}
+				outputVals();
+			}
+		}
+	}
+
 	public void append(Atom[] newVals) {
 		values.addAll(Arrays.asList(newVals));
 		outputVals();
@@ -219,7 +286,7 @@ public class seq extends MaxObject {
 
 	public void insert(Atom[] args) {
 		if (args.length < 2) {
-			error("invalid call to insert, expected: insert position vals");
+			error("invalid call to insert, expected: insert position value1 ...");
 		}
 		else {
 			try {
@@ -228,7 +295,7 @@ public class seq extends MaxObject {
 				insert(position, Atom.removeFirst(args));
 			}
 			catch (NumberFormatException e) {
-				error("invalid call to insert, position argument was not a number (expcected: insert position vals)");
+				error("invalid call to insert, position argument was not a number (expcected: insert position value1 ...)");
 			}
 		}
 		outputVals();
@@ -243,17 +310,21 @@ public class seq extends MaxObject {
 
 
 	public void repeat() {
-		values.addAll(values);
-		outputVals();
+		if (!values.isEmpty()) {
+			values.addAll(values);
+			outputVals();
+		}
 	}
 
 
 	public void repeat(int n) {
-		List<Atom> currVals = new ArrayList<Atom>(values);
-		for (int i = 0; i < n; i++) {
-			values.addAll(currVals);
+		if (!values.isEmpty()) {
+			List<Atom> currVals = new ArrayList<Atom>(values);
+			for (int i = 0; i < n; i++) {
+				values.addAll(currVals);
+			}
+			outputVals();
 		}
-		outputVals();
 	}
 
 
@@ -264,18 +335,25 @@ public class seq extends MaxObject {
 	// probably need a boolean to keep track of this undefined state
 	// and let the list traversal methods (advance, goto, etc) handle it
 	public void delete(int index) {
-		values.remove(index);
-		outputVals();
+		if (index >= 0 && index < values.size()) {
+			values.remove(index);
+			outputVals();
+		}
 	}
 
 
 	public void delete(int[] indices) {
-		Arrays.sort(indices);
-		// delete in reverse order so any index shifting that occurs doesn't affect things
-		for (int i = indices.length - 1; i >= 0; i--) {
-			values.remove(indices[i]);
+		if (!values.isEmpty()) {
+			Arrays.sort(indices);
+			// delete in reverse order so any index shifting that occurs doesn't affect the result
+			for (int i = indices.length - 1; i >= 0; i--) {
+				int index = indices[i];
+				if (index >= 0 && index < values.size()) {
+					values.remove(index);
+				}
+			}
+			outputVals();
 		}
-		outputVals();
 	}
 
 	public void clear() {
@@ -308,49 +386,53 @@ public class seq extends MaxObject {
 	}
 
 
-	// TODO: all my methods use inclusive ranges... is that too confusing?
-	public void delrange(int left, int right) {
-		int[] lr = fixBounds(left, right);
-		left = lr[0];
-		right = lr[1];
+	public void deleterange(int left, int right) {
+		if (!values.isEmpty()) {
+			int[] lr = fixBounds(left, right);
+			left = lr[0];
+			right = lr[1];
 
-		ArrayList<Atom> newVals = new ArrayList<Atom>(values.size() - (right - left + 1));
-		for (int i = 0; i < left; i++) {
-			newVals.add(values.get(i));
+			ArrayList<Atom> newVals = new ArrayList<Atom>(values.size() - (right - left + 1));
+			for (int i = 0; i < left; i++) {
+				newVals.add(values.get(i));
+			}
+			for (int i = right + 1; i < values.size(); i++) {
+				newVals.add(values.get(i));
+			}
+			values = newVals;
+			outputVals();
 		}
-		for (int i = right + 1; i < values.size(); i++) {
-			newVals.add(values.get(i));
-		}
-		values = newVals;
-		outputVals();
 	}
 
 
-	public void delfirst() {
+	public void deletefirst() {
 		delete(0);
 	}
 
 
-	public void delfirst(int n) {
+	public void deletefirst(int n) {
 		if (n > 0) {
-			delrange(0, n - 1);
+			deleterange(0, n - 1);
 		}
 	}
 
 
-	public void dellast() {
+	public void deletelast() {
+		if (values.size() == 0) {
+			return;
+		}
 		delete(values.size() - 1);
 	}
 
 
-	public void dellast(int n) {
-		if (n > 0) {
-			delrange(values.size() - n, values.size() - 1);
+	public void deletelast(int n) {
+		if (n > 0 && n <= values.size()) {
+			deleterange(values.size() - n, values.size() - 1);
 		}
 	}
 
 
-	public void delcurr() {
+	public void deletecurrent() {
 		delete(index);
 	}
 
@@ -369,6 +451,9 @@ public class seq extends MaxObject {
 
 
 	public void sortrange(int left, int right) {
+		if (values.size() == 0) {
+			return;
+		}
 		int[] lr = fixBounds(left, right);
 		left = lr[0];
 		right = lr[1];
@@ -426,6 +511,9 @@ public class seq extends MaxObject {
 	 * @param idx2
 	 */
 	public void revrange(int idx1, int idx2) {
+		if (values.size() == 0) {
+			return;
+		}
 		int[] lr = fixBounds(idx1, idx2);
 		reverseVals(lr[0], lr[1]);
 		outputVals();
@@ -433,8 +521,6 @@ public class seq extends MaxObject {
 
 
 	protected void reverseVals(int left, int right) {
-
-
 		while (left < right) {
 			Atom temp = values.get(left);
 			values.set(left, values.get(right));
@@ -446,30 +532,27 @@ public class seq extends MaxObject {
 
 
 	public void rotate(int n) {
-		rotate(n, 0, values.size() - 1);
+		rotaterange(n, 0, values.size() - 1);
 	}
 
 
-	public void rotate(int n, int left, int right) {
-		if (left > right) {
-			int tmp = left;
-			left = right;
-			right = tmp;
+	public void rotaterange(int n, int left, int right) {
+		if (values.size() == 0) {
+			return;
 		}
-		if (left < 0)
-			left = 0;
-		if (right >= values.size())
-			right = values.size() - 1;
+		int[] lr = fixBounds(left, right);
+		left = lr[0];
+		right = lr[1];
 
-		int segmentLen = right - left;
+		int segmentLen = right - left + 1;
 		n = left + n;
 		while (n < left)
 			n += segmentLen;
-		while (n >= right)
+		while (n > right)
 			n -= segmentLen;
 
 		if (n != left) {
-			// This is not the fastest rotate algorithm, but it is the easiest to understand
+			// This is not the fastest rotate algorithm, but it is the easiest
 			reverseVals(left, n - 1);
 			reverseVals(n, right);
 			reverseVals(left, right);
@@ -513,35 +596,27 @@ public class seq extends MaxObject {
 	}
 
 	public void index(int index) {
-		autoIncrement = false;
-		setIndex(index);
-	}
-
-	protected void setIndex(int index) {
 		this.index = index;
+		/*
 		if (!values.isEmpty()) {
 			// this check is needed so that attribute order won't matter
 			fixIndexBounds();
-		}
+		}*/
 	}
+
+	/*
+	protected void initIndex() {
+		fixIndexBounds();
+	}*/
 
 	public void bang() {
-		/* Although it would be much easier to not keep track of autoIncrement, and
-		   just output() then increment, that would lead to misleading results when querying
-		   for the current value, current index, and current interation 
-		   (it'll be the next value, not the current one). */
 		if (!values.isEmpty()) {
-			if (autoIncrement) {
-				setIndex(index + increment);
-			}
-			else {
-				autoIncrement = true;
-			}
 			output();
+			index += increment;
 		}
 	}
 
-	private void fixIndexBounds() {
+	protected void fixIndexBounds() {
 		int size = values.size();
 		while (index >= size) {
 			wrap = true;
@@ -614,7 +689,7 @@ public class seq extends MaxObject {
 		index = defaultIndex;
 		iteration = defaultIteration;
 		wrap = true;
-		autoIncrement = false;
+		// autoIncrement = false;
 	}
 
 
@@ -630,6 +705,19 @@ public class seq extends MaxObject {
 
 	public String toString() {
 		return getClass().getName() + values;
+	}
+
+	// for use with debugging unit tests, must be set from the test after instanatiation
+	private PrintStream debugOut;
+
+	protected void debug(String msg) {
+		if (debugOut != null) {
+			debugOut.println(msg);
+		}
+	}
+
+	protected void setDebugOut(PrintStream debugOut) {
+		this.debugOut = debugOut;
 	}
 
 }

@@ -3,6 +3,7 @@ package ajm;
 import junit.framework.TestCase;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.MaxQelem;
 
 public class intseqTest extends TestCase {
 
@@ -20,6 +21,10 @@ public class intseqTest extends TestCase {
 
 		@Override
 		protected void output(OUTLET outlet, int data) {}
+
+		protected MaxQelem getOutputValuesOnInit() {
+			return null;
+		}
 	}
 
 	protected intseq makeSeq(String... vals) {

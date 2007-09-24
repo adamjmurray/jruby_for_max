@@ -141,6 +141,23 @@ public class seqparserTest extends TestCase {
 		assertEquals("SECTION<\"1 2\",\"3 4\">", root.toString());
 	}
 
+	public void testBracketedSymbols() {
+		Parser p = parse("1", "[2", "3]");
+		Node root = p.getRoot();
+
+		assertEquals(1, root.getChildren().size());
+		assertEquals(2, root.getChildren().get(0).getChildren().size());
+		assertEquals("SECTION<1,\"2 3\">", root.toString());
+	}
+
+	public void testDegenerateBrackets() {
+		Parser p = parse("[1]");
+		Node root = p.getRoot();
+
+		assertEquals(1, root.getChildren().size());
+		assertEquals(1, root.getChildren().get(0).getChildren().size());
+		assertEquals("SECTION<1>", root.toString());
+	}
 
 	public void testNoNextSectionInRepeat() {
 		try {

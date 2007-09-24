@@ -29,13 +29,15 @@ public class seqparser extends MaxObject {
 	protected static class Parser {
 
 		enum TOKEN {
-			REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, REPEAT_COUNT, NEXT_SECTION, DATA
+			REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, REPEAT_COUNT, BEGIN_CHORD, END_CHORD, NEXT_SECTION, DATA
 		}
 
 		private Node root;
 		private Node previousRepeat;
 		private TOKEN previous;
 		private Node currentParent;
+		private StringBuilder data = new StringBuilder();
+
 
 		public Parser(Atom[] list) {
 			this(null, list);
@@ -55,17 +57,40 @@ public class seqparser extends MaxObject {
 			}
 		}
 
+		// TODO: this might be a whole lot easier if I require tosymbol before the input
 		private void parse(String text) {
 			// post("tokenizing: " + text);
-			StringBuilder data = new StringBuilder();
 			char[] chars = text.toCharArray();
 
 			boolean needsQuotes = false;
 
+			if (previous == TOKEN.BEGIN_CHORD && data.length() > 0) {
+				data.append(" ");
+				needsQuotes = true;
+			}
+
 			for (int i = 0; i < chars.length; i++) {
 				char c = chars[i];
 				switch (c) {
+					case '[':
+						flush(data, needsQuotes);
+						previous = TOKEN.BEGIN_CHORD;
+						break;
+
+					case ']':
+						// todo: state transitions data structure I can just ask (is this new state valid?)
+						if (previous != TOKEN.BEGIN_CHORD) {
+							throw new IllegalStateException("Invalid syntax: ] with no matching [");
+						}
+						previous = TOKEN.END_CHORD;
+						flush(data, needsQuotes);
+						break;
+
 					case '(':
+						if (previous == TOKEN.BEGIN_CHORD) {
+							throw new IllegalStateException("error: expected ] before other symbols");
+						}
+
 						flush(data, needsQuotes);
 						Node repeat = Node.newRepeat();
 						currentParent.addChild(repeat);
@@ -74,6 +99,10 @@ public class seqparser extends MaxObject {
 						break;
 
 					case ')':
+						if (previous == TOKEN.BEGIN_CHORD) {
+							throw new IllegalStateException("error: expected ] before other symbols");
+						}
+
 						flush(data, needsQuotes);
 						previousRepeat = currentParent;
 						currentParent = currentParent.getParent();
@@ -81,6 +110,9 @@ public class seqparser extends MaxObject {
 						break;
 
 					case '*':
+						if (previous == TOKEN.BEGIN_CHORD) {
+							throw new IllegalStateException("error: expected ] before other symbols");
+						}
 						if (previous == TOKEN.REPEAT_END) {
 							previous = TOKEN.REPEAT_STAR;
 						}
@@ -91,11 +123,15 @@ public class seqparser extends MaxObject {
 						break;
 
 					case '>':
-						flush(data, needsQuotes);
+						if (previous == TOKEN.BEGIN_CHORD) {
+							throw new IllegalStateException("error: expected ] before other symbols");
+						}
 						if (currentParent.type == Node.TYPE.REPEAT) {
 							throw new IllegalStateException(
-									"Illegal syntax: > cannot be used inside a repeated section (between parentheses)");
+									"error: > cannot be used inside a repeated section (between parentheses)");
 						}
+						flush(data, needsQuotes);
+
 						Node section = Node.newSection();
 						currentParent.getParent().addChild(section);
 						currentParent = section;
@@ -112,7 +148,9 @@ public class seqparser extends MaxObject {
 				}
 			}
 
-			flush(data, needsQuotes);
+			if (previous != TOKEN.BEGIN_CHORD) {
+				flush(data, needsQuotes);
+			}
 		}
 
 		private void flush(StringBuilder data, boolean needsQuotes) {

@@ -707,7 +707,7 @@ public class seq extends MaxObject {
 		return getClass().getName() + values;
 	}
 
-	// for use with debugging unit tests, must be set from the test after instanatiation
+	// for use with debugging unit tests, must be set from the test after instantiation
 	private PrintStream debugOut;
 
 	protected void debug(String msg) {

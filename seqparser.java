@@ -1,333 +1,286 @@
 package ajm;
 
-import java.util.ArrayList;
-import java.util.List;
+import static ajm.seqparser.Parser.STATE.CHORD;
+import static ajm.seqparser.Parser.STATE.DEFAULT;
+import static ajm.seqparser.Parser.STATE.REPETITION;
+import static ajm.seqparser.Parser.Token.TYPE.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 
 public class seqparser extends MaxObject {
 
-	public void list(Atom[] list) {
-		Parser p = new Parser(list);
-		// post("Finished parsing: " + p.getRoot());
+	public seqparser() {
+		createInfoOutlet(false);
+	}
 
-		output(p.evaluate());
+	public void list(Atom[] list) {
+		anything(null, list);
 	}
 
 	public void anything(String msg, Atom[] args) {
-		Parser p = new Parser(msg, args);
-		// post("Finished parsing: " + p.getRoot());
-		output(p.evaluate());
+		// construct a single String from the input (makes parsing easier)
+		StringBuilder input = new StringBuilder();
+		if (msg != null) {
+			input.append(msg).append(" ");
+		}
+		for (int i = 0; i < args.length; i++) {
+			if (i > 0) {
+				input.append(" ");
+			}
+			input.append(args[i]);
+		}
+
+		output(new Parser(input).parse());
 	}
 
-	protected void output(List<String> data) {
-		outlet(0, Atom.newAtom(data.toArray(new String[data.size()])));
+	protected void output(String data) {
+		outlet(0, Atom.newAtom(data));
 	}
 
 
 	protected static class Parser {
 
-		enum TOKEN {
-			REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, REPEAT_COUNT, BEGIN_CHORD, END_CHORD, NEXT_SECTION, DATA
-		}
 
-		private Node root;
-		private Node previousRepeat;
-		private TOKEN previous;
-		private Node currentParent;
-		private StringBuilder data = new StringBuilder();
-
-
-		public Parser(Atom[] list) {
-			this(null, list);
-		}
-
-		public Parser(String msg, Atom[] args) {
-			root = Node.newRoot();
-			Node section = Node.newSection();
-			root.addChild(section);
-			currentParent = section;
-
-			if (msg != null) {
-				parse(msg);
-			}
-			for (Atom atom : args) {
-				parse(atom.toString());
-			}
-		}
-
-		// TODO: this might be a whole lot easier if I require tosymbol before the input
-		private void parse(String text) {
-			// post("tokenizing: " + text);
-			char[] chars = text.toCharArray();
-
-			boolean needsQuotes = false;
-
-			if (previous == TOKEN.BEGIN_CHORD && data.length() > 0) {
-				data.append(" ");
-				needsQuotes = true;
-			}
-
-			for (int i = 0; i < chars.length; i++) {
-				char c = chars[i];
-				switch (c) {
-					case '[':
-						flush(data, needsQuotes);
-						previous = TOKEN.BEGIN_CHORD;
-						break;
-
-					case ']':
-						// todo: state transitions data structure I can just ask (is this new state valid?)
-						if (previous != TOKEN.BEGIN_CHORD) {
-							throw new IllegalStateException("Invalid syntax: ] with no matching [");
-						}
-						previous = TOKEN.END_CHORD;
-						flush(data, needsQuotes);
-						break;
-
-					case '(':
-						if (previous == TOKEN.BEGIN_CHORD) {
-							throw new IllegalStateException("error: expected ] before other symbols");
-						}
-
-						flush(data, needsQuotes);
-						Node repeat = Node.newRepeat();
-						currentParent.addChild(repeat);
-						currentParent = repeat;
-						previous = TOKEN.REPEAT_BEGIN;
-						break;
-
-					case ')':
-						if (previous == TOKEN.BEGIN_CHORD) {
-							throw new IllegalStateException("error: expected ] before other symbols");
-						}
-
-						flush(data, needsQuotes);
-						previousRepeat = currentParent;
-						currentParent = currentParent.getParent();
-						previous = TOKEN.REPEAT_END;
-						break;
-
-					case '*':
-						if (previous == TOKEN.BEGIN_CHORD) {
-							throw new IllegalStateException("error: expected ] before other symbols");
-						}
-						if (previous == TOKEN.REPEAT_END) {
-							previous = TOKEN.REPEAT_STAR;
-						}
-						else {
-							// error?
-							data.append(c);
-						}
-						break;
-
-					case '>':
-						if (previous == TOKEN.BEGIN_CHORD) {
-							throw new IllegalStateException("error: expected ] before other symbols");
-						}
-						if (currentParent.type == Node.TYPE.REPEAT) {
-							throw new IllegalStateException(
-									"error: > cannot be used inside a repeated section (between parentheses)");
-						}
-						flush(data, needsQuotes);
-
-						Node section = Node.newSection();
-						currentParent.getParent().addChild(section);
-						currentParent = section;
-						previous = TOKEN.NEXT_SECTION;
-						break;
-
-					case ' ':
-						needsQuotes = true;
-						data.append(c);
-						break;
-
-					default:
-						data.append(c);
-				}
-			}
-
-			if (previous != TOKEN.BEGIN_CHORD) {
-				flush(data, needsQuotes);
-			}
-		}
-
-		private void flush(StringBuilder data, boolean needsQuotes) {
-			if (data.length() > 0) {
-				if (previous == TOKEN.REPEAT_STAR) {
-					previousRepeat.setValue(Integer.parseInt(data.toString()));
-					previous = TOKEN.REPEAT_COUNT;
-				}
-				else {
-					if (needsQuotes) {
-						data.insert(0, '"');
-						data.append('"');
-					}
-					currentParent.addChild(Node.newTerminal(data));
-					previous = TOKEN.DATA;
-				}
-				data.setLength(0);
-			}
-		}
-
-		protected Node getRoot() {
-			return root;
-		}
-
-		protected List<String> evaluate() {
-			List<String> result = new ArrayList<String>();
-			for (Node child : root.getChildren()) {
-				result.add(child.eval());
-			}
-			return result;
-		}
-
-		protected static class Node {
+		protected static class Token {
 
 			enum TYPE {
-				ROOT, SECTION, REPEAT, TERMINAL
-			};
+				REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, TEXT;
+			}
 
-			private final TYPE type;
-			private String data;
-			private int value;
-			private final List<Node> children;
-			private Node parent;
+			private TYPE type;
+			private String text;
 
-			private Node(TYPE type, String data, int value, List<Node> children) {
+			public Token(TYPE type) {
+				this(type, null);
+			}
+
+			public Token(TYPE type, String text) {
 				this.type = type;
-				this.data = data;
-				this.value = value;
-				this.children = children;
-			}
-
-			static Node newRoot() {
-				return new Node(TYPE.ROOT, null, -1, new ArrayList<Node>());
-			}
-
-			static Node newSection() {
-				return new Node(TYPE.SECTION, null, -1, new ArrayList<Node>());
-			}
-
-			static Node newTerminal(CharSequence data) {
-				return new Node(TYPE.TERMINAL, data.toString(), -1, null);
-			}
-
-			static Node newRepeat() {
-				return new Node(TYPE.REPEAT, null, 1, new ArrayList<Node>());
-			}
-
-			public String getData() {
-				return data;
-			}
-
-			public void setData(String data) {
-				this.data = data;
-			}
-
-			public int getValue() {
-				return value;
-			}
-
-			public void setValue(int value) {
-				this.value = value;
+				this.text = text;
 			}
 
 			public TYPE getType() {
 				return type;
 			}
 
-			public List<Node> getChildren() {
-				return children;
+			public String getText() {
+				return text;
 			}
 
-			public void addChild(Node n) {
-				children.add(n);
-				n.parent = this;
-			}
-
-			public Node getParent() {
-				return parent;
-			}
-
-			public String eval() {
-				switch (type) {
-					case ROOT:
-						throw new IllegalStateException("The root node cannot be evaluated");
-
-					case SECTION:
-						StringBuilder s = new StringBuilder();
-						for (int i = 0; i < children.size(); i++) {
-							if (i > 0) {
-								s.append(" ");
-							}
-							s.append(children.get(i).eval());
-						}
-						return s.toString();
-
-
-					case REPEAT:
-						s = new StringBuilder();
-						for (int i = 0; i < children.size(); i++) {
-							if (i > 0) {
-								s.append(" ");
-							}
-							s.append(children.get(i).eval());
-						}
-						String seq = s.toString();
-						for (int i = 1; i < value; i++) {
-							s.append(" ").append(seq); // expand the repitition
-						}
-						return s.toString();
-
-					default:
-						return data;
-				}
-			}
-
-
-			public String toString() {
-				StringBuilder s = new StringBuilder();
-				switch (type) {
-					case ROOT:
-						for (int i = 0; i < children.size(); i++) {
-							if (i > 0) {
-								s.append(",");
-							}
-							s.append(children.get(i).toString());
-						}
+			public int getValue() {
+				int val;
+				switch (Character.toUpperCase(text.charAt(0))) {
+					case 'C':
+						val = 0;
 						break;
 
-					case SECTION:
-						s.append("SECTION<");
-						for (int i = 0; i < children.size(); i++) {
-							if (i > 0) {
-								s.append(",");
-							}
-							s.append(children.get(i).toString());
-						}
-						s.append(">");
+					case 'D':
+						val = 2;
 						break;
 
-					case REPEAT:
-						s.append("REPEAT(");
-						for (int i = 0; i < children.size(); i++) {
-							if (i > 0) {
-								s.append(",");
-							}
-							s.append(children.get(i).toString());
-						}
-						s.append(")*").append(value);
+					case 'E':
+						val = 4;
+						break;
+
+					case 'F':
+						val = 5;
+						break;
+
+					case 'G':
+						val = 7;
+						break;
+
+					case 'A':
+						val = 9;
+						break;
+
+					case 'B':
+						val = 11;
 						break;
 
 					default:
-						s.append(data);
+						return Integer.parseInt(text);
 				}
-				return s.toString();
+
+				int i = 1;
+				loop: for (; i < text.length(); i++) {
+					switch (text.charAt(i)) {
+						case '#':
+							val++;
+							break;
+
+						case 'b':
+							val--;
+							break;
+
+						default:
+							break loop;
+					}
+				}
+
+				int octave = Integer.parseInt(text.substring(i));
+
+				val += (octave + 1) * 12;
+				return val;
 			}
 
 		}
-	}
 
+		enum STATE {
+			CHORD, REPETITION, DEFAULT;
+		}
+
+		private CharSequence input;
+		private int index = -1;
+		private boolean lookedAhead = false;
+		private Token token;
+		Stack<STATE> states = new Stack<STATE>();
+		private Stack<StringBuilder> scopes = new Stack<StringBuilder>();
+		private StringBuilder currentScope;
+
+		public Parser(CharSequence input) {
+			this.input = input;
+		}
+
+		protected String parse() {
+			currentScope = new StringBuilder();
+			states.push(DEFAULT);
+			nextToken();
+			do {
+				switch (token.getType()) {
+					case CHORD_BEGIN:
+						startScope(CHORD);
+						break;
+
+					case CHORD_END:
+						endScope(CHORD);
+						break;
+
+					case REPEAT_BEGIN:
+						startScope(REPETITION);
+						break;
+
+					case REPEAT_END:
+						endScope(REPETITION);
+						break;
+
+					case REPEAT_STAR:
+						throw new IllegalStateException("Unexpected '*' at character " + index);
+
+					case TEXT:
+						evalRepeat(token.getValue() + "");
+						break;
+
+					default:
+						throw new IllegalStateException("There is a bug in the parsing algorithm!");
+
+				}
+				if (!lookedAhead) {
+					nextToken();
+				}
+				else {
+					lookedAhead = false;
+				}
+
+			} while (token != null);
+
+			return currentScope.toString().trim();
+		}
+
+		private void startScope(STATE state) {
+			if (state == CHORD && states.contains(CHORD)) {
+				throw new IllegalStateException("nested chords '[' are not allowed, at character " + index);
+			}
+			states.push(state);
+			scopes.push(currentScope);
+			currentScope = new StringBuilder();
+		}
+
+		private void endScope(STATE state) {
+
+			if (states.pop() != state) {
+				throw new IllegalStateException("Unexpected end of " + state + " at character " + index);
+			}
+			String scope = currentScope.toString().trim();
+			if (state == CHORD) {
+				scope = '"' + scope + '"';
+			}
+			currentScope = scopes.pop();
+			evalRepeat(scope);
+		}
+
+		private void evalRepeat(String text) {
+			nextToken();
+			int repetitions = 1;
+			if (token != null) {
+				if (token.getType() == REPEAT_STAR) {
+					nextToken();
+					if (token.getType() == TEXT) {
+						repetitions = token.getValue();
+					}
+					else {
+						throw new IllegalStateException("Expected a number after '*' at character " + index);
+					}
+				}
+				else {
+					lookedAhead = true;
+				}
+			}
+
+			for (int i = 0; i < repetitions; i++) {
+				currentScope.append(text).append(" ");
+			}
+		}
+
+
+		private static Map<Character, Token> specialCharMap = new HashMap<Character, Token>();
+		static {
+			specialCharMap.put('[', new Token(CHORD_BEGIN));
+			specialCharMap.put(']', new Token(CHORD_END));
+			specialCharMap.put('(', new Token(REPEAT_BEGIN));
+			specialCharMap.put(')', new Token(REPEAT_END));
+			specialCharMap.put('*', new Token(REPEAT_STAR));
+		}
+
+		private void nextToken() {
+			token = null;
+
+			StringBuilder buf = new StringBuilder();
+
+			for (index++; index < input.length(); index++) {
+				char c = input.charAt(index);
+
+				Token specialToken = specialCharMap.get(c);
+				if (specialToken != null) {
+					if (buf.length() == 0) {
+						token = specialToken;
+					}
+					else {
+						// we've run over into the next token, so back up
+						index--;
+					}
+					break;
+				}
+
+				else if (Character.isWhitespace(c)) {
+					if (buf.length() > 0) {
+						break;
+					}
+				}
+
+				else {
+					buf.append(c);
+				}
+			}
+
+			if (buf.length() > 0) {
+				token = new Token(TEXT, buf.toString());
+			}
+		}
+	}
 }

@@ -1,13 +1,9 @@
 package ajm;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import junit.framework.TestCase;
 import ajm.seqparser.Parser;
-import ajm.seqparser.Parser.Node;
-
-import com.cycling74.max.Atom;
 
 public class seqparserTest extends TestCase {
 
@@ -16,152 +12,103 @@ public class seqparserTest extends TestCase {
 	protected class parserStub extends seqparser {
 
 		@Override
-		protected void output(List<String> data) {
+		protected void output(String data) {
 			lastOutput = data;
 		}
 
-		private List<String> lastOutput = null;
+		private String lastOutput = null;
 
-		public List<String> getLastOutput() {
+		public String getLastOutput() {
 			return lastOutput;
 		}
 	}
 
-	protected Parser parse(String... vals) {
-		return new Parser(Atom.newAtom(vals));
+	protected String parse(String input) {
+		return new Parser(input).parse();
 	}
 
-
-	public void testSimpleList() {
-		Parser p = parse("1", "2", "3");
-		Node root = p.getRoot();
-		assertEquals(1, root.getChildren().size());
-		assertEquals(3, root.getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<1,2,3>", root.toString());
-
-		List<String> output = p.evaluate();
-		assertEquals(1, output.size());
-		assertEquals("1 2 3", output.get(0));
+	public void testDegenerateCase() {
+		assertEquals("1 2 3", parse("1 2 3"));
 	}
-
-
-	public void testMultipleSections() {
-		Parser p = parse("1", "2", "3", ">", "4", "5");
-		Node root = p.getRoot();
-		assertEquals(2, root.getChildren().size());
-		assertEquals(3, root.getChildren().get(0).getChildren().size());
-		assertEquals(2, root.getChildren().get(1).getChildren().size());
-		assertEquals("SECTION<1,2,3>,SECTION<4,5>", root.toString());
-
-		List<String> output = p.evaluate();
-		assertEquals(2, output.size());
-		assertEquals("1 2 3", output.get(0));
-		assertEquals("4 5", output.get(1));
-	}
-
-
-	public void testSimpleRepeat() {
-		Parser p = parse("(", "1", "2", "3", ")", "*", "5");
-		Node root = p.getRoot();
-		assertEquals(1, root.getChildren().size());
-		assertEquals(1, root.getChildren().get(0).getChildren().size());
-		assertEquals(3, root.getChildren().get(0).getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<REPEAT(1,2,3)*5>", root.toString());
-
-		List<String> output = p.evaluate();
-		assertEquals(1, output.size());
-		assertEquals("1 2 3 1 2 3 1 2 3 1 2 3 1 2 3", output.get(0));
-		// todo: check the output for the rest of these tests
-	}
-
 
 	public void testDegenerateRepeat() {
-		Parser p = parse("(", "1", "2", "3", ")");
-		Node root = p.getRoot();
-		assertEquals(1, root.getChildren().size());
-		assertEquals(1, root.getChildren().get(0).getChildren().size());
-		assertEquals(3, root.getChildren().get(0).getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<REPEAT(1,2,3)*1>", root.toString());
+		assertEquals("1 2 3", parse("(1 2 3)"));
 	}
 
+	public void testSimpleRepeats() {
+		assertEquals("1 2 3 1 2 3", parse("(1 2 3)*2"));
+		assertEquals("1 1", parse("1*2"));
+		assertEquals("\"1 2 3\" \"1 2 3\"", parse("[1 2 3]*2"));
+	}
+
+	public void testMultipleRepeats() {
+		assertEquals("1 2 3 1 2 3 1 1 \"1 2 3\" \"1 2 3\"", parse("(1 2 3)*2 1*2 [1 2 3]*2"));
+	}
+
+	public void testNonRepeats() {
+		assertEquals("", parse("(1 2 3)*0"));
+		assertEquals("", parse("1*0"));
+		assertEquals("", parse("[1 2 3]*0"));
+	}
 
 	public void testNestedRepeat() {
-		Parser p = parse("(", "1", "(", "2", "3", ")", "*", "3", ")", "*", "2");
-		Node root = p.getRoot();
-		assertEquals(1, root.getChildren().size());
-		assertEquals(1, root.getChildren().get(0).getChildren().size());
-		assertEquals(2, root.getChildren().get(0).getChildren().get(0).getChildren().size());
-		assertNull(root.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren());
-		assertEquals(2, root.getChildren().get(0).getChildren().get(0).getChildren().get(1).getChildren().size());
-		assertEquals("SECTION<REPEAT(1,REPEAT(2,3)*3)*2>", root.toString());
+		assertEquals("1 2 3 2 3 2 3 1 2 3 2 3 2 3", parse("(1 (2 3)*3)*2"));
+		assertEquals("1 2 2 3 2 2 3 1 2 2 3 2 2 3", parse("(1 (2*2 3)*2)*2"));
+		assertEquals("1 \"2 3\" \"2 3\" 1 \"2 3\" \"2 3\"", parse("(1 [2 3]*2)*2"));
+		assertEquals("1 \"2 3\" \"2 3\" 1 \"2 3\" \"2 3\"", parse("(1 ([2 3])*2)*2"));
+		assertEquals("1 \"2 2 3\" \"2 2 3\" 1 \"2 2 3\" \"2 2 3\"", parse("(1 ([2*2 3])*2)*2"));
 	}
 
-
-	public void testMultipleSectionsWithRepeats() {
-		Parser p = parse("1", "(", "2", "3", ")", "*", "3", ">", "4", "5");
-		Node root = p.getRoot();
-		assertEquals(2, root.getChildren().size());
-		assertEquals(2, root.getChildren().get(0).getChildren().size());
-		assertEquals(2, root.getChildren().get(1).getChildren().size());
-		assertEquals("SECTION<1,REPEAT(2,3)*3>,SECTION<4,5>", root.toString());
+	public void testNote() {
+		assertEquals("0", parse("C-1"));
+		assertEquals("12", parse("C0"));
+		assertEquals("24", parse("C1"));
+		assertEquals("60", parse("C4"));
+		assertEquals("62", parse("D4"));
+		assertEquals("64", parse("E4"));
+		assertEquals("65", parse("F4"));
+		assertEquals("67", parse("G4"));
+		assertEquals("69", parse("A4"));
+		assertEquals("71", parse("B4"));
+		assertEquals("60", parse("c4"));
+		assertEquals("62", parse("d4"));
+		assertEquals("64", parse("e4"));
+		assertEquals("65", parse("f4"));
+		assertEquals("67", parse("g4"));
+		assertEquals("69", parse("a4"));
+		assertEquals("71", parse("b4"));
 	}
 
-	public void testMixedTokens() {
-		Parser p = parse("(", "1", "2", "3", ")*", "2");
-		Node root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
-
-		p = parse("(1", "2", "3", ")", "*", "2");
-		root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
-
-		p = parse("(", "1", "2", "3", ")", "*2");
-		root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
-
-		p = parse("(", "1", "2", "3", ")*2");
-		root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
-
-		p = parse("(1", "2", "3", ")*2");
-		root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
-
-		p = parse("(1", "2", "3)*2");
-		root = p.getRoot();
-		assertEquals("SECTION<REPEAT(1,2,3)*2>", root.toString());
+	public void testNoteAccidental() {
+		assertEquals("61", parse("C#4"));
+		assertEquals("61", parse("Db4"));
+		assertEquals("62", parse("C##4"));
+		assertEquals("60", parse("Dbb4"));
+		assertEquals("65", parse("e#4"));
+		assertEquals("64", parse("fb4"));
+		assertEquals("66", parse("e##4"));
+		assertEquals("63", parse("fbb4"));
 	}
 
-	public void testQuotedSymbols() {
-		Parser p = parse("1 2", "3 4");
-		Node root = p.getRoot();
-
-		assertEquals(1, root.getChildren().size());
-		assertEquals(2, root.getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<\"1 2\",\"3 4\">", root.toString());
+	public void testNoteSequence() {
+		assertEquals("60 64 67 72", parse("C4 e4 G4 b#4"));
+		assertEquals("60 67 64 72", parse("C4 G4 e4 b#4"));
 	}
 
-	public void testBracketedSymbols() {
-		Parser p = parse("1", "[2", "3]");
-		Node root = p.getRoot();
-
-		assertEquals(1, root.getChildren().size());
-		assertEquals(2, root.getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<1,\"2 3\">", root.toString());
+	public void testNoteChords() {
+		assertEquals("\"60 64 67 72\"", parse("[C4 e4 G4 b#4]"));
+		assertEquals("60 \"64 67\" 72", parse("C4 [e4 G4] b#4"));
 	}
 
-	public void testDegenerateBrackets() {
-		Parser p = parse("[1]");
-		Node root = p.getRoot();
-
-		assertEquals(1, root.getChildren().size());
-		assertEquals(1, root.getChildren().get(0).getChildren().size());
-		assertEquals("SECTION<1>", root.toString());
+	public void testNoteRepeat() {
+		assertEquals("60 64 67 72 60 64 67 72", parse("(C4 e4 G4 b#4)*2"));
+		assertEquals("60 64 67 64 67 72", parse("C4 (e4 G4)*2 b#4"));
+		assertEquals("60 64 67 67 72", parse("C4 e4 G4*2 b#4"));
 	}
 
-	public void testNoNextSectionInRepeat() {
+	public void testNoNestedChords() {
 		try {
-			parse("(", ">", ")");
+			parse("[1 [2 3]]");
 			fail("Invalid syntax parsed successfully");
 		}
 		catch (IllegalStateException e) {

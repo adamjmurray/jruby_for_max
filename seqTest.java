@@ -44,7 +44,8 @@ public class seqTest extends TestCase {
 			return ((Atom) outputData.get(OUTLET.CURRENT_VAL)).toString();
 		}
 
-		protected MaxQelem getOutputValuesOnInit() {
+		@Override
+		protected MaxQelem getInitializer() {
 			return null;
 		}
 	}
@@ -57,6 +58,12 @@ public class seqTest extends TestCase {
 	}
 
 	protected seqStub makeSeq(int... vals) {
+		seqStub s = new seqStub(Atom.emptyArray);
+		s.set(Atom.newAtom(vals));
+		return s;
+	}
+
+	protected seqStub makeFloatSeq(float... vals) {
 		seqStub s = new seqStub(Atom.emptyArray);
 		s.set(Atom.newAtom(vals));
 		return s;
@@ -232,7 +239,60 @@ public class seqTest extends TestCase {
 		assertEquals("E", s.getLastStringValue());
 	}
 
+	public void testAdd() {
+		seqStub s = makeSeq(1, 2, 3);
+		s.add(Atom.newAtom(2));
+		assertEquals(makeSeq(3, 4, 5), s);
+		s.add(Atom.newAtom(0));
+		assertEquals(makeSeq(3, 4, 5), s);
+		s.add(Atom.newAtom(-4));
+		assertEquals(makeSeq(-1, 0, 1), s);
+
+		s.add(Atom.newAtom(2), 1, 2);
+		assertEquals(makeSeq(-1, 2, 3), s);
+		s.add(Atom.newAtom(2), 1, 1);
+		assertEquals(makeSeq(-1, 4, 3), s);
+
+		s.add(Atom.newAtom(2.5));
+		assertEquals(makeFloatSeq(-1 + 2.5f, 4 + 2.5f, 3 + 2.5f), s);
+
+		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
+		s.add(Atom.newAtom(2));
+		assertEquals(Atom.newAtom(3), s.values.get(0));
+		assertEquals(Atom.newAtom("a"), s.values.get(1));
+		assertEquals(Atom.newAtom(2.5 + 2), s.values.get(2));
+		assertEquals(Atom.newAtom("b"), s.values.get(3));
+	}
+
+	public void testMultiply() {
+		seqStub s = makeSeq(1, 2, 3);
+		s.multiply(Atom.newAtom(2));
+		assertEquals(makeSeq(2, 4, 6), s);
+		s.multiply(Atom.newAtom(1));
+		assertEquals(makeSeq(2, 4, 6), s);
+		s.multiply(Atom.newAtom(-1));
+		assertEquals(makeSeq(-2, -4, -6), s);
+
+		s.multiply(Atom.newAtom(2), 1, 2);
+		assertEquals(makeSeq(-2, -8, -12), s);
+		s.multiply(Atom.newAtom(0), 1, 1);
+		assertEquals(makeSeq(-2, 0, -12), s);
+
+		s.multiply(Atom.newAtom(2.5));
+		assertEquals(makeFloatSeq(-2 * 2.5f, 0, -12 * 2.5f), s);
+
+
+		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
+		s.multiply(Atom.newAtom(2));
+		assertEquals(Atom.newAtom(2), s.values.get(0));
+		assertEquals(Atom.newAtom("a"), s.values.get(1));
+		assertEquals(Atom.newAtom(2.5 * 2), s.values.get(2));
+		assertEquals(Atom.newAtom("b"), s.values.get(3));
+	}
+
+
 	public void testInsertNumberAndMaintainIndex() {
+	// TODO!
 	// what is the correct behavior in different situations?
 	// setting a new list vs
 

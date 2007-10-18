@@ -47,8 +47,14 @@ public abstract class numericseq extends seq {
 
 	protected abstract Atom add(Atom n, Atom m);
 
+	// TODO: make these methods work generically and phase out this class
+	// adding should ignore any non numeric values, and handle int and float as expected(?)
 	public void add(Atom n) {
-		add(n, 0, values.size() - 1);
+		for (int i = 0; i < values.size(); i++) {
+			values.set(i, add(n, values.get(i)));
+		}
+		handleListChange();
+		outputVals();
 	}
 
 	public void add(Atom n, int left, int right) {
@@ -65,13 +71,18 @@ public abstract class numericseq extends seq {
 		for (int i = left; i <= right; i++) {
 			values.set(i, add(n, values.get(i)));
 		}
+		handleListChange();
 		outputVals();
 	}
 
 	protected abstract Atom multiply(Atom n, Atom m);
 
 	public void multiply(Atom n) {
-		multiply(n, 0, values.size() - 1);
+		for (int i = 0; i < values.size(); i++) {
+			values.set(i, multiply(n, values.get(i)));
+		}
+		handleListChange();
+		outputVals();
 	}
 
 	public void multiply(Atom n, int left, int right) {
@@ -88,6 +99,7 @@ public abstract class numericseq extends seq {
 		for (int i = left; i <= right; i++) {
 			values.set(i, multiply(n, values.get(i)));
 		}
+		handleListChange();
 		outputVals();
 	}
 

@@ -22,7 +22,8 @@ public class intseqTest extends TestCase {
 		@Override
 		protected void output(OUTLET outlet, int data) {}
 
-		protected MaxQelem getOutputValuesOnInit() {
+		@Override
+		protected MaxQelem getInitializer() {
 			return null;
 		}
 	}

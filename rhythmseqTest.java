@@ -50,7 +50,7 @@ public class rhythmseqTest extends TestCase {
 		}
 
 		@Override
-		protected MaxQelem getOutputValuesOnInit() {
+		protected MaxQelem getInitializer() {
 			return null;
 		}
 

@@ -1,9 +1,6 @@
 package ajm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 import com.cycling74.max.Atom;
 
@@ -13,12 +10,11 @@ public class rhythmseq extends intseq {
 	protected int duration = 0;
 	protected boolean countChanged = false;
 	protected int tick = 0;
-	protected int maxTick = 0;
 	protected int sum;
 
-	protected Map<Integer, List<Integer>> valuesAtTick = new HashMap<Integer, List<Integer>>();
-	protected Map<Integer, Integer> tickAtIndex = new HashMap<Integer, Integer>();
-	protected Map<Integer, Integer> indexAtTick = new HashMap<Integer, Integer>();
+	protected int[] tickList = {};
+
+	// todo: default tick (attribute), set tick
 
 	public rhythmseq(Atom[] args) {
 		super(args);
@@ -41,53 +37,84 @@ public class rhythmseq extends intseq {
 			}
 		}
 		super.set(list);
-		handleListChange();
 	}
 
-	// todo: need to call this after most maniuplation methods
-	// TODO: it would be better to add an overridable handleListChange callback() in seq (and add/multiple in
-	// numericseq)
 	protected void handleListChange() {
-		valuesAtTick.clear();
-		tickAtIndex.clear();
-		indexAtTick.clear();
-		int seqsum = 0;
-		int newsum = 0;
-
 		int currtick = sum + count;
+		int seqsum = 0;
+		int prevsum = 0;
 
 		for (int i = 0; i < values.size(); i++) {
-			int value = values.get(i).getInt();
-			int dur = Math.abs(value);
+			// todo: can't assume everything is a number if we want to embed commands in a rhythmseq
+			int dur = Math.abs(values.get(i).getInt());
 
 			if (seqsum < currtick) {
-				newsum = seqsum;
 				index = i;
 				duration = dur;
-				debug("handler set index to " + index + " and duration=" + duration);
+				prevsum = seqsum;
 			}
-			else if (sum != newsum) {
-				int tick = sum + count;
-				sum = newsum;
-				count = tick - newsum;
-				debug("handler set sum=" + sum + " and count=" + count);
+			else if (sum != prevsum) {
+				sum = prevsum;
+				count = currtick - prevsum;
 			}
 
-			tickAtIndex.put(i, seqsum);
-			indexAtTick.put(seqsum, i);
-			List<Integer> vals = valuesAtTick.get(seqsum);
-			if (vals == null) {
-				vals = new ArrayList<Integer>();
-				valuesAtTick.put(seqsum, vals);
-			}
-			vals.add(value);
 			seqsum += dur;
 		}
-		maxTick = seqsum;
+		// do we really need to do this every time? or only when there are operations that need it?
+		// of course we could phase out the javascript by outputting this and adding an input to set the ticklist (needs
+		// a better name)
+		setTickListFromValues();
+	}
 
-		// TODO: can we just output this info so we don't need the JS?
-		// debug("!!! " + tickAtIndex);
-		// debug("???? " + valuesAtTick);
+	protected void setTickListFromValues() {
+		tickList = new int[getRhythmLength()];
+		if (tickList.length > 0) {
+			// Arrays.fill(tickList, 0); // should already be initialized to 0?
+
+			int seqsum = 0;
+			for (int i = 0; i < values.size(); i++) {
+				// todo: can't assume everything is a number if we want to embed commands in a rhythmseq
+				int value = values.get(i).getInt();
+				if (seqsum >= tickList.length && value == 0) {
+					tickList[0]++; // I think this is always correct? TEST
+				}
+				else if (value >= 0) {
+					tickList[seqsum]++;
+				}
+				seqsum += Math.abs(value);
+			}
+		}
+	}
+
+	protected void setValuesFromTickList() {
+		// Todo: this loses some information.
+		// We'd need to keep a list of all values on each tick to not lose info
+
+		values.clear();
+		if (tickList.length > 0) {
+			int seqVal = 1;
+			int sign = 1;
+			if (tickList[0] == 0) {
+				sign = -1; // if the first tick is not a beat, then this is a rest (negative sequence value)
+			}
+
+			if (tickList.length == 1) {
+				values.add(Atom.newAtom(sign));
+			}
+			else {
+				for (int i = 1; i < tickList.length; i++) {
+					if (tickList[i] == 0) {
+						seqVal++;
+					}
+					else {
+						values.add(Atom.newAtom(seqVal * sign));
+						sign = 1; // only the first seq value can be a rest
+						seqVal = 1;
+					}
+				}
+				values.add(Atom.newAtom(seqVal * sign));
+			}
+		}
 	}
 
 	/**
@@ -142,47 +169,22 @@ public class rhythmseq extends intseq {
 			}
 			outputVals();
 		}
-
+		setTickListFromValues();
 	}
 
-	/*
-	public void bang() {
-		if (!values.isEmpty()) {
-			if (tick == maxTick) {
-				List<Integer> trailingZeros = valuesAtTick.get(tick);
-				if (trailingZeros != null) {
-					for (int i = 0; i < trailingZeros.size(); i++) {
-						output();
-						index++;
-					}
-				}
-				tick = 0;
-			}
-			output(OUTLET.TICK, tick);
-			List<Integer> vals = valuesAtTick.get(tick);
-			if (vals != null) {
-				// index = indexAtTick.get(tick);
-				// handle reverse traversals (but how should 0s work, they then attach to prev element??)
-				// maybe they should not attach , if you want flams and stuff via 0's and a matrix gui
-				for (int i = 0; i < vals.size(); i++) {
-					output();
-					index++;
-					// what to do about increment? += increment;
-				}
-			}
+	public void rhythmrot(int ticks) {
 
-			tick++;// = (tick + 1) % maxTick;
-			debug("incrementing tick to " + tick);
-
-		}
+		post(Arrays.toString(tickList));
+		ArrayUtils.rotate(tickList, ticks);
+		post(Arrays.toString(tickList));
+		setValuesFromTickList();
+		outputVals();
 	}
-	*/
-
 
 	public void bang() {
 		if (!values.isEmpty()) {
 
-			debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
+			// debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
 
 			if (count >= duration) {
 				// debug("auto setindex");
@@ -195,15 +197,13 @@ public class rhythmseq extends intseq {
 					index(index);
 					// autoIncrement = true;
 				}
-				debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
-
-
+				// debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
 			}
 
 
 			// TODO: I am wondering if it is better to output the current count instead of this tick?
 			// maybe even count & sum in separate outlets???...
-			// this wouldn't work so well with the matrix-based GUI I am developing
+			// this wouldn't work so well with the matrix-based GUI I am developing (just add count and sum, duh!)
 
 
 			output(OUTLET.TICK, sum + count);
@@ -258,6 +258,7 @@ public class rhythmseq extends intseq {
 	protected int getRhythmLength() {
 		int length = 0;
 		for (Atom atom : values) {
+			// todo: can't assume this will be ints if we want to embed commands in here too
 			length += Math.abs(atom.toInt());
 		}
 		return length;

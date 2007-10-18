@@ -78,14 +78,14 @@ public class seq extends MaxObject {
 		defaultIndex = Atom.newAtom(getAttr("index").toString()).toInt();
 		defaultIteration = Atom.newAtom(getAttr("iteration").toString()).toInt();
 
-		if (outputValuesOnInit != null) {
-			outputValuesOnInit.set();
+		if (initializer != null) {
+			initializer.set();
 		}
 	}
 
-	private MaxQelem outputValuesOnInit = getOutputValuesOnInit();
+	private MaxQelem initializer = getInitializer();
 
-	protected MaxQelem getOutputValuesOnInit() {
+	protected MaxQelem getInitializer() {
 		// This is done this round about way so we can override this method and avoid an UnsatisfiedLinkError
 		// in the jUnit tests.
 		return new MaxQelem(new Executable() {
@@ -94,7 +94,12 @@ public class seq extends MaxObject {
 			// but note using too long of a Thread.sleep() will make Max temporarily hang when opening a patch where
 			// many instances of this class are instantiated.
 			public void execute() {
+				// handle attributes used to construct the object
+				defaultIndex = index;
+				defaultIteration = iteration;
+				defaultIncrement = increment;
 				if (!values.isEmpty()) {
+					defaultValues.addAll(values);
 					outputVals();
 				}
 			}
@@ -103,7 +108,7 @@ public class seq extends MaxObject {
 
 	@Override
 	protected void notifyDeleted() {
-		outputValuesOnInit.release();
+		initializer.release();
 	}
 
 
@@ -137,7 +142,6 @@ public class seq extends MaxObject {
 	 */
 	protected int index = 0;
 
-
 	/**
 	 * The current iteration. Supports attribute messages:
 	 * <dl>
@@ -166,9 +170,10 @@ public class seq extends MaxObject {
 
 	// Other internal state:
 	protected boolean wrap = true;
-	// protected boolean autoIncrement = false;
-	protected int defaultIndex = 0;
-	protected int defaultIteration = 0;
+	protected ArrayList<Atom> defaultValues = new ArrayList<Atom>();
+	protected int defaultIndex = index;
+	protected int defaultIteration = iteration;
+	protected int defaultIncrement = increment;
 
 	protected enum OUTLET {
 		CURRENT_VAL(0), INDEX(1), ITERATION(2), VALUES(3), TICK(4);
@@ -214,6 +219,7 @@ public class seq extends MaxObject {
 	public void set(Atom[] list) {
 		values.clear();
 		Collections.addAll(values, list);
+		handleListChange();
 	}
 
 	/**
@@ -269,17 +275,20 @@ public class seq extends MaxObject {
 				}
 				outputVals();
 			}
+			handleListChange();
 		}
 	}
 
 	public void append(Atom[] newVals) {
 		values.addAll(Arrays.asList(newVals));
+		handleListChange();
 		outputVals();
 	}
 
 
 	public void prepend(Atom[] newVals) {
 		values.addAll(0, Arrays.asList(newVals));
+		handleListChange();
 		outputVals();
 	}
 
@@ -293,12 +302,13 @@ public class seq extends MaxObject {
 				// parse as a Float so we can accept any number
 				int position = (new Float(args[0].toString())).intValue();
 				insert(position, Atom.removeFirst(args));
+				handleListChange();
+				outputVals();
 			}
 			catch (NumberFormatException e) {
 				error("invalid call to insert, position argument was not a number (expcected: insert position value1 ...)");
 			}
 		}
-		outputVals();
 	}
 
 
@@ -312,6 +322,7 @@ public class seq extends MaxObject {
 	public void repeat() {
 		if (!values.isEmpty()) {
 			values.addAll(values);
+			handleListChange();
 			outputVals();
 		}
 	}
@@ -323,6 +334,7 @@ public class seq extends MaxObject {
 			for (int i = 0; i < n; i++) {
 				values.addAll(currVals);
 			}
+			handleListChange();
 			outputVals();
 		}
 	}
@@ -337,6 +349,7 @@ public class seq extends MaxObject {
 	public void delete(int index) {
 		if (index >= 0 && index < values.size()) {
 			values.remove(index);
+			handleListChange();
 			outputVals();
 		}
 	}
@@ -352,12 +365,14 @@ public class seq extends MaxObject {
 					values.remove(index);
 				}
 			}
+			handleListChange();
 			outputVals();
 		}
 	}
 
 	public void clear() {
 		values.clear();
+		handleListChange();
 	}
 
 	/**
@@ -400,6 +415,7 @@ public class seq extends MaxObject {
 				newVals.add(values.get(i));
 			}
 			values = newVals;
+			handleListChange();
 			outputVals();
 		}
 	}
@@ -447,6 +463,8 @@ public class seq extends MaxObject {
 
 		values.clear();
 		Collections.addAll(values, sortedVals);
+		handleListChange();
+		outputVals();
 	}
 
 
@@ -468,11 +486,22 @@ public class seq extends MaxObject {
 
 		values.clear();
 		Collections.addAll(values, sortedVals);
+		handleListChange();
+		outputVals();
 	}
 
 
 	protected int compare(Atom a1, Atom a2) {
-		return a1.toString().compareTo(a2.toString());
+		// todo: TEST!
+		if (a1.isString() || a2.isString()) {
+			return a1.toString().compareTo(a2.toString());
+		}
+		else if (a1.isFloat() || a2.isFloat()) {
+			return Float.compare(a1.toFloat(), a2.toFloat());
+		}
+		else {
+			return a1.toInt() - a2.toInt();
+		}
 	}
 
 
@@ -490,6 +519,7 @@ public class seq extends MaxObject {
 			values.set(idx1, values.get(idx2));
 			values.set(idx2, tmp);
 		}
+		handleListChange();
 		outputVals();
 	}
 
@@ -499,6 +529,7 @@ public class seq extends MaxObject {
 	 */
 	public void reverse() {
 		reverseVals(0, values.size() - 1);
+		handleListChange();
 		outputVals();
 	}
 
@@ -516,6 +547,7 @@ public class seq extends MaxObject {
 		}
 		int[] lr = fixBounds(idx1, idx2);
 		reverseVals(lr[0], lr[1]);
+		handleListChange();
 		outputVals();
 	}
 
@@ -557,6 +589,83 @@ public class seq extends MaxObject {
 			reverseVals(n, right);
 			reverseVals(left, right);
 		}
+		handleListChange();
+		outputVals();
+	}
+
+
+	/**
+	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed.
+	 * 
+	 * @param n -
+	 *            an int or float value (non-numeric inputs are ignored)
+	 */
+	public void add(Atom n) {
+		add(n, 0, values.size() - 1);
+	}
+
+	/**
+	 * Add the specified value to all numeric values in the sequence within the specified range. Non-numeric values will
+	 * not be changed.
+	 * 
+	 * @param n -
+	 *            an int or float value (non-numeric inputs are ignored)
+	 */
+	public void add(Atom n, int left, int right) {
+		if (!n.isFloat() && !n.isInt()) {
+			return;
+		}
+		int intVal = n.toInt();
+		float floatVal = n.toFloat();
+		boolean isFloat = n.isFloat();
+
+		int[] lr = fixBounds(left, right);
+		left = lr[0];
+		right = lr[1];
+
+		for (int i = left; i <= right; i++) {
+			Atom val = values.get(i);
+			if (val.isFloat() || val.isInt()) {
+				if (isFloat || val.isFloat()) {
+					values.set(i, Atom.newAtom(floatVal + val.toFloat()));
+				}
+				else {
+					values.set(i, Atom.newAtom(intVal + val.toInt()));
+				}
+			}
+		}
+		handleListChange();
+		outputVals();
+	}
+
+	public void multiply(Atom n) {
+		multiply(n, 0, values.size() - 1);
+	}
+
+	public void multiply(Atom n, int left, int right) {
+		if (!n.isFloat() && !n.isInt()) {
+			return;
+		}
+		int intVal = n.toInt();
+		float floatVal = n.toFloat();
+		boolean isFloat = n.isFloat();
+
+		int[] lr = fixBounds(left, right);
+		left = lr[0];
+		right = lr[1];
+
+		for (int i = left; i <= right; i++) {
+			Atom val = values.get(i);
+			if (val.isFloat() || val.isInt()) {
+				if (isFloat || val.isFloat()) {
+					values.set(i, Atom.newAtom(floatVal * val.toFloat()));
+				}
+				else {
+					values.set(i, Atom.newAtom(intVal * val.toInt()));
+				}
+			}
+		}
+		handleListChange();
 		outputVals();
 	}
 
@@ -589,10 +698,6 @@ public class seq extends MaxObject {
 
 	public void prev() {
 		advance(-1);
-	}
-
-	public int getindex() {
-		return index;
 	}
 
 	public void index(int index) {
@@ -685,12 +790,16 @@ public class seq extends MaxObject {
 
 
 	public void reset() {
-		// todo: test!
 		index = defaultIndex;
 		iteration = defaultIteration;
+		increment = defaultIncrement;
+		values.clear();
+		values.addAll(defaultValues);
 		wrap = true;
-		// autoIncrement = false;
+		handleListChange();
 	}
+
+	protected void handleListChange() {}
 
 
 	public boolean equals(Object obj) {

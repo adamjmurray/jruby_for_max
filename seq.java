@@ -597,31 +597,39 @@ public class seq extends MaxObject {
 	/**
 	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed.
 	 * 
-	 * @param n -
-	 *            an int or float value (non-numeric inputs are ignored)
+	 * @param args -
+	 *            first param is the required value to add to all numers in the sequence if 3 args are used then the
+	 *            second and third speciy the range to apply the add operation to an int or float value (non-numeric
+	 *            inputs are ignored)
 	 */
-	public void add(Atom n) {
-		add(n, 0, values.size() - 1);
-	}
-
-	/**
-	 * Add the specified value to all numeric values in the sequence within the specified range. Non-numeric values will
-	 * not be changed.
-	 * 
-	 * @param n -
-	 *            an int or float value (non-numeric inputs are ignored)
-	 */
-	public void add(Atom n, int left, int right) {
-		if (!n.isFloat() && !n.isInt()) {
+	public void add(Atom[] args) {
+		if (args.length == 0) {
+			error("add command needs at least one argument");
 			return;
 		}
-		int intVal = n.toInt();
-		float floatVal = n.toFloat();
-		boolean isFloat = n.isFloat();
+		Atom summand = args[0];
+		if (!summand.isFloat() && !summand.isInt()) {
+			error("arguments to add command must be a number");
+			return;
+		}
+		int intVal = summand.toInt();
+		float floatVal = summand.toFloat();
+		boolean isFloat = summand.isFloat();
 
-		int[] lr = fixBounds(left, right);
-		left = lr[0];
-		right = lr[1];
+		int left = 0;
+		int right = values.size() - 1;
+		if (args.length > 2) {
+			Atom leftArg = args[1];
+			Atom rightArg = args[2];
+			if ((!leftArg.isInt() && !leftArg.isFloat()) || (!rightArg.isInt() && !rightArg.isFloat())) {
+				error("arguments to add command must be a number");
+				return;
+			}
+
+			int[] lr = fixBounds(leftArg.toInt(), rightArg.toInt());
+			left = lr[0];
+			right = lr[1];
+		}
 
 		for (int i = left; i <= right; i++) {
 			Atom val = values.get(i);
@@ -638,21 +646,42 @@ public class seq extends MaxObject {
 		outputVals();
 	}
 
-	public void multiply(Atom n) {
-		multiply(n, 0, values.size() - 1);
-	}
-
-	public void multiply(Atom n, int left, int right) {
-		if (!n.isFloat() && !n.isInt()) {
+	/**
+	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed.
+	 * 
+	 * @param args -
+	 *            first param is the required value to add to all numers in the sequence if 3 args are used then the
+	 *            second and third speciy the range to apply the add operation to an int or float value (non-numeric
+	 *            inputs are ignored)
+	 */
+	public void multiply(Atom[] args) {
+		if (args.length == 0) {
+			error("add command needs at least one argument");
 			return;
 		}
-		int intVal = n.toInt();
-		float floatVal = n.toFloat();
-		boolean isFloat = n.isFloat();
+		Atom multiplier = args[0];
+		if (!multiplier.isFloat() && !multiplier.isInt()) {
+			error("arguments to add command must be a number");
+			return;
+		}
+		int intVal = multiplier.toInt();
+		float floatVal = multiplier.toFloat();
+		boolean isFloat = multiplier.isFloat();
 
-		int[] lr = fixBounds(left, right);
-		left = lr[0];
-		right = lr[1];
+		int left = 0;
+		int right = values.size() - 1;
+		if (args.length > 2) {
+			Atom leftArg = args[1];
+			Atom rightArg = args[2];
+			if ((!leftArg.isInt() && !leftArg.isFloat()) || (!rightArg.isInt() && !rightArg.isFloat())) {
+				error("arguments to add command must be a number");
+				return;
+			}
+
+			int[] lr = fixBounds(leftArg.toInt(), rightArg.toInt());
+			left = lr[0];
+			right = lr[1];
+		}
 
 		for (int i = left; i <= right; i++) {
 			Atom val = values.get(i);
@@ -668,7 +697,6 @@ public class seq extends MaxObject {
 		handleListChange();
 		outputVals();
 	}
-
 
 	/*
 	 * we get setincrement for free via the attribute system public void increment(int n) { increment = n; }

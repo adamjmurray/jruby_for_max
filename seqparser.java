@@ -49,7 +49,7 @@ public class seqparser extends MaxObject {
 		protected static class Token {
 
 			enum TYPE {
-				REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, TEXT;
+				REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, NEXT, TEXT;
 			}
 
 			private TYPE type;
@@ -172,8 +172,20 @@ public class seqparser extends MaxObject {
 					case REPEAT_STAR:
 						throw new IllegalStateException("Unexpected '*' at character " + index);
 
+					case NEXT:
+						evalRepeat("next");
+						break;
+
 					case TEXT:
-						evalRepeat(token.getValue() + "");
+
+						String value = null;
+						try {
+							value = token.getValue() + "";
+						}
+						catch (NumberFormatException e) {
+							value = token.getText();
+						}
+						evalRepeat(value + "");
 						break;
 
 					default:
@@ -245,6 +257,7 @@ public class seqparser extends MaxObject {
 			specialCharMap.put('(', new Token(REPEAT_BEGIN));
 			specialCharMap.put(')', new Token(REPEAT_END));
 			specialCharMap.put('*', new Token(REPEAT_STAR));
+			specialCharMap.put('>', new Token(NEXT));
 		}
 
 		private void nextToken() {

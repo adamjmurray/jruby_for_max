@@ -48,6 +48,46 @@ public class seqTest extends TestCase {
 		protected MaxQelem getInitializer() {
 			return null;
 		}
+
+		public void add(int n) {
+			add(new int[] { n });
+		}
+
+		public void add(float n) {
+			add(new float[] { n });
+		}
+
+		public void add(int n, int l, int r) {
+			add(new int[] { n, l, r });
+		}
+
+		private void add(int... n) {
+			super.add(Atom.newAtom(n));
+		}
+
+		private void add(float... n) {
+			super.add(Atom.newAtom(n));
+		}
+
+		public void multiply(int n) {
+			multiply(new int[] { n });
+		}
+
+		public void multiply(float n) {
+			multiply(new float[] { n });
+		}
+
+		public void multiply(int n, int l, int r) {
+			multiply(new int[] { n, l, r });
+		}
+
+		private void multiply(int... n) {
+			super.multiply(Atom.newAtom(n));
+		}
+
+		private void multiply(float... n) {
+			super.multiply(Atom.newAtom(n));
+		}
 	}
 
 
@@ -241,23 +281,23 @@ public class seqTest extends TestCase {
 
 	public void testAdd() {
 		seqStub s = makeSeq(1, 2, 3);
-		s.add(Atom.newAtom(2));
+		s.add(2);
 		assertEquals(makeSeq(3, 4, 5), s);
-		s.add(Atom.newAtom(0));
+		s.add(0);
 		assertEquals(makeSeq(3, 4, 5), s);
-		s.add(Atom.newAtom(-4));
+		s.add(-4);
 		assertEquals(makeSeq(-1, 0, 1), s);
 
-		s.add(Atom.newAtom(2), 1, 2);
+		s.add(2, 1, 2);
 		assertEquals(makeSeq(-1, 2, 3), s);
-		s.add(Atom.newAtom(2), 1, 1);
+		s.add(2, 1, 1);
 		assertEquals(makeSeq(-1, 4, 3), s);
 
-		s.add(Atom.newAtom(2.5));
+		s.add(2.5f);
 		assertEquals(makeFloatSeq(-1 + 2.5f, 4 + 2.5f, 3 + 2.5f), s);
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
-		s.add(Atom.newAtom(2));
+		s.add(2);
 		assertEquals(Atom.newAtom(3), s.values.get(0));
 		assertEquals(Atom.newAtom("a"), s.values.get(1));
 		assertEquals(Atom.newAtom(2.5 + 2), s.values.get(2));
@@ -266,24 +306,24 @@ public class seqTest extends TestCase {
 
 	public void testMultiply() {
 		seqStub s = makeSeq(1, 2, 3);
-		s.multiply(Atom.newAtom(2));
+		s.multiply(2);
 		assertEquals(makeSeq(2, 4, 6), s);
-		s.multiply(Atom.newAtom(1));
+		s.multiply(1);
 		assertEquals(makeSeq(2, 4, 6), s);
-		s.multiply(Atom.newAtom(-1));
+		s.multiply(-1);
 		assertEquals(makeSeq(-2, -4, -6), s);
 
-		s.multiply(Atom.newAtom(2), 1, 2);
+		s.multiply(2, 1, 2);
 		assertEquals(makeSeq(-2, -8, -12), s);
-		s.multiply(Atom.newAtom(0), 1, 1);
+		s.multiply(0, 1, 1);
 		assertEquals(makeSeq(-2, 0, -12), s);
 
-		s.multiply(Atom.newAtom(2.5));
+		s.multiply(2.5f);
 		assertEquals(makeFloatSeq(-2 * 2.5f, 0, -12 * 2.5f), s);
 
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
-		s.multiply(Atom.newAtom(2));
+		s.multiply(2);
 		assertEquals(Atom.newAtom(2), s.values.get(0));
 		assertEquals(Atom.newAtom("a"), s.values.get(1));
 		assertEquals(Atom.newAtom(2.5 * 2), s.values.get(2));

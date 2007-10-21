@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.cycling74.max.Atom;
 
-public class rhythmseq extends intseq {
+public class rhythmseq extends seq {
 
 	protected int count = 0;
 	protected int duration = 0;
@@ -45,8 +45,11 @@ public class rhythmseq extends intseq {
 		int prevsum = 0;
 
 		for (int i = 0; i < values.size(); i++) {
-			// todo: can't assume everything is a number if we want to embed commands in a rhythmseq
-			int dur = Math.abs(values.get(i).getInt());
+			Atom a = values.get(i);
+			if (!a.isInt() && !a.isFloat()) {
+				continue;
+			}
+			int dur = Math.abs(a.toInt());
 
 			if (seqsum < currtick) {
 				index = i;
@@ -67,15 +70,21 @@ public class rhythmseq extends intseq {
 	}
 
 	protected void setTickListFromValues() {
-		tickList = new int[getRhythmLength()];
+		tickList = new int[getTotalTicks()];
 		if (tickList.length > 0) {
 			// Arrays.fill(tickList, 0); // should already be initialized to 0?
 
 			int seqsum = 0;
 			for (int i = 0; i < values.size(); i++) {
-				// todo: can't assume everything is a number if we want to embed commands in a rhythmseq
-				int value = values.get(i).getInt();
+				Atom a = values.get(i);
+				if (!a.isInt() && !a.isFloat()) {
+					continue;
+					// TODO: the tick list should be a list of lists (each nested list is all the things that
+					// occur at that tick), instead of just ignoring the extra data
+				}
+				int value = values.get(i).toInt();
 				if (seqsum >= tickList.length && value == 0) {
+					// handle trailing 0s
 					tickList[0]++; // I think this is always correct? TEST
 				}
 				else if (value >= 0) {
@@ -123,22 +132,29 @@ public class rhythmseq extends intseq {
 	 * from the end of the sequence, and the last remaining value decreased as needed in order to set the new rhythm
 	 * length.
 	 * 
-	 * @param length -
+	 * @param newLen -
 	 *            the new rhythmic length
 	 */
-	public void rhythmlen(int length) {
+	public void rhythmlen(int newLen) {
 
-		if (length <= 0) {
+		if (newLen <= 0) {
 			values.clear();
 		}
 		else {
-			int current = getRhythmLength();
-			if (current > length) {
-				for (; current > length; current = getRhythmLength()) {
-					int diff = current - length;
-					int last = values.get(values.size() - 1).getInt();
-					int lastMag = Math.abs(last);
-					if (lastMag > diff) {
+			int currLen = getTotalTicks();
+			if (currLen > newLen) {
+				// Need to shorten the list
+				while (currLen > newLen) {
+					int diff = currLen - newLen;
+
+					int last = values.get(values.size() - 1).toInt();
+					int lastMagnitude = Math.abs(last);
+					if (lastMagnitude <= diff) {
+						values.remove(values.size() - 1);
+						currLen -= lastMagnitude;
+					}
+					else { // shorten the last value and then we're done
+
 						// adjust the magnitude while maintaining the sign
 						if (last < 0) {
 							last += diff;
@@ -147,24 +163,33 @@ public class rhythmseq extends intseq {
 							last -= diff;
 						}
 						values.set(values.size() - 1, Atom.newAtom(last));
-					}
-					else {
-						values.remove(values.size() - 1);
+						break;
 					}
 				}
 			}
 			else {
-				int diff = length - current;
+				int diff = newLen - currLen;
 				if (diff > 0) {
-					int last = values.get(values.size() - 1).getInt();
-					// adjust the magnitude while maintaining the sign
-					if (last < 0) {
-						last -= diff;
+
+					Atom lastAtom = values.get(values.size() - 1);
+					if (lastAtom.isInt() || lastAtom.isFloat()) {
+						int last = values.get(values.size() - 1).toInt();
+						// adjust the magnitude while maintaining the sign
+						if (last < 0) {
+							last -= diff;
+						}
+						else {
+							last += diff;
+						}
+						values.set(values.size() - 1, Atom.newAtom(last));
 					}
 					else {
-						last += diff;
+						// TODO: even if the last value is a number, this behavior
+						// would be desirable if we want to maintain the existing note length
+						// instead of playing legato until the end of the seq
+						// An additional arg to this method could choose what to do...
+						values.add(Atom.newAtom(-diff));
 					}
-					values.set(values.size() - 1, Atom.newAtom(last));
 				}
 			}
 			outputVals();
@@ -210,37 +235,31 @@ public class rhythmseq extends intseq {
 
 			if (count == 0) {
 				output();
-				while (duration == 0) {
-					index(index + increment);
-					// debug("--- OUTPUTTING");
-
-					output();
-					// infinite loops prevented by setVals()
+				if (increment % values.size() != 0) {
+					while (duration == 0) {
+						// a list of all 0s (which would cause infinite loops) is prevented by setVals()
+						index(index + increment);
+						output();
+					}
 				}
+				// else we'd have an infinite loop
 			}
 
 			count++;
 		}
 	}
 
-
-	// TODO: now I think going back to the sum+count approach is best. we just need to update
-	// things properly when the list changes
-
-
 	@Override
 	public void index(int idx) {
 		if (values.size() > 0) {
-			debug("Called setIndex(" + idx + ")");
+			// debug("Called setIndex(" + idx + ")");
 			index = idx;
 			fixIndexBounds();
-			debug("index = " + index);
+			// debug("index = " + index);
+			// Strings will be coerced to 0, which is exactly what we want (output immediately and advance)
 			duration = Math.abs(values.get(index).toInt());
 			count = 0;
-			sum = 0;
-			for (int i = 0; i < index; i++) {
-				sum += Math.abs(values.get(i).toInt());
-			}
+			sum = getTicksUpToIndex(index);
 		}
 	}
 
@@ -255,13 +274,19 @@ public class rhythmseq extends intseq {
 		}
 		*/
 
-	protected int getRhythmLength() {
-		int length = 0;
-		for (Atom atom : values) {
-			// todo: can't assume this will be ints if we want to embed commands in here too
-			length += Math.abs(atom.toInt());
+	protected int getTotalTicks() {
+		return getTicksUpToIndex(values.size());
+	}
+
+	protected int getTicksUpToIndex(int index) {
+		int ticks = 0;
+		for (int i = 0; i < index; i++) {
+			Atom a = values.get(i);
+			if (a.isInt() || a.isFloat()) {
+				ticks += Math.abs(a.toInt());
+			}
 		}
-		return length;
+		return ticks;
 	}
 
 	@Override

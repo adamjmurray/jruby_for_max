@@ -332,6 +332,8 @@ public class rhythmseqTest extends TestCase {
 		if (DEBUG) {
 			out.println("\n*** START testRhythmlen ***");
 		}
+		// TODO: test with symbols in the list
+
 		rhythmseqStub s = makeSeq(1, 2, 3);
 		s.rhythmlen(7);
 		assertEquals(makeSeq(1, 2, 4), s);

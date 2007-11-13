@@ -12,6 +12,7 @@ import com.cycling74.max.Executable;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
 
+
 /**
  * <p>
  * Store a list of symbols that can be manipulated and traversed in various ways.
@@ -26,10 +27,10 @@ import com.cycling74.max.MaxQelem;
  * </p>
  * <p>
  * The list is traversed by keeping track of the {@link #index current index}. When a {@link #bang <code>bang</code>}
- * is recieved the current index increases by 1, then the current value (the symbol at the current index) and the
+ * is received the current index increases by 1, then the current value (the symbol at the current index) and the
  * current index are sent out the first and second outlets, respectively. When the current index reaches the end of the
  * list it wraps around to the beginning, then an {@link #iteration iteration} count is increased and sent out the third
- * outlet the next time a bang is recieved. This describes the default behavior of looping through the list
+ * outlet the next time a bang is received. This describes the default behavior of looping through the list
  * sequentially. This traversal behavior can be controlled by the following commands:<br/>
  * {@link #increment <code>increment</code>}, {@link #direction <code>direction</code>},
  * {@link #advance <code>advance</code>}, {@link #index <code>index</code>}, {@link #next <code>next</code>},
@@ -74,6 +75,10 @@ public class seq extends MaxObject {
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("iteration");
 		declareAttribute("increment");
+
+		// TODO: document these, and finish implementing!
+		declareAttribute("wrapmode");
+		declareAttribute("wraplimit");
 
 		defaultIndex = Atom.newAtom(getAttr("index").toString()).toInt();
 		defaultIteration = Atom.newAtom(getAttr("iteration").toString()).toInt();
@@ -168,6 +173,14 @@ public class seq extends MaxObject {
 	 */
 	protected int increment = 1;
 
+
+	protected int wrapmode = WRAP_MODE_DEFAULT;
+
+	public static final int WRAP_MODE_DEFAULT = 0;
+	public static final int WRAP_MODE_REVERSE = 1;
+
+	protected int wraplimit = 0;
+
 	// Other internal state:
 	protected boolean wrap = true;
 	protected ArrayList<Atom> defaultValues = new ArrayList<Atom>();
@@ -243,13 +256,14 @@ public class seq extends MaxObject {
 
 
 	/**
-	 * TODO: update this text Set the length of the sequence. If the sequence is currently shorter than the requested
-	 * length, it will be padded with 0s. If it is longer, it will be truncated.
+     * Set the length of the sequence. If the sequence is currently shorter than the requested
+	 * length, it will be padded with 0s. If it is longer, it will be truncated. The optional second arg sets the pad
+	 * value.
 	 * 
 	 * @param length -
 	 *            the new length of the sequence.
 	 */
-	public void len(Atom[] args) {
+	public void length(Atom[] args) {
 		if (args.length > 0) {
 			int length = args[0].getInt();
 			if (length <= 0) {
@@ -297,27 +311,49 @@ public class seq extends MaxObject {
 		if (args.length < 2) {
 			error("invalid call to insert, expected: insert position value1 ...");
 		}
+		else if (!args[0].isInt() && !args[0].isFloat()) {
+			error("invalid call to insert, first argument (position) was not a number");
+		}
 		else {
-			try {
-				// parse as a Float so we can accept any number
-				int position = (new Float(args[0].toString())).intValue();
-				insert(position, Atom.removeFirst(args));
-				handleListChange();
-				outputVals();
-			}
-			catch (NumberFormatException e) {
-				error("invalid call to insert, position argument was not a number (expcected: insert position value1 ...)");
-			}
+			int position = args[0].toInt();
+			insert(position, Atom.removeFirst(args));
+			handleListChange();
+			outputVals();
 		}
 	}
 
+	public void insertAtCurrent(Atom[] args) {
+		insert(index, args);
+		handleListChange();
+		outputVals();
+	}
 
-	// This is split out as a separate method so it can be overriden in typedseq after validation of the args
-	// is performed in insert(Atom[] args)
 	protected void insert(int position, Atom[] newVals) {
 		values.addAll(position, Arrays.asList(newVals));
 	}
 
+	// This does not guarantee the list is sorted, it just inserts the arguments into the first spot
+	// where they are not less then a value.
+	public void sortinsert(Atom[] args) {
+		if (args.length > 0) {
+			argLoop: for (Atom a : args) {
+				if (values.isEmpty()) {
+					values.add(a);
+				}
+				else {
+					for (int i = 0; i < values.size(); i++) {
+						if (compare(a, values.get(i)) <= 0) {
+							values.add(i, a);
+							continue argLoop;
+						}
+					}
+					values.add(a);
+				}
+			}
+			handleListChange();
+			outputVals();
+		}
+	}
 
 	public void repeat() {
 		if (!values.isEmpty()) {
@@ -452,6 +488,22 @@ public class seq extends MaxObject {
 		delete(index);
 	}
 
+	public void deletevalue(Atom[] args) {
+		for (Atom a : args) {
+			values.remove(a);
+		}
+		outputVals();
+	}
+
+	public void clearvalue(Atom[] args) {
+		for (Atom a : args) {
+			while (values.remove(a)) {
+				// keep looping until all values have been removed
+			}
+			outputVals();
+		}
+	}
+
 
 	public void sort() {
 		Atom[] sortedVals = values.toArray(new Atom[values.size()]);
@@ -497,6 +549,7 @@ public class seq extends MaxObject {
 			return a1.toString().compareTo(a2.toString());
 		}
 		else if (a1.isFloat() || a2.isFloat()) {
+			// rely on Float.compare() because it handles infinity and NaN
 			return Float.compare(a1.toFloat(), a2.toFloat());
 		}
 		else {
@@ -751,15 +804,49 @@ public class seq extends MaxObject {
 
 	protected void fixIndexBounds() {
 		int size = values.size();
-		while (index >= size) {
-			wrap = true;
-			iteration++;
-			index -= size;
+		if (wrapmode == WRAP_MODE_DEFAULT) {
+			while (index >= size) {
+				wrap = true;
+				iteration++;
+				index -= size;
+			}
+			while (index < 0) {
+				wrap = true;
+				iteration--;
+				index += size;
+			}
 		}
-		while (index < 0) {
-			wrap = true;
-			iteration--;
-			index += size;
+		else {
+			// TODO: I think we need to force increment=1 for wrapmode=1 ??
+			if (index >= size) {
+				index = size - 2;
+				if (index < 0) {
+					index = 0;
+				}
+				increment = -increment;
+			}
+			else if (index < 0) {
+				index = 1;
+				if (index >= size) {
+					index = 0;
+				}
+				increment = -increment;
+			}
+
+			/*
+			int inc = increment < 0 ? -increment : increment;
+			inc %= size;
+			post("inc=" + inc);
+			while (index >= size) {
+				index -= inc;
+			}
+			while (index < 0) {
+				index += inc;
+			}
+			post("now index=" + index);
+
+			post("\n");
+			*/
 		}
 	}
 
@@ -827,7 +914,28 @@ public class seq extends MaxObject {
 		handleListChange();
 	}
 
-	protected void handleListChange() {}
+	public void resetindex() {
+		index = defaultIndex;
+	}
+
+	public void resetiteration() {
+		iteration = defaultIteration;
+		wrap = true;
+	}
+
+	public void resetincrement() {
+		increment = defaultIncrement;
+	}
+
+	public void resetseq() {
+		values.clear();
+		values.addAll(defaultValues);
+		handleListChange();
+	}
+
+	protected void handleListChange() {
+	// maybe? index = defaultIndex;
+	}
 
 
 	public boolean equals(Object obj) {

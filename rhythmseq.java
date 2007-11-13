@@ -49,7 +49,8 @@ public class rhythmseq extends seq {
 			if (!a.isInt() && !a.isFloat()) {
 				continue;
 			}
-			int dur = Math.abs(a.toInt());
+			int val = a.toInt();
+			int dur = (val < 0 ? -val : val);
 
 			if (seqsum < currtick) {
 				index = i;
@@ -90,7 +91,7 @@ public class rhythmseq extends seq {
 				else if (value >= 0) {
 					tickList[seqsum]++;
 				}
-				seqsum += Math.abs(value);
+				seqsum += (value < 0 ? -value : value);
 			}
 		}
 	}
@@ -148,7 +149,7 @@ public class rhythmseq extends seq {
 					int diff = currLen - newLen;
 
 					int last = values.get(values.size() - 1).toInt();
-					int lastMagnitude = Math.abs(last);
+					int lastMagnitude = last < 0 ? -last : last;
 					if (lastMagnitude <= diff) {
 						values.remove(values.size() - 1);
 						currLen -= lastMagnitude;
@@ -257,7 +258,9 @@ public class rhythmseq extends seq {
 			fixIndexBounds();
 			// debug("index = " + index);
 			// Strings will be coerced to 0, which is exactly what we want (output immediately and advance)
-			duration = Math.abs(values.get(index).toInt());
+			int val = values.get(index).toInt();
+
+			duration = (val < 0 ? -val : val);
 			count = 0;
 			sum = getTicksUpToIndex(index);
 		}
@@ -283,7 +286,8 @@ public class rhythmseq extends seq {
 		for (int i = 0; i < index; i++) {
 			Atom a = values.get(i);
 			if (a.isInt() || a.isFloat()) {
-				ticks += Math.abs(a.toInt());
+				int val = a.toInt();
+				ticks += (val < 0 ? -val : val);
 			}
 		}
 		return ticks;

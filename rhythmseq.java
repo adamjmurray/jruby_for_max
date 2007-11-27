@@ -1,6 +1,7 @@
 package ajm;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cycling74.max.Atom;
 
@@ -12,7 +13,16 @@ public class rhythmseq extends seq {
 	protected int tick = 0;
 	protected int sum;
 
-	protected int[] tickList = {};
+	protected int maxTick;
+	protected int tickWrapIdx = 0;
+
+	// protected MappedList<Integer, Atom> tmap = new MappedList<Integer, Atom>();
+
+	protected Map<Integer, Integer> tickIndexMap = new HashMap<Integer, Integer>();
+	protected Map<Integer, Integer> indexTickMap = new HashMap<Integer, Integer>();
+
+	// TODO: new offset attribute (tick offset separate attr?), to replace the rhythmrot method
+	// actual tick will be tick + offset
 
 	// todo: default tick (attribute), set tick
 
@@ -40,37 +50,40 @@ public class rhythmseq extends seq {
 	}
 
 	protected void handleListChange() {
-		int currtick = sum + count;
-		int seqsum = 0;
-		int prevsum = 0;
+		maxTick = getTotalTicks();
 
+		// tmap.clear();
+		tickIndexMap.clear();
+		indexTickMap.clear();
+		tickWrapIdx = 0;
+		int pos = 0;
 		for (int i = 0; i < values.size(); i++) {
-			Atom a = values.get(i);
-			if (!a.isInt() && !a.isFloat()) {
-				continue;
+			if (pos == maxTick && tickWrapIdx == 0) {
+				tickWrapIdx = i;
 			}
-			int val = a.toInt();
-			int dur = (val < 0 ? -val : val);
-
-			if (seqsum < currtick) {
-				index = i;
-				duration = dur;
-				prevsum = seqsum;
+			Atom val = values.get(i);
+			if (tickIndexMap.get(pos) == null) {
+				tickIndexMap.put(pos, i);
 			}
-			else if (sum != prevsum) {
-				sum = prevsum;
-				count = currtick - prevsum;
+			indexTickMap.put(i, pos);
+			// tmap.addValue(pos, val);
+			if (val.isInt() || val.isFloat()) {
+				int delay = val.toInt();
+				delay = (delay < 0) ? -delay : delay;
+				pos += delay;
 			}
 
-			seqsum += dur;
 		}
-		// do we really need to do this every time? or only when there are operations that need it?
-		// of course we could phase out the javascript by outputting this and adding an input to set the ticklist (needs
-		// a better name)
-		setTickListFromValues();
+
+		// debug("values: " + values);
+		// debug("twi: " + tickWrapIdx);
+		// debug("tiamap: " + tickIndexMap);
+
 	}
 
+	/*
 	protected void setTickListFromValues() {
+
 		tickList = new int[getTotalTicks()];
 		if (tickList.length > 0) {
 			// Arrays.fill(tickList, 0); // should already be initialized to 0?
@@ -95,6 +108,8 @@ public class rhythmseq extends seq {
 			}
 		}
 	}
+
+
 
 	protected void setValuesFromTickList() {
 		// Todo: this loses some information.
@@ -126,6 +141,8 @@ public class rhythmseq extends seq {
 			}
 		}
 	}
+	
+	*/
 
 	/**
 	 * Sets the length of the sequence in terms of the total number of ticks represented by the rhythm. If the new
@@ -133,123 +150,75 @@ public class rhythmseq extends seq {
 	 * from the end of the sequence, and the last remaining value decreased as needed in order to set the new rhythm
 	 * length.
 	 * 
-	 * @param newLen -
-	 *            the new rhythmic length
+	 * @param maxTick -
+	 *            the new maximum tick
 	 */
-	public void rhythmlen(int newLen) {
-
-		if (newLen <= 0) {
-			values.clear();
-		}
-		else {
-			int currLen = getTotalTicks();
-			if (currLen > newLen) {
-				// Need to shorten the list
-				while (currLen > newLen) {
-					int diff = currLen - newLen;
-
-					int last = values.get(values.size() - 1).toInt();
-					int lastMagnitude = last < 0 ? -last : last;
-					if (lastMagnitude <= diff) {
-						values.remove(values.size() - 1);
-						currLen -= lastMagnitude;
-					}
-					else { // shorten the last value and then we're done
-
-						// adjust the magnitude while maintaining the sign
-						if (last < 0) {
-							last += diff;
-						}
-						else {
-							last -= diff;
-						}
-						values.set(values.size() - 1, Atom.newAtom(last));
-						break;
-					}
-				}
-			}
-			else {
-				int diff = newLen - currLen;
-				if (diff > 0) {
-
-					Atom lastAtom = values.get(values.size() - 1);
-					if (lastAtom.isInt() || lastAtom.isFloat()) {
-						int last = values.get(values.size() - 1).toInt();
-						// adjust the magnitude while maintaining the sign
-						if (last < 0) {
-							last -= diff;
-						}
-						else {
-							last += diff;
-						}
-						values.set(values.size() - 1, Atom.newAtom(last));
-					}
-					else {
-						// TODO: even if the last value is a number, this behavior
-						// would be desirable if we want to maintain the existing note length
-						// instead of playing legato until the end of the seq
-						// An additional arg to this method could choose what to do...
-						values.add(Atom.newAtom(-diff));
-					}
-				}
-			}
-			outputVals();
-		}
-		setTickListFromValues();
+	public void maxtick(int maxTick) {
+		this.maxTick = maxTick;
 	}
 
 	public void rhythmrot(int ticks) {
-
+		/*
 		post(Arrays.toString(tickList));
 		ArrayUtils.rotate(tickList, ticks);
 		post(Arrays.toString(tickList));
 		setValuesFromTickList();
+		*/
+
 		outputVals();
 	}
 
 	public void bang() {
-		if (!values.isEmpty()) {
 
-			// debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
+		if (maxTick > 0) {
 
-			if (count >= duration) {
-				// debug("auto setindex");
-				if (duration > 0) { // auto increment has issues with setIndex (rethink?)
-					// debug("auto increment");
-					index(index + increment);
-				}
-				else {
-					// debug("NOT auto increment");
-					index(index);
-					// autoIncrement = true;
-				}
-				// debug("Count=" + count + " | sum=" + sum + " | dur=" + duration + " | index=" + index);
+			// todo: replace this with the skip system
+			boolean tickWrap = false;
+			while (tick >= maxTick) {
+				tickWrap = true;
+				tick -= maxTick;
+			}
+			while (index < 0) {
+				tickWrap = true;
+				tick += maxTick;
 			}
 
+			output(OUTLET.TICK, tick);
 
-			// TODO: I am wondering if it is better to output the current count instead of this tick?
-			// maybe even count & sum in separate outlets???...
-			// this wouldn't work so well with the matrix-based GUI I am developing (just add count and sum, duh!)
-
-
-			output(OUTLET.TICK, sum + count);
-
-			if (count == 0) {
-				output();
-				if (increment % values.size() != 0) {
-					while (duration == 0) {
-						// a list of all 0s (which would cause infinite loops) is prevented by setVals()
-						index(index + increment);
-						output();
-					}
-				}
-				// else we'd have an infinite loop
+			Integer idx = tickIndexMap.get(tick);
+			if (tickWrap) {
+				idx = tickWrapIdx;
+			}
+			if (idx != null) {
+				int val = -1;
+				do {
+					index(idx);
+					output();
+					// Strings will be coerced to 0, which is exactly what we want (output immediately and advance)
+					val = values.get(index).toInt();
+					idx++;
+				} while (val == 0);
 			}
 
-			count++;
+			tick += increment;
 		}
 	}
 
+	@Override
+	public void index(int idx) {
+		if (!values.isEmpty()) {
+			super.index(idx);
+			/*
+			Integer t = indexTickMap.get(index);
+			if (t == null) {
+				error("ERROR for seq: " + this);
+				error("index had no tick! " + indexTickMap);
+			}*/
+			tick = indexTickMap.get(index);
+		}
+	}
+
+	/*
 	@Override
 	public void index(int idx) {
 		if (values.size() > 0) {
@@ -264,7 +233,9 @@ public class rhythmseq extends seq {
 			count = 0;
 			sum = getTicksUpToIndex(index);
 		}
+		
 	}
+	*/
 
 	/*
 		@Override
@@ -278,7 +249,14 @@ public class rhythmseq extends seq {
 		*/
 
 	protected int getTotalTicks() {
-		return getTicksUpToIndex(values.size());
+		int total = 0;
+		for (Atom a : values) {
+			if (a.isInt() || a.isFloat()) {
+				int val = a.toInt();
+				total += (val < 0) ? -val : val;
+			}
+		}
+		return total;
 	}
 
 	protected int getTicksUpToIndex(int index) {

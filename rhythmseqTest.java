@@ -159,8 +159,10 @@ public class rhythmseqTest extends TestCase {
 
 	public void testSetIndex() {
 
+		// TODO: this is broken :(
+		// need a setTick() test, and figure out what to do with this
 		if (DEBUG) {
-			out.println("\n*** START testSetIndexToZero ***");
+			out.println("\n*** START testSetIndex ***");
 		}
 		rhythmseqStub s = makeSeq(1, 0, 1);
 		assertNull(s.valueSinceBang());
@@ -176,13 +178,13 @@ public class rhythmseqTest extends TestCase {
 		assertEquals(2, s.indexSinceBang());
 		assertEquals(s.getValueOutputs(), 1, 0, 1, 0, 1);
 		if (DEBUG) {
-			out.println("*** END testSetIndexToZero ***\n");
+			out.println("*** END testSetIndex ***\n");
 		}
 	}
 
 	public void testSetIndexToZero() {
 		if (DEBUG) {
-			out.println("\n*** START testSetIndex ***");
+			out.println("\n*** START testSetIndexToZero ***");
 		}
 		rhythmseqStub s = makeSeq(1, 2, 3);
 		assertNull(s.valueSinceBang());
@@ -198,7 +200,7 @@ public class rhythmseqTest extends TestCase {
 
 		assertEquals(s.getValueOutputs(), 1, 2, 1, 2);
 		if (DEBUG) {
-			out.println("*** END testSetIndex ***\n");
+			out.println("*** END testSetIndexToZero ***\n");
 		}
 	}
 
@@ -265,7 +267,12 @@ public class rhythmseqTest extends TestCase {
 		assertEquals(1, s.valueSinceBang());
 		assertEquals(s.getValueOutputs(), new int[] { 1 });
 
+		out.println("outs=" + Arrays.toString(s.getValueOutputs()));
+
 		s.bang();
+
+
+		out.println("outs=" + Arrays.toString(s.getValueOutputs()));
 		assertEquals(1, s.valueSinceBang());
 		assertEquals(s.getValueOutputs(), 1, 0, 1);
 
@@ -328,6 +335,7 @@ public class rhythmseqTest extends TestCase {
 		}
 	}
 
+	/*
 	public void testRhythmlen() throws Exception {
 		if (DEBUG) {
 			out.println("\n*** START testRhythmlen ***");
@@ -353,6 +361,47 @@ public class rhythmseqTest extends TestCase {
 		assertEquals(emptySeq(), s);
 		if (DEBUG) {
 			out.println("*** END testRhythmlen ***\n");
+		}
+	}
+	*/
+
+	public void testMaxtick() throws Exception {
+		if (DEBUG) {
+			out.println("\n*** START testMaxtick ***");
+		}
+		// TODO: test with symbols in the list
+
+		rhythmseqStub s = makeSeq(1, 2, 3);
+		s.maxtick(7);
+		s.bang();
+		assertEquals(1, s.valueSinceBang());
+		s.bang();
+		assertEquals(2, s.valueSinceBang());
+		s.bang();
+		s.bang();
+		assertEquals(3, s.valueSinceBang());
+		s.bang();
+		s.bang();
+		s.bang();
+		assertEquals(null, s.valueSinceBang());
+		s.bang();
+		assertEquals(1, s.valueSinceBang());
+
+		s.index(0);
+		s.maxtick(5);
+		s.bang();
+		assertEquals(1, s.valueSinceBang());
+		s.bang();
+		assertEquals(2, s.valueSinceBang());
+		s.bang();
+		s.bang();
+		assertEquals(3, s.valueSinceBang());
+		s.bang();
+		s.bang();
+		assertEquals(1, s.valueSinceBang());
+
+		if (DEBUG) {
+			out.println("*** END testMaxtick ***\n");
 		}
 	}
 

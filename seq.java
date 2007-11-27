@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ajm.data.SkipRules;
+
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
 import com.cycling74.max.MaxObject;
@@ -183,6 +185,8 @@ public class seq extends MaxObject {
 
 	// Other internal state:
 	protected boolean wrap = true;
+	protected SkipRules skipRules = new SkipRules();
+
 	protected ArrayList<Atom> defaultValues = new ArrayList<Atom>();
 	protected int defaultIndex = index;
 	protected int defaultIteration = iteration;
@@ -256,9 +260,8 @@ public class seq extends MaxObject {
 
 
 	/**
-     * Set the length of the sequence. If the sequence is currently shorter than the requested
-	 * length, it will be padded with 0s. If it is longer, it will be truncated. The optional second arg sets the pad
-	 * value.
+	 * Set the length of the sequence. If the sequence is currently shorter than the requested length, it will be padded
+	 * with 0s. If it is longer, it will be truncated. The optional second arg sets the pad value.
 	 * 
 	 * @param length -
 	 *            the new length of the sequence.
@@ -301,6 +304,7 @@ public class seq extends MaxObject {
 
 
 	public void prepend(Atom[] newVals) {
+		// TODO: // keep the index at the correct current element
 		values.addAll(0, Arrays.asList(newVals));
 		handleListChange();
 		outputVals();
@@ -308,6 +312,7 @@ public class seq extends MaxObject {
 
 
 	public void insert(Atom[] args) {
+		// TODO: // keep the index at the correct current element
 		if (args.length < 2) {
 			error("invalid call to insert, expected: insert position value1 ...");
 		}
@@ -329,6 +334,7 @@ public class seq extends MaxObject {
 	}
 
 	protected void insert(int position, Atom[] newVals) {
+		// TODO: // keep the index at the correct current element
 		values.addAll(position, Arrays.asList(newVals));
 	}
 
@@ -344,6 +350,13 @@ public class seq extends MaxObject {
 					for (int i = 0; i < values.size(); i++) {
 						if (compare(a, values.get(i)) <= 0) {
 							values.add(i, a);
+							if (i <= index) {
+								// TODO: test this, I thought it was supposed to be i<index, but because we
+								// increment the index at the end of bang() I think this is now the correct comparison
+								// keep the index at the correct current element. Except delete still uses i<index,
+								// seemed to give the best results with the arpeggiator (confusing!)
+								index++;
+							}
 							continue argLoop;
 						}
 					}
@@ -383,6 +396,8 @@ public class seq extends MaxObject {
 	// probably need a boolean to keep track of this undefined state
 	// and let the list traversal methods (advance, goto, etc) handle it
 	public void delete(int index) {
+		// TODO: // keep the index at the correct current element
+
 		if (index >= 0 && index < values.size()) {
 			values.remove(index);
 			handleListChange();
@@ -392,6 +407,8 @@ public class seq extends MaxObject {
 
 
 	public void delete(int[] indices) {
+		// TODO: // keep the index at the correct current element
+
 		if (!values.isEmpty()) {
 			Arrays.sort(indices);
 			// delete in reverse order so any index shifting that occurs doesn't affect the result
@@ -438,6 +455,8 @@ public class seq extends MaxObject {
 
 
 	public void deleterange(int left, int right) {
+		// TODO: // keep the index at the correct current element
+
 		if (!values.isEmpty()) {
 			int[] lr = fixBounds(left, right);
 			left = lr[0];
@@ -458,11 +477,15 @@ public class seq extends MaxObject {
 
 
 	public void deletefirst() {
+		// TODO: // keep the index at the correct current element
+
 		delete(0);
 	}
 
 
 	public void deletefirst(int n) {
+		// TODO: // keep the index at the correct current element
+
 		if (n > 0) {
 			deleterange(0, n - 1);
 		}
@@ -485,12 +508,28 @@ public class seq extends MaxObject {
 
 
 	public void deletecurrent() {
+		// TODO?? // keep the index at the correct current element
+
 		delete(index);
 	}
 
 	public void deletevalue(Atom[] args) {
 		for (Atom a : args) {
-			values.remove(a);
+			for (int i = 0; i < values.size(); i++) {
+				if (values.get(i).equals(a)) {
+					values.remove(i);
+					// keep the index at the correct current element
+					if (i < index) {
+						// TODO: test this
+
+						index--;
+					}
+					break;
+				}
+			}
+		}
+		if (values.isEmpty()) {
+			index = 0;
 		}
 		outputVals();
 	}
@@ -651,7 +690,7 @@ public class seq extends MaxObject {
 	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed.
 	 * 
 	 * @param args -
-	 *            first param is the required value to add to all numers in the sequence if 3 args are used then the
+	 *            first param is the required value to add to all numbers in the sequence if 3 args are used then the
 	 *            second and third speciy the range to apply the add operation to an int or float value (non-numeric
 	 *            inputs are ignored)
 	 */
@@ -783,11 +822,11 @@ public class seq extends MaxObject {
 
 	public void index(int index) {
 		this.index = index;
-		/*
+
 		if (!values.isEmpty()) {
 			// this check is needed so that attribute order won't matter
 			fixIndexBounds();
-		}*/
+		}
 	}
 
 	/*
@@ -862,8 +901,10 @@ public class seq extends MaxObject {
 				wrap = false;
 				output(OUTLET.ITERATION, iteration);
 			}
-			output(OUTLET.INDEX, this.index);
-			output(OUTLET.CURRENT_VAL, values.get(this.index));
+			if (!skipRules.skip(iteration, index)) {
+				output(OUTLET.INDEX, this.index);
+				output(OUTLET.CURRENT_VAL, values.get(this.index));
+			}
 		}
 	}
 
@@ -880,6 +921,65 @@ public class seq extends MaxObject {
 		}
 		else {
 			output(OUTLET.CURRENT_VAL, values.get(index));
+		}
+	}
+
+	public void skip(Atom[] args) {
+		if (args.length > 1) {
+			if (args[0].isInt() || args[0].isFloat()) {
+				int iter = args[0].toInt();
+				for (int i = 1; i < args.length; i++) {
+					Atom a = args[i];
+					if (a.isInt() || a.isFloat()) {
+						int idx = a.toInt();
+						skipRules.addRule(iter, idx);
+					}
+				}
+			}
+			else if ("*".equals(args[0].toString())) {
+				for (int i = 1; i < args.length; i++) {
+					Atom a = args[i];
+					if (a.isInt() || a.isFloat()) {
+						int idx = a.toInt();
+						skipRules.addWildcardRule(idx);
+					}
+				}
+			}
+		}
+	}
+
+	public void clearskip(Atom[] args) {
+		if (args.length == 0) {
+			skipRules.clearAll();
+		}
+		else if (args[0].isInt() || args[0].isFloat()) {
+			int iteration = args[0].toInt();
+			if (args.length == 1) {
+				skipRules.clearRules(iteration);
+			}
+			else {
+				for (int i = 1; i < args.length; i++) {
+					Atom a = args[i];
+					if (a.isInt() || a.isFloat()) {
+						int idx = a.toInt();
+						skipRules.clearRule(iteration, idx);
+					}
+				}
+			}
+		}
+		else if ("*".equals(args[0].toString())) {
+			if (args.length == 1) {
+				skipRules.clearWildcardRules();
+			}
+			else {
+				for (int i = 1; i < args.length; i++) {
+					Atom a = args[i];
+					if (a.isInt() || a.isFloat()) {
+						int idx = a.toInt();
+						skipRules.clearWildcardRule(idx);
+					}
+				}
+			}
 		}
 	}
 

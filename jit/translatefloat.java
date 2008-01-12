@@ -12,24 +12,14 @@ public class translatefloat extends Jitter2DInterpolatingMapper {
 		declareAttribute("y");
 	}
 
-	public void map(long step, int currX, int currY) {
-		float nextX = currX + (step * x);
-		while (nextX < 0) {
-			nextX += width;
-		}
-		while (nextX >= width) {
-			nextX -= width;
-		}
 
-		float nextY = currY + (step * y);
-		while (nextY < 0) {
-			nextY += height;
-		}
-		while (nextY >= height) {
-			nextY -= height;
-		}
+	public void inverseMap(long step, int currX, int currY, float[] mappedXY) {
+		mappedXY[0] = currX - (step * x);
+		mappedXY[1] = currY - (step * y);
+	}
 
-		mappedXY[0] = nextX;
-		mappedXY[1] = nextY;
+	public void map(long step, int currX, int currY, float[] mappedXY) {
+		mappedXY[0] = currX + (step * x);
+		mappedXY[1] = currY + (step * y);
 	}
 }

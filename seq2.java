@@ -683,10 +683,15 @@ public class seq2 extends MaxObject {
 			output();
 			Item currentItem = values.get(this.index);
 			if (currentItem.isAtomArray() && chordmode == CHORDMODE.ARPEGGIATE) {
-				chordIndex = (chordIndex + 1) % currentItem.getAtoms().length;
-				if (chordIndex == 0) {
-					// we wrapped around
+				if (currentItem.getAtoms().length == 0) {
 					index += increment;
+				}
+				else {
+					chordIndex = (chordIndex + 1) % currentItem.getAtoms().length;
+					if (chordIndex == 0) {
+						// we wrapped around
+						index += increment;
+					}
 				}
 			}
 			else {
@@ -793,7 +798,9 @@ public class seq2 extends MaxObject {
 				case ARPEGGIATE:
 					// probably we should ensure the chordIndex range here, but
 					// it is best it is always correct by the time we reach here!
-					outlet(outlet.outletNumber, data.getAtoms()[chordIndex]);
+					if (data.getAtoms().length > 0) {
+						outlet(outlet.outletNumber, data.getAtoms()[chordIndex]);
+					}
 					break;
 
 				case SYMBOL:

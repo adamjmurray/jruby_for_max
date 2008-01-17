@@ -80,7 +80,7 @@ public class Parser {
 
 		states.push(DEFAULT);
 		nextToken();
-		do {
+		while (token != null) {
 			switch (token.getType()) {
 				case CHORD_BEGIN:
 					startScope(CHORD);
@@ -126,8 +126,7 @@ public class Parser {
 			else {
 				lookedAhead = false;
 			}
-
-		} while (token != null);
+		}
 
 		return currentScope;
 	}

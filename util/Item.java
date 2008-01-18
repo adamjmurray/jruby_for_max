@@ -15,6 +15,8 @@ public class Item implements Comparable {
 	private Atom atom;
 	private Atom[] atoms;
 
+	private Item() {}
+
 	public Item(Atom atom) {
 		this.atom = atom;
 	}
@@ -57,7 +59,7 @@ public class Item implements Comparable {
 		return atoms;
 	}
 
-	// these kinds of operation must return a new item. otherwise we overright the defaultSeq values
+	// these kinds of operation must return a new item. otherwise we overwrite the defaultSeq values
 	// I think cloning for the defaultSeq and resetseq will be too slow, as resets are fairly common
 	// in my 16 track sequencer app
 	public Item add(Atom summand) {
@@ -144,11 +146,18 @@ public class Item implements Comparable {
 	}
 
 	public Item clone() {
-		if (isAtomArray()) {
-			return new Item(atoms);
+		Item i = new Item();
+		i.atom = atom;
+		i.atoms = atoms;
+		return i;
+	}
+
+	public boolean equals(Object obj) {
+		if (obj instanceof Item) {
+			return Arrays.equals(this.atoms, ((Item) obj).atoms);
 		}
 		else {
-			return new Item(atom);
+			return false;
 		}
 	}
 

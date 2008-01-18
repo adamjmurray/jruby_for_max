@@ -34,7 +34,8 @@ public class Parser {
 	private Token token;
 	Stack<STATE> states = new Stack<STATE>();
 	private Stack<List<Item>> scopes = new Stack<List<Item>>();
-	private List<Item> currentScope = new ArrayList<Item>();
+	private List<Item> topScope = new ArrayList<Item>();
+	private List<Item> currentScope;
 
 	public List<Item> parse(Atom[] list) {
 		return parse(null, list);
@@ -72,7 +73,8 @@ public class Parser {
 
 	protected List<Item> parse(CharSequence inputStr) {
 		input = inputStr;
-		currentScope.clear();
+		topScope.clear();
+		currentScope = topScope;
 		index = -1;
 		lookedAhead = false;
 		states.clear();
@@ -99,16 +101,21 @@ public class Parser {
 					break;
 
 				case REPEAT_STAR:
-					throw new IllegalStateException("Unexpected '*' at character " + index);
+					throw new IllegalStateException("Unexpected '*' (index=" + index
+							+ "): Did you forget to put something before the '*'?");
 
 				case NEXT:
 					evalRepeat(new Item("next"));
 					break;
 
+				case PREV:
+					evalRepeat(new Item("prev"));
+					break;
+
 				case TEXT:
 					Item item;
 					if (evaluateNotes) {
-						item = token.getValue();
+						item = new Item(token.getValue());
 					}
 					else {
 						item = token.getItem();
@@ -128,12 +135,16 @@ public class Parser {
 			}
 		}
 
-		return currentScope;
+		if (currentScope != topScope) {
+			throw new IllegalStateException(
+					"Input ended unexpectedly. Did you type '[' or '(' without a matching ']' or ')'?");
+		}
+		return topScope;
 	}
 
 	private void startScope(STATE state) {
 		if (state == CHORD && states.contains(CHORD)) {
-			throw new IllegalStateException("nested chords '[' are not allowed, at character " + index);
+			throw new IllegalStateException("Unexpected '[' (index=" + index + "): nested chords are not allowed.");
 		}
 		states.push(state);
 		scopes.push(currentScope);
@@ -142,7 +153,7 @@ public class Parser {
 
 	private void endScope(STATE state) {
 		if (states.pop() != state) {
-			throw new IllegalStateException("Unexpected end of " + state + " at character " + index);
+			throw new IllegalStateException("Unexpected end of " + state + " (index=" + index + ")");
 		}
 		List<Item> scope = currentScope;
 		if (state == CHORD) {
@@ -179,11 +190,14 @@ public class Parser {
 		if (token != null) {
 			if (token.getType() == REPEAT_STAR) {
 				nextToken();
-				if (token.getType() == TEXT) {
+				try {
+					if (token == null || token.getType() != TEXT) {
+						throw new NumberFormatException();
+					}
 					repetitions = token.getInt();
 				}
-				else {
-					throw new IllegalStateException("Expected a number after '*' at character " + index);
+				catch (NumberFormatException e) {
+					throw new IllegalStateException("Expected an integer after '*' (index=" + index + ")");
 				}
 			}
 			else {
@@ -202,6 +216,7 @@ public class Parser {
 		specialCharMap.put(')', new Token(REPEAT_END));
 		specialCharMap.put('*', new Token(REPEAT_STAR));
 		specialCharMap.put('>', new Token(NEXT));
+		specialCharMap.put('<', new Token(PREV));
 	}
 
 	private void nextToken() {
@@ -212,26 +227,26 @@ public class Parser {
 		for (index++; index < input.length(); index++) {
 			char c = input.charAt(index);
 
-			Token specialToken = specialCharMap.get(c);
-			if (specialToken != null) {
-				if (buf.length() == 0) {
-					token = specialToken;
-				}
-				else {
-					// we've run over into the next token, so back up
-					index--;
-				}
-				break;
-			}
-
-			else if (Character.isWhitespace(c)) {
+			if (Character.isWhitespace(c)) {
 				if (buf.length() > 0) {
 					break;
 				}
 			}
-
 			else {
-				buf.append(c);
+				Token specialToken = specialCharMap.get(c);
+				if (specialToken != null) {
+					if (buf.length() == 0) {
+						token = specialToken;
+					}
+					else {
+						// we've run over into the next token, so back up
+						index--;
+					}
+					break;
+				}
+				else {
+					buf.append(c);
+				}
 			}
 		}
 

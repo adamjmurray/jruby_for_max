@@ -1,9 +1,11 @@
 package ajm.util;
 
+import com.cycling74.max.Atom;
+
 public class Token {
 
 	enum TYPE {
-		REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, NEXT, TEXT;
+		REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, NEXT, PREV, TEXT;
 	}
 
 	private TYPE type;
@@ -44,7 +46,21 @@ public class Token {
 		}
 	}
 
-	public Item getValue() {
+	public Atom getAtom() {
+		try {
+			if (text.contains(".")) {
+				return Atom.newAtom(Float.parseFloat(text));
+			}
+			else {
+				return Atom.newAtom(Integer.parseInt(text));
+			}
+		}
+		catch (NumberFormatException e) {
+			return Atom.newAtom(text);
+		}
+	}
+
+	public Atom getValue() {
 		int val;
 		int quarterSteps = 0;
 		switch (Character.toUpperCase(text.charAt(0))) {
@@ -77,7 +93,7 @@ public class Token {
 				break;
 
 			default:
-				return getItem();
+				return getAtom();
 
 		}
 
@@ -110,14 +126,14 @@ public class Token {
 			val += (octave + 1) * 12;
 			// only convert to float if absolutely necessary (floats introduce round off error)
 			if (quarterSteps % 2 == 0) {
-				return new Item(val + quarterSteps / 2);
+				return Atom.newAtom(val + quarterSteps / 2);
 			}
 			else {
-				return new Item(val + quarterSteps / 2.0f);
+				return Atom.newAtom(val + quarterSteps / 2.0f);
 			}
 		}
 		catch (NumberFormatException e) {
-			return new Item(text);
+			return Atom.newAtom(text);
 		}
 	}
 }

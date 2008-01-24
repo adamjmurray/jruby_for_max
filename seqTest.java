@@ -14,7 +14,7 @@ public class seqTest extends TestCase {
 	private boolean DEBUG = false;
 	private PrintStream out = System.out;
 
-	protected class seqStub extends seq2 {
+	protected class seqStub extends seq {
 		public seqStub(Atom[] args) {
 			super(args);
 			if (DEBUG) {
@@ -131,14 +131,14 @@ public class seqTest extends TestCase {
 	}
 
 	public void testReverse() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.reverse();
 		assertEquals(makeSeq("E", "D", "C", "B", "A"), s);
 	}
 
 
 	public void testReverseRange() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.revrange(1, 3);
 		assertEquals(makeSeq("A", "D", "C", "B", "E"), s);
 		s.revrange(4, 3);
@@ -147,7 +147,7 @@ public class seqTest extends TestCase {
 
 
 	public void testDelete() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.delete(0);
 		assertEquals(makeSeq("B", "C", "D", "E"), s);
 		s.delete(-1);
@@ -165,7 +165,7 @@ public class seqTest extends TestCase {
 
 
 	public void testDeleteRange() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.deleterange(1, 3);
 		assertEquals(makeSeq("A", "E"), s);
 
@@ -196,7 +196,7 @@ public class seqTest extends TestCase {
 
 
 	public void testSort() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.reverse();
 		s.sort();
 		assertEquals(makeSeq(), s);
@@ -204,7 +204,7 @@ public class seqTest extends TestCase {
 
 	// It was possible to get an IndexOutOfBoundsException
 	public void testShortenList() throws Exception {
-		seq2 s = makeSeq(1, 2);
+		seq s = makeSeq(1, 2);
 		s.increment = 0;
 		s.next();
 		s.values(Atom.newAtom(new int[] { 1 }));
@@ -222,7 +222,7 @@ public class seqTest extends TestCase {
 	}
 
 	public void testRotate() throws Exception {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.rotate(1);
 		assertEquals(makeSeq("B", "C", "D", "E", "A"), s);
 		s.rotate(2);
@@ -247,7 +247,7 @@ public class seqTest extends TestCase {
 	}
 
 	public void testDeleteCurrent() {
-		seq2 s = makeSeq();
+		seq s = makeSeq();
 		s.index = 2;
 		s.deletecurrent();
 		assertEquals(makeSeq("A", "B", "D", "E"), s);

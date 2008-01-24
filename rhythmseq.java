@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.cycling74.max.Atom;
 
-public class rhythmseq extends seq {
+public class rhythmseq extends oldseq {
 
 	protected int count = 0;
 	protected int duration = 0;

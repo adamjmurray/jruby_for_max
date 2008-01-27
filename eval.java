@@ -2,7 +2,7 @@ package ajm;
 
 import java.util.List;
 
-import ajm.util.Item;
+import ajm.data.Item;
 import ajm.util.MaxUtils;
 import ajm.util.Parser;
 

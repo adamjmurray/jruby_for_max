@@ -1,4 +1,4 @@
-package ajm.util;
+package ajm.data;
 
 import java.util.Arrays;
 
@@ -10,7 +10,7 @@ import com.cycling74.max.Atom;
  * @author Adam Murray
  * 
  */
-public class Item implements Comparable {
+public class Item implements Comparable<Item> {
 
 	private Atom atom;
 	private Atom[] atoms;
@@ -130,9 +130,9 @@ public class Item implements Comparable {
 		}
 	}
 
-	public int compareTo(Object other) {
+	public int compareTo(Item other) {
 		Atom a1 = getAtom();
-		Atom a2 = ((Item) other).getAtom();
+		Atom a2 = other.getAtom();
 		if (a1.isString() || a2.isString()) {
 			return a1.toString().compareTo(a2.toString());
 		}

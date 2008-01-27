@@ -379,14 +379,14 @@ public class rseqTest extends TestCase {
 	}
 	*/
 
-	public void testLength() throws Exception {
+	public void testRlength() throws Exception {
 		if (DEBUG) {
 			out.println("\n*** START testMaxtick ***");
 		}
 		// TODO: test with symbols in the list
 
 		rStub s = makeSeq(1, 2, 3);
-		s.length(7);
+		s.rlength(7);
 		s.bang();
 		assertEquals(1, s.valueSinceBang());
 		s.bang();
@@ -402,7 +402,7 @@ public class rseqTest extends TestCase {
 		assertEquals(1, s.valueSinceBang());
 
 		s.index(0);
-		s.length(5);
+		s.rlength(5);
 		s.bang();
 		assertEquals(1, s.valueSinceBang());
 		s.bang();

@@ -11,23 +11,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import ajm.data.Item;
+
 import com.cycling74.max.Atom;
 
 public class Parser {
 
 	public Parser() {
-		evaluateNotes = true;
-	}
-
-	public Parser(boolean evaluateNotes) {
-		this.evaluateNotes = evaluateNotes;
+		evalNotes = true;
 	}
 
 	enum STATE {
 		CHORD, REPETITION, DEFAULT;
 	}
 
-	private boolean evaluateNotes = true;
+	private boolean evalNotes = true;
 	private CharSequence input;
 	private int index;
 	private boolean lookedAhead;
@@ -114,7 +112,7 @@ public class Parser {
 
 				case TEXT:
 					Item item;
-					if (evaluateNotes) {
+					if (evalNotes) {
 						item = new Item(token.getValue());
 					}
 					else {
@@ -253,5 +251,13 @@ public class Parser {
 		if (buf.length() > 0) {
 			token = new Token(TEXT, buf.toString());
 		}
+	}
+
+	public boolean getEvalNotes() {
+		return evalNotes;
+	}
+
+	public void setEvalNotes(boolean evalNotes) {
+		this.evalNotes = evalNotes;
 	}
 }

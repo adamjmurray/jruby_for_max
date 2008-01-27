@@ -205,9 +205,9 @@ public class seqTest extends TestCase {
 	// It was possible to get an IndexOutOfBoundsException
 	public void testShortenList() throws Exception {
 		seq s = makeSeq(1, 2);
-		s.increment = 0;
+		s.step = 0;
 		s.next();
-		s.values(Atom.newAtom(new int[] { 1 }));
+		s.seq(Atom.newAtom(new int[] { 1 }));
 		s.output();
 	}
 
@@ -215,7 +215,7 @@ public class seqTest extends TestCase {
 		seqStub s = emptySeq();
 		s.index(2);
 		// assertEquals(2, s.getindex());
-		s.values(Atom.newAtom(new String[] { "A", "B", "C" }));
+		s.seq(Atom.newAtom(new String[] { "A", "B", "C" }));
 		// assertEquals(2, s.getindex());
 		s.bang();
 		assertEquals("C", s.getLastStringValue());
@@ -298,10 +298,10 @@ public class seqTest extends TestCase {
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
 		s.add(2);
-		assertEquals(Atom.newAtom(3), s.values.get(0));
-		assertEquals(Atom.newAtom("a"), s.values.get(1));
-		assertEquals(Atom.newAtom(2.5 + 2), s.values.get(2));
-		assertEquals(Atom.newAtom("b"), s.values.get(3));
+		assertEquals(Atom.newAtom(3), s.seq.get(0));
+		assertEquals(Atom.newAtom("a"), s.seq.get(1));
+		assertEquals(Atom.newAtom(2.5 + 2), s.seq.get(2));
+		assertEquals(Atom.newAtom("b"), s.seq.get(3));
 	}
 
 	public void testMultiply() {
@@ -324,10 +324,10 @@ public class seqTest extends TestCase {
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
 		s.multiply(2);
-		assertEquals(Atom.newAtom(2), s.values.get(0));
-		assertEquals(Atom.newAtom("a"), s.values.get(1));
-		assertEquals(Atom.newAtom(2.5 * 2), s.values.get(2));
-		assertEquals(Atom.newAtom("b"), s.values.get(3));
+		assertEquals(Atom.newAtom(2), s.seq.get(0));
+		assertEquals(Atom.newAtom("a"), s.seq.get(1));
+		assertEquals(Atom.newAtom(2.5 * 2), s.seq.get(2));
+		assertEquals(Atom.newAtom("b"), s.seq.get(3));
 	}
 
 

@@ -6,6 +6,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import ajm.data.Item;
+
 import com.cycling74.max.Atom;
 
 public class ParserTest extends TestCase {

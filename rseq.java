@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ajm.data.Item;
 import ajm.data.MappedList;
-import ajm.util.Item;
 import ajm.util.Parser;
 
 import com.cycling74.max.Atom;
@@ -27,6 +27,8 @@ public class rseq extends MaxObject {
 		declareAttribute("increment");
 		declareAttribute("offset");
 
+		parser.setEvalNotes(false);
+
 		if (initializer != null) {
 			initializer.set();
 		}
@@ -41,12 +43,12 @@ public class rseq extends MaxObject {
 			// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
 			public void execute() {
 				// handle attributes used to construct the object
-				defaultIndex = index;
+				defaultTick = tick;
 				defaultIteration = iteration;
 				defaultIncrement = increment;
 				defaultOffset = offset;
-				if (!idxMap.isEmpty()) {
-					defaultIdxMap = idxMap.clone();
+				if (!tickMap.isEmpty()) {
+					defaultTickMap = tickMap.clone();
 					outputVals();
 				}
 			}
@@ -72,26 +74,26 @@ public class rseq extends MaxObject {
 
 	// attributes
 	protected List<Item> values = new ArrayList<Item>();
-	protected int index = 0;
+	protected int tick = 0;
 	protected int iteration = 0;
 	protected int increment = 1;
 	protected int offset;
 
 	// default values (for reset functions)
-	protected int defaultIndex = index;
+	protected int defaultTick = tick;
 	protected int defaultIteration = iteration;
 	protected int defaultIncrement = increment;
 	protected int defaultOffset = offset;
-	protected MappedList<Atom> defaultIdxMap = new MappedList<Atom>(); // ??? no default values?
+	protected MappedList<Integer> defaultTickMap = new MappedList<Integer>(); // ??? no default values?
 
 	// other internal state
 	protected int maxIdx;
 	boolean initialOutput = true;
 	protected int initialIdx = 0;
-	protected MappedList<Atom> idxMap = new MappedList<Atom>();
+	protected MappedList<Integer> tickMap = new MappedList<Integer>();
 	protected boolean wrap = true;
 
-	protected Parser parser = new Parser(false);
+	protected Parser parser = new Parser();
 
 	// TODO: new offset attribute (tick offset separate attr?), to replace the rhythmrot method
 	// actual tick will be tick + offset
@@ -144,22 +146,22 @@ public class rseq extends MaxObject {
 			}
 		}
 
-		idxMap.clear();
+		tickMap.clear();
 		maxIdx = getIdxCount();
 		int pos = 0;
 		for (int i = 0; i < values.size(); i++) {
 			Item item = values.get(i);
-			Atom a = item.getAtom();
 			if (pos == maxIdx) {
 				// then we exceeded the number of indexes, and these occur on index 0, but
 				// not during the initial playback because they end the list rather than start it
 				// the special -1 index is used to distinguish trailing 0s (or messages) from leading 0s (or messages)
-				idxMap.addValue(-1, a);
+				tickMap.addValue(-1, i);
 			}
 			else {
-				idxMap.addValue(pos, a);
+				tickMap.addValue(pos, i);
 			}
 
+			Atom a = item.getAtom();
 			if (a.isInt() || a.isFloat()) {
 				int delay = a.toInt();
 				delay = (delay < 0) ? -delay : delay;
@@ -184,22 +186,11 @@ public class rseq extends MaxObject {
 	}
 
 	public int getindex() {
-		return this.index;
+		return this.tick;
 	}
 
 	public void index(int index) {
-		this.index = index;
-	}
-
-	// instead of this, we should just extend ajm.seq and support the output command
-	public void get(int index) {
-		if (index < 0 || index >= values.size()) {
-			error(getClass() + ": invalid index " + index + " (valid indexes for current list are 0 - "
-					+ (values.size() - 1) + ")");
-		}
-		else {
-			outputValuesAtIndex(index);
-		}
+		this.tick = index;
 	}
 
 	/* Sets the length of the sequence in terms of the total number of ticks represented by the rhythm. If the new
@@ -207,19 +198,20 @@ public class rseq extends MaxObject {
 	 * from the end of the sequence, and the last remaining value decreased as needed in order to set the new rhythm
 	 * length.
 	 */
-	public void length(int length) {
+	// TODO: update patches
+	public void rlength(int length) {
 		this.maxIdx = length;
 	}
 
-	/* try just setting a tick offset
-	public void rhythmrot(int ticks) {
+	/* try just setting a tick offset?
+	public void rrotate(int ticks) {
 		outputVals();
 	}*/
 
 	public void bang() {
 		if (maxIdx > 0) {
 			output();
-			index += increment;
+			tick += increment;
 		}
 	}
 
@@ -231,28 +223,28 @@ public class rseq extends MaxObject {
 				wrap = false;
 				output(OUTLET.ITERATION, iteration);
 			}
-			output(OUTLET.INDEX, index);
+			output(OUTLET.INDEX, tick);
 			if (initialOutput) {
 				initialOutput = false;
 			}
-			else if (index == 0) {
-				outputValuesAtIndex(-1);
+			else if (tick == 0) {
+				outputValuesAtTick(-1);
 			}
-			outputValuesAtIndex(index);
+			outputValuesAtTick(tick);
 		}
 	}
 
 	private void fixIdxBounds() {
 		// TODO: how to handle offset? do we need a new "adjustedIndex" var?
-		while (index >= maxIdx) {
+		while (tick >= maxIdx) {
 			wrap = true;
 			iteration++;
-			index -= maxIdx;
+			tick -= maxIdx;
 		}
-		while (index < 0) {
+		while (tick < 0) {
 			wrap = true;
 			iteration--;
-			index += maxIdx;
+			tick += maxIdx;
 		}
 	}
 
@@ -265,11 +257,11 @@ public class rseq extends MaxObject {
 		outlet(outlet.outletNumber, data);
 	}
 
-	private void outputValuesAtIndex(int index) {
-		List<Atom> values = idxMap.get(index);
-		if (values != null) {
-			for (Atom atom : values) {
-				output(OUTLET.CURRENT_VAL, atom);
+	private void outputValuesAtTick(int tick) {
+		List<Integer> indexes = tickMap.get(tick);
+		if (indexes != null) {
+			for (Integer index : indexes) {
+				output(OUTLET.CURRENT_VAL, values.get(index).getAtom());
 			}
 		}
 	}
@@ -283,7 +275,7 @@ public class rseq extends MaxObject {
 	}
 
 	public void reset() {
-		index = defaultIndex;
+		tick = defaultTick;
 		increment = defaultIncrement;
 		iteration = defaultIteration;
 		offset = defaultOffset;
@@ -292,7 +284,7 @@ public class rseq extends MaxObject {
 	}
 
 	public void resetindex() {
-		index = defaultIndex;
+		tick = defaultTick;
 		initialOutput = true; // This needs to be here for syncing to work right
 	}
 
@@ -310,7 +302,7 @@ public class rseq extends MaxObject {
 	}
 
 	public void resetseq() {
-		idxMap = (MappedList<Atom>) defaultIdxMap.clone();
+		tickMap = defaultTickMap.clone();
 		initialOutput = true;
 		outputVals();
 	}

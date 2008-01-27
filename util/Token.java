@@ -1,5 +1,7 @@
 package ajm.util;
 
+import ajm.data.Item;
+
 import com.cycling74.max.Atom;
 
 public class Token {

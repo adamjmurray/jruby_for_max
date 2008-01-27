@@ -1001,7 +1001,7 @@ public class oldseq extends MaxObject {
 
 	public boolean equals(Object obj) {
 		if (obj instanceof seq) {
-			return Arrays.equals(getvalues(), ((seq) obj).getvalues());
+			return Arrays.equals(getvalues(), ((seq) obj).getseq());
 		}
 		else {
 			return false;

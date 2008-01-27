@@ -3,8 +3,8 @@ package ajm;
 import java.util.ArrayList;
 import java.util.List;
 
+import ajm.data.Item;
 import ajm.data.MappedList;
-import ajm.util.Item;
 import ajm.util.Parser;
 
 import com.cycling74.max.Atom;

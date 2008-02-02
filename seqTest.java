@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxQelem;
@@ -38,10 +39,15 @@ public class seqTest extends TestCase {
 			outputData.put(outlet, data);
 		}
 
+		@Override
+		protected void output(OUTLET outlet, Item data) {
+			outputData.put(outlet, data);
+		}
+
 		public Map<OUTLET, Object> outputData = new HashMap<OUTLET, Object>();
 
 		public String getLastStringValue() {
-			return ((Atom) outputData.get(OUTLET.CURRENT_VAL)).toString();
+			return outputData.get(OUTLET.VALUE).toString();
 		}
 
 		@Override
@@ -139,9 +145,9 @@ public class seqTest extends TestCase {
 
 	public void testReverseRange() throws Exception {
 		seq s = makeSeq();
-		s.revrange(1, 3);
+		s.reverserange(1, 3);
 		assertEquals(makeSeq("A", "D", "C", "B", "E"), s);
-		s.revrange(4, 3);
+		s.reverserange(4, 3);
 		assertEquals(makeSeq("A", "D", "C", "E", "B"), s);
 	}
 
@@ -246,6 +252,7 @@ public class seqTest extends TestCase {
 		assertEquals(emptySeq(), s);
 	}
 
+	/*
 	public void testDeleteCurrent() {
 		seq s = makeSeq();
 		s.index = 2;
@@ -255,6 +262,7 @@ public class seqTest extends TestCase {
 		s = emptySeq();
 		s.deletecurrent();
 	}
+	*/
 
 	public void testSetIndex() {
 		seqStub s = makeSeq();
@@ -337,5 +345,4 @@ public class seqTest extends TestCase {
 	// setting a new list vs
 
 	}
-
 }

@@ -18,16 +18,26 @@ import com.cycling74.max.MaxQelem;
 public class seq extends MaxObject {
 
 	public seq(Atom[] args) {
+		declareAttrs();
 		declareIO(1, 4);
 		setInletAssist(new String[] { "list / bang / commands" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
+		init();
+	}
 
+	protected seq() { // for subclasses
+		declareAttrs();
+	}
+
+	protected void declareAttrs() {
 		declareAttribute("seq", "getseq", "seq");
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("cmode", "getchordmode", "chordmode");
 		declareAttribute("iter", "getiter", "iter");
 		declareAttribute("step", "getstep", "step");
+	}
 
+	protected void init() {
 		if (initializer != null) {
 			initializer.set();
 		}
@@ -36,26 +46,28 @@ public class seq extends MaxObject {
 		}
 	}
 
-	private MaxQelem initializer = getInitializer();
+	protected MaxQelem initializer = getInitializer();
 
+	// This is done this round about way so we can override this method
+	// and avoid an UnsatisfiedLinkError in the jUnit tests.
 	protected MaxQelem getInitializer() {
-		// This is done this round about way so we can override this method and avoid an UnsatisfiedLinkError
-		// in the jUnit tests.
-		return new MaxQelem(new Executable() {
-			// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
-			public void execute() {
-				// handle attributes used to construct the object
-				defaultIndex = index;
-				defaultIter = iter;
-				defaultStep = step;
-				defaultChordmode = chordmode;
-				if (!seq.isEmpty()) {
-					defaultSeq.addAll(seq);
-					outputSeq();
-				}
-				initialized = true;
+		return new MaxQelem(new seqInitializationCallback());
+	}
+
+	protected class seqInitializationCallback implements Executable {
+		// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
+		public void execute() {
+			// handle attributes used to construct the object
+			defaultIndex = index;
+			defaultIter = iter;
+			defaultStep = step;
+			defaultChordmode = chordmode;
+			if (!seq.isEmpty()) {
+				defaultSeq.addAll(seq);
+				outputSeq();
 			}
-		});
+			initialized = true;
+		}
 	}
 
 	@Override
@@ -65,7 +77,8 @@ public class seq extends MaxObject {
 
 
 	protected enum OUTLET {
-		CURRENT_VAL(0), INDEX(1), ITERATION(2), VALUES(3), TICK(4);
+		VALUE(0), INDEX(1), ITER(2), SEQ(3), VALINDEX(4);
+		// VALINDEX outlet is just for the rseq subclass. Java enums don't support inheritance :(
 
 		private final int outletNumber;
 
@@ -90,7 +103,7 @@ public class seq extends MaxObject {
 	protected int step = 1;
 	protected CHORDMODE chordmode = CHORDMODE.CHORD;
 
-	// Defaults
+	// Defaults (for reset commands)
 	protected ArrayList<Item> defaultSeq = new ArrayList<Item>();
 	protected int defaultIndex = index;
 	protected int defaultIter = iter;
@@ -199,7 +212,7 @@ public class seq extends MaxObject {
 	public void set(Atom[] list) {
 		seq.clear();
 		seq.addAll(parser.parse(list));
-		handleListChange();
+		handleSeqChange();
 	}
 
 	// Max doesn't treat lists starting with a symbol as lists (they're just messages)
@@ -207,7 +220,7 @@ public class seq extends MaxObject {
 	public void anything(String msg, Atom[] args) {
 		seq.clear();
 		seq.addAll(parser.parse(msg, args));
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -217,7 +230,7 @@ public class seq extends MaxObject {
 	 *------------------------------------------------*/
 	public void append(Atom[] list) {
 		seq.addAll(parser.parse(list));
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -241,11 +254,12 @@ public class seq extends MaxObject {
 
 	protected void insert(int idx, Atom[] list) {
 		List<Item> newSeq = parser.parse(list);
+		idx = fixBounds(idx);
 		seq.addAll(idx, newSeq);
 		if (idx <= index) {
 			index += newSeq.size(); // keep the index at the correct current element
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -276,26 +290,27 @@ public class seq extends MaxObject {
 					seq.add(item);
 				}
 			}
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
 
 	public void repeat(Atom[] args) {
 		int n = 1; // the default is one repetition
-		if (args.length > 1) {
+		if (args.length > 0) {
 			if (!args[0].isInt() && !args[0].isFloat()) {
 				error("Invalid call to repeat. Argument was not a number.");
 				return;
 			}
 			n = args[0].toInt();
+			post("set n to " + n);
 		}
 		if (!seq.isEmpty()) {
 			ArrayList<Item> currVals = new ArrayList<Item>(seq);
 			for (int i = 0; i < n; i++) {
 				seq.addAll(currVals);
 			}
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
@@ -326,7 +341,7 @@ public class seq extends MaxObject {
 				}
 				outputSeq();
 			}
-			handleListChange();
+			handleSeqChange();
 		}
 	}
 
@@ -341,7 +356,7 @@ public class seq extends MaxObject {
 
 		if (index >= 0 && index < seq.size()) {
 			seq.remove(index);
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
@@ -360,26 +375,42 @@ public class seq extends MaxObject {
 					seq.remove(index);
 				}
 			}
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
 
 	public void clear() {
 		seq.clear();
-		handleListChange();
+		handleSeqChange();
+	}
+
+	protected int fixBounds(int idx) {
+		if (!seq.isEmpty()) { // prevent infinite loops!
+			int size = seq.size();
+			while (idx >= size) {
+				idx -= size;
+			}
+			while (idx < 0) {
+				idx += size;
+			}
+		}
+		return idx;
 	}
 
 	/*
 	 * TODO: make this return an array or arrays [l,r][l2,r2] for the case where we go from say, -1 to 1
 	 * Takes two bounds, and returns an array [left, right] where left and right and both are valid indices for the values list
 	 */
+	@Deprecated
 	protected int[] fixBounds(int left, int right) {
 		if (left > right) {
 			int tmp = left;
 			left = right;
 			right = tmp;
 		}
+		// TODO: phase this out, this logic is wrong anyway (what if both left and right are less than 0 or greater than
+		// seq.size()?)
 		if (left < 0) {
 			left = 0;
 		}
@@ -387,6 +418,38 @@ public class seq extends MaxObject {
 			right = seq.size() - 1;
 		}
 		return new int[] { left, right };
+	}
+
+	protected int[] getRange(int start, int end) {
+		if (seq.isEmpty()) {
+			return new int[] { 0, 0 };
+		}
+		while (end < start) {
+			end += seq.size();
+		}
+		// now make sure both values are non-negative so we can do
+		// positive modular arithmetic
+		while (start < 0 || end < 0) {
+			start += seq.size();
+			end += seq.size();
+		}
+		return new int[] { start, end };
+	}
+
+	protected int[] getReverseRange(int start, int end) {
+		if (seq.isEmpty()) {
+			return new int[] { 0, 0 };
+		}
+		while (start < end) {
+			start += seq.size();
+		}
+		// now make sure both values are non-negative so we can do
+		// positive modular arithmetic
+		while (start < 0 || end < 0) {
+			start += seq.size();
+			end += seq.size();
+		}
+		return new int[] { start, end };
 	}
 
 
@@ -406,7 +469,7 @@ public class seq extends MaxObject {
 				newVals.add(seq.get(i));
 			}
 			seq = newVals;
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
@@ -414,7 +477,7 @@ public class seq extends MaxObject {
 	public void deletevalue(Atom[] args) {
 		for (Atom a : args) {
 			for (int i = 0; i < seq.size(); i++) {
-				if (seq.get(i).equals(a)) {
+				if (seq.get(i).getAtom().equals(a)) {
 					seq.remove(i);
 					// keep the index at the correct current element
 					if (i < index) {
@@ -443,7 +506,7 @@ public class seq extends MaxObject {
 
 	public void sort() {
 		Collections.sort(seq);
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -460,7 +523,7 @@ public class seq extends MaxObject {
 
 			deleterange(left, right);
 			seq.addAll(left, sorted);
-			handleListChange();
+			handleSeqChange();
 			outputSeq();
 		}
 	}
@@ -510,13 +573,13 @@ public class seq extends MaxObject {
 			seq.set(idx1, seq.get(idx2));
 			seq.set(idx2, tmp);
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
 	public void reverse() {
 		reverseVals(0, seq.size() - 1);
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -527,7 +590,7 @@ public class seq extends MaxObject {
 		}
 		int[] lr = fixBounds(idx1, idx2);
 		reverseVals(lr[0], lr[1]);
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -571,7 +634,7 @@ public class seq extends MaxObject {
 			reverseVals(n, right);
 			reverseVals(left, right);
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -595,7 +658,7 @@ public class seq extends MaxObject {
 		for (int i = 0; i < seq.size(); i++) {
 			seq.set(i, seq.get(i).add(args[i % args.length]));
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -614,13 +677,49 @@ public class seq extends MaxObject {
 			}
 		}
 
-		int[] lr = fixBounds(args[0].toInt(), args[1].toInt());
-		int left = lr[0];
-		int right = lr[1];
-		for (int i = left; i <= right; i++) {
-			seq.set(i, seq.get(i).add(args[i % args.length]));
+		int[] range = getRange(args[0].toInt(), args[1].toInt());
+		int start = range[0];
+		int end = range[1];
+		int len = args.length - 2;
+		int i = start;
+		int j = 0;
+		while (i <= end) {
+			Atom summand = args[(j % len) + 2];
+			int idx = i % seq.size();
+			seq.set(idx, seq.get(idx).add(summand));
+			i++;
+			j++;
 		}
-		handleListChange();
+		handleSeqChange();
+		outputSeq();
+	}
+
+	public void addrevrange(Atom[] args) {
+		if (args.length < 3) {
+			error("addrevrange command needs at least 3 arguments");
+			return;
+		}
+		for (Atom atom : args) {
+			if (!atom.isFloat() && !atom.isInt()) {
+				error("arguments to add command must be numbers");
+				return;
+			}
+		}
+
+		int[] range = getReverseRange(args[0].toInt(), args[1].toInt());
+		int start = range[0];
+		int end = range[1];
+		int len = args.length - 2;
+		int i = start;
+		int j = 0;
+		while (i >= end) {
+			Atom summand = args[(j % len) + 2];
+			int idx = i % seq.size();
+			seq.set(idx, seq.get(idx).add(summand));
+			i--;
+			j++;
+		}
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -638,7 +737,7 @@ public class seq extends MaxObject {
 		for (int i = 0; i < seq.size(); i++) {
 			seq.set(i, seq.get(i).multiply(args[i % args.length]));
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -658,9 +757,9 @@ public class seq extends MaxObject {
 		int left = lr[0];
 		int right = lr[1];
 		for (int i = left; i <= right; i++) {
-			seq.set(i, seq.get(i).multiply(args[i % args.length]));
+			seq.set(i, seq.get(i).multiply(args[(i - left) % args.length]));
 		}
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
@@ -774,10 +873,10 @@ public class seq extends MaxObject {
 			fixIndexBounds();
 			if (iterChanged) {
 				iterChanged = false;
-				output(OUTLET.ITERATION, iter);
+				output(OUTLET.ITER, iter);
 			}
 			output(OUTLET.INDEX, this.index);
-			output(OUTLET.CURRENT_VAL, seq.get(this.index));
+			output(OUTLET.VALUE, seq.get(this.index));
 		}
 	}
 
@@ -794,7 +893,13 @@ public class seq extends MaxObject {
 	*/
 
 	protected void outputSeq() {
-		output(OUTLET.VALUES, getseq());
+		Atom[] atoms = getseq();
+		if (atoms.length > 0) {
+			output(OUTLET.SEQ, getseq());
+		}
+		else {
+			output(OUTLET.SEQ, Atom.newAtom(""));
+		}
 	}
 
 
@@ -834,11 +939,9 @@ public class seq extends MaxObject {
 		}
 	}
 
-	/*
 	protected void output(OUTLET outlet, Atom data) {
 		outlet(outlet.outletNumber, data);
 	}
-	*/
 
 	protected void output(OUTLET outlet, Atom[] data) {
 		outlet(outlet.outletNumber, data);
@@ -873,16 +976,17 @@ public class seq extends MaxObject {
 	public void resetseq() {
 		seq.clear();
 		seq.addAll(defaultSeq);
-		handleListChange();
+		handleSeqChange();
 		outputSeq();
 	}
 
 
-	protected void handleListChange() {
+	protected void handleSeqChange() {
 		// maybe? index = defaultIndex;
 
 		chordIndex = 0;
-		// chordIndex needs to be reset whenever the current value changes, but is this overly aggressive?
+		// chordIndex needs to be reset whenever the current value changes, but is this overly aggressive? YES! Try
+		// changing a list of chords while it is playing. it is not cool...
 	}
 
 
@@ -901,7 +1005,7 @@ public class seq extends MaxObject {
 	}
 
 	// for use with debugging unit tests, must be set from the test after instantiation
-	private PrintStream debugOut;
+	protected PrintStream debugOut;
 
 	protected void debug(String msg) {
 		if (debugOut != null) {

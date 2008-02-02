@@ -29,7 +29,7 @@ public class rseqTest extends TestCase {
 		// Sending to outlet will not work inside jUnit tests:
 		@Override
 		protected void output(OUTLET outlet, Atom data) {
-			if (outlet == OUTLET.CURRENT_VAL) {
+			if (outlet == OUTLET.VALUE) {
 				valOuts.add(data.getInt());
 				if (DEBUG) {
 					out.println(outlet + ": " + data.getInt());
@@ -67,7 +67,7 @@ public class rseqTest extends TestCase {
 		}
 
 		public Integer valueSinceBang() {
-			return outputs.get(OUTLET.CURRENT_VAL);
+			return outputs.get(OUTLET.VALUE);
 		}
 
 		public Integer indexSinceBang() {
@@ -75,7 +75,7 @@ public class rseqTest extends TestCase {
 		}
 
 		public Integer iterationSinceBang() {
-			return outputs.get(OUTLET.ITERATION);
+			return outputs.get(OUTLET.ITER);
 		}
 
 		@Override
@@ -145,13 +145,13 @@ public class rseqTest extends TestCase {
 		}
 		rStub s = makeSeq(1, 1);
 		s.bang();
-		assertEquals(0, s.iteration);
+		assertEquals(0, s.iter);
 
-		s.values(Atom.newAtom(new int[] { 1 }));
+		s.seq(Atom.newAtom(new int[] { 1 }));
 		s.bang();
-		assertEquals(1, s.iteration);
+		assertEquals(1, s.iter);
 		s.bang();
-		assertEquals(2, s.iteration);
+		assertEquals(2, s.iter);
 
 		if (DEBUG) {
 			out.println("*** END testShortenList ***\n");

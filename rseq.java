@@ -1,138 +1,93 @@
 package ajm;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import ajm.data.Item;
 import ajm.data.MappedList;
-import ajm.util.Parser;
 
 import com.cycling74.max.Atom;
-import com.cycling74.max.Executable;
-import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
 
-public class rseq extends MaxObject {
+public class rseq extends seq {
 
 	public rseq(Atom[] args) {
-		declareIO(1, 4);
-		setInletAssist(new String[] { "list / commands" });
-		setOutletAssist(new String[] { "value", "index", "iteration", "list" });
+		super(); // declares seq attributes
+		declareAttribute("valindex", "getvalindex", "valindex");
 
-		declareAttribute("values", "getvalues", "values");
-		declareAttribute("index", "getindex", "index");
-		declareAttribute("iteration");
-		declareAttribute("increment");
-		declareAttribute("offset");
+		declareIO(1, 5);
+		setInletAssist(new String[] { "list / bang / commands" });
+		setOutletAssist(new String[] { "value", "rhythmic index", "iter", "sequence", "value index" });
 
 		parser.setEvalNotes(false);
 
-		if (initializer != null) {
-			initializer.set();
-		}
+		init();
 	}
-
-	private MaxQelem initializer = getInitializer();
 
 	protected MaxQelem getInitializer() {
-		// This is done this round about way so we can override this method and avoid an UnsatisfiedLinkError
-		// in the jUnit tests.
-		return new MaxQelem(new Executable() {
-			// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
-			public void execute() {
-				// handle attributes used to construct the object
-				defaultTick = tick;
-				defaultIteration = iteration;
-				defaultIncrement = increment;
-				defaultOffset = offset;
-				if (!tickMap.isEmpty()) {
-					defaultTickMap = tickMap.clone();
-					outputVals();
-				}
+		return new MaxQelem(new rseqInitializationCallback());
+	}
+
+	protected class rseqInitializationCallback extends seqInitializationCallback {
+		public void execute() {
+			defaultRIndex = rIndex;
+			/*
+			if (!tickMap.isEmpty()) {
+				defaultTickMap = tickMap.clone();
 			}
-		});
-	}
-
-	@Override
-	protected void notifyDeleted() {
-		initializer.release();
-	}
-
-
-	protected enum OUTLET {
-		CURRENT_VAL(0), INDEX(1), ITERATION(2), VALUES(3);
-
-		private final int outletNumber;
-
-		OUTLET(int outletNumber) {
-			this.outletNumber = outletNumber;
+			*/
+			super.execute();
 		}
 	}
 
 
-	// attributes
-	protected List<Item> values = new ArrayList<Item>();
-	protected int tick = 0;
-	protected int iteration = 0;
-	protected int increment = 1;
-	protected int offset;
+	/*------------------------------------------------
+	 *  Internal State
+	 *------------------------------------------------*/
 
-	// default values (for reset functions)
-	protected int defaultTick = tick;
-	protected int defaultIteration = iteration;
-	protected int defaultIncrement = increment;
-	protected int defaultOffset = offset;
-	protected MappedList<Integer> defaultTickMap = new MappedList<Integer>(); // ??? no default values?
+	// Attributes
+	// The rhythmic index, which is the "index" to Max. The index in the superclass (seq) is the "valindex" for this
+	// class.
+	protected int rIndex = 0;
+
+	// Defaults (for reset commands)
+	protected int defaultRIndex = rIndex;
+	// protected MappedList<Integer> defaultTickMap = new MappedList<Integer>(); // ??? no default seq?
 
 	// other internal state
-	protected int maxIdx;
+	protected int maxRIndex;
 	boolean initialOutput = true;
 	protected int initialIdx = 0;
 	protected MappedList<Integer> tickMap = new MappedList<Integer>();
-	protected boolean wrap = true;
 
-	protected Parser parser = new Parser();
+	/*------------------------------------------------
+	 *  Attribute Handlers
+	 *------------------------------------------------*/
 
-	// TODO: new offset attribute (tick offset separate attr?), to replace the rhythmrot method
-	// actual tick will be tick + offset
-
-	public Atom[] getvalues() {
-		Atom[] atoms = new Atom[values.size()];
-		for (int i = 0; i < values.size(); i++) {
-			atoms[i] = values.get(i).getAtom();
-		}
-		return atoms;
+	@Override
+	public int getindex() {
+		return rIndex;
 	}
 
-	public void values(Atom[] list) {
-		set(list);
-		outputVals();
+	@Override
+	public void index(int index) {
+		this.rIndex = index;
 	}
 
-	public void list(Atom[] list) {
-		set(list);
-		outputVals();
+	public int getvalindex() {
+		return super.getindex();
 	}
 
-	// Max doesn't treat lists starting with a symbol as lists (they're just messages)
-	// so we need to handle them here:
-	public void anything(String msg, Atom[] args) {
-		values = parser.parse(msg, args);
-		handleValueChange();
-		outputVals();
+	public void valindex(int index) {
+		super.index(index);
 	}
 
-	public void set(Atom[] list) {
-		values = parser.parse(list);
-		handleValueChange();
-	}
-
-	private void handleValueChange() {
-		if (values.size() > 0) {
+	@Override
+	protected void handleSeqChange() {
+		super.handleSeqChange();
+		if (seq.size() > 0) {
 			boolean allZeros = true;
-			for (Item item : values) {
+			for (Item item : seq) {
 				if (!item.isAtomArray()) {
 					Atom a = item.getAtom();
 					if ((a.isInt() || a.isFloat()) && a.toInt() != 0) {
@@ -142,16 +97,16 @@ public class rseq extends MaxObject {
 				}
 			}
 			if (allZeros) {
-				values.add(new Item(1)); // prevents infinite loops
+				seq.add(new Item(1)); // prevents infinite loops
 			}
 		}
 
 		tickMap.clear();
-		maxIdx = getIdxCount();
+		maxRIndex = getIdxCount();
 		int pos = 0;
-		for (int i = 0; i < values.size(); i++) {
-			Item item = values.get(i);
-			if (pos == maxIdx) {
+		for (int i = 0; i < seq.size(); i++) {
+			Item item = seq.get(i);
+			if (pos == maxRIndex) {
 				// then we exceeded the number of indexes, and these occur on index 0, but
 				// not during the initial playback because they end the list rather than start it
 				// the special -1 index is used to distinguish trailing 0s (or messages) from leading 0s (or messages)
@@ -173,7 +128,7 @@ public class rseq extends MaxObject {
 
 	private int getIdxCount() {
 		int total = 0;
-		for (Item i : values) {
+		for (Item i : seq) {
 			if (!i.isAtomArray()) {
 				Atom a = i.getAtom();
 				if (a.isInt() || a.isFloat()) {
@@ -185,22 +140,15 @@ public class rseq extends MaxObject {
 		return total;
 	}
 
-	public int getindex() {
-		return this.tick;
-	}
-
-	public void index(int index) {
-		this.tick = index;
-	}
 
 	/* Sets the length of the sequence in terms of the total number of ticks represented by the rhythm. If the new
-	 * length is longer then the current, the last value will be increased as needed. Otherwise, values will be removed
+	 * length is longer then the current, the last value will be increased as needed. Otherwise, seq will be removed
 	 * from the end of the sequence, and the last remaining value decreased as needed in order to set the new rhythm
 	 * length.
 	 */
 	// TODO: update patches
 	public void rlength(int length) {
-		this.maxIdx = length;
+		this.maxRIndex = length;
 	}
 
 	/* try just setting a tick offset?
@@ -208,124 +156,80 @@ public class rseq extends MaxObject {
 		outputVals();
 	}*/
 
+	@Override
 	public void bang() {
-		if (maxIdx > 0) {
+		if (maxRIndex > 0) {
 			output();
-			tick += increment;
+			rIndex += step;
 		}
 	}
 
-
+	@Override
 	public void output() {
-		if (maxIdx > 0) {
+		if (maxRIndex > 0) {
 			fixIdxBounds();
-			if (wrap) {
-				wrap = false;
-				output(OUTLET.ITERATION, iteration);
+			if (iterChanged) {
+				iterChanged = false;
+				output(OUTLET.ITER, iter);
 			}
-			output(OUTLET.INDEX, tick);
+			output(OUTLET.INDEX, rIndex);
 			if (initialOutput) {
 				initialOutput = false;
 			}
-			else if (tick == 0) {
+			else if (rIndex == 0) {
 				outputValuesAtTick(-1);
 			}
-			outputValuesAtTick(tick);
+			outputValuesAtTick(rIndex);
 		}
 	}
 
 	private void fixIdxBounds() {
-		// TODO: how to handle offset? do we need a new "adjustedIndex" var?
-		while (tick >= maxIdx) {
-			wrap = true;
-			iteration++;
-			tick -= maxIdx;
+		while (rIndex >= maxRIndex) {
+			iterChanged = true;
+			iter++;
+			rIndex -= maxRIndex;
 		}
-		while (tick < 0) {
-			wrap = true;
-			iteration--;
-			tick += maxIdx;
+		while (rIndex < 0) {
+			iterChanged = true;
+			iter--;
+			rIndex += maxRIndex;
 		}
 	}
 
-	protected void outputVals() {
-		output(OUTLET.VALUES, getvalues());
-	}
-
-
-	protected void output(OUTLET outlet, int data) {
-		outlet(outlet.outletNumber, data);
-	}
 
 	private void outputValuesAtTick(int tick) {
 		List<Integer> indexes = tickMap.get(tick);
 		if (indexes != null) {
 			for (Integer index : indexes) {
-				output(OUTLET.CURRENT_VAL, values.get(index).getAtom());
+				output(OUTLET.VALINDEX, index);
+				output(OUTLET.VALUE, seq.get(index).getAtom());
 			}
 		}
 	}
 
-	protected void output(OUTLET outlet, Atom data) {
-		outlet(outlet.outletNumber, data);
-	}
-
-	protected void output(OUTLET outlet, Atom[] data) {
-		outlet(outlet.outletNumber, data);
-	}
-
+	@Override
 	public void reset() {
-		tick = defaultTick;
-		increment = defaultIncrement;
-		iteration = defaultIteration;
-		offset = defaultOffset;
-		resetseq();
-		initialOutput = true;
+		resetvalindex();
+		super.reset();
 	}
 
+	@Override
 	public void resetindex() {
-		tick = defaultTick;
+		rIndex = defaultRIndex;
 		initialOutput = true; // This needs to be here for syncing to work right
 	}
 
-	public void resetiteration() {
-		iteration = defaultIteration;
-		wrap = true;
+	public void resetvalindex() {
+		super.resetindex();
 	}
 
-	public void resetincrement() {
-		increment = defaultIncrement;
-	}
-
-	public void resetoffset() {
-		offset = defaultOffset;
-	}
-
-	public void resetseq() {
-		tickMap = defaultTickMap.clone();
-		initialOutput = true;
-		outputVals();
-	}
 
 	public boolean equals(Object obj) {
 		if (obj instanceof rseq) {
-			return Arrays.equals(getvalues(), ((rseq) obj).getvalues());
+			return Arrays.equals(getseq(), ((rseq) obj).getseq());
 		}
 		else {
 			return false;
-		}
-	}
-
-	public String toString() {
-		return getClass().getName() + values;
-	}
-
-	// for use with debugging unit tests, must be set from the test after instantiation
-	protected PrintStream debugOut;
-
-	protected void debug(String msg) {
-		if (debugOut != null) {
-			debugOut.println(msg);
 		}
 	}
 }

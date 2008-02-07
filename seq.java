@@ -1,28 +1,27 @@
 package ajm;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import ajm.data.Item;
 import ajm.util.Parser;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
-import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
 
-
-public class seq extends MaxObject {
+public class seq extends AbstractMaxObject {
 
 	public seq(Atom[] args) {
 		declareAttrs();
 		declareIO(1, 4);
 		setInletAssist(new String[] { "list / bang / commands" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
-		init();
+
 	}
 
 	protected seq() { // for subclasses
@@ -37,25 +36,14 @@ public class seq extends MaxObject {
 		declareAttribute("step", "getstep", "step");
 	}
 
-	protected void init() {
-		if (initializer != null) {
-			initializer.set();
-		}
-		else {
-			initialized = true;
-		}
-	}
-
-	protected MaxQelem initializer = getInitializer();
-
-	// This is done this round about way so we can override this method
-	// and avoid an UnsatisfiedLinkError in the jUnit tests.
+	@Override
 	protected MaxQelem getInitializer() {
 		return new MaxQelem(new seqInitializationCallback());
 	}
 
 	protected class seqInitializationCallback implements Executable {
-		// see discussion at http://www.cycling74.com/forums/index.php?t=rview&goto=114649
+		// see discussion at
+		// http://www.cycling74.com/forums/index.php?t=rview&goto=114649
 		public void execute() {
 			// handle attributes used to construct the object
 			defaultIndex = index;
@@ -70,15 +58,10 @@ public class seq extends MaxObject {
 		}
 	}
 
-	@Override
-	protected void notifyDeleted() {
-		initializer.release();
-	}
-
-
 	protected enum OUTLET {
 		VALUE(0), INDEX(1), ITER(2), SEQ(3), VALINDEX(4);
-		// VALINDEX outlet is just for the rseq subclass. Java enums don't support inheritance :(
+		// VALINDEX outlet is just for the rseq subclass because Java enums
+		// don't support inheritance :(
 
 		private final int outletNumber;
 
@@ -90,7 +73,6 @@ public class seq extends MaxObject {
 	protected enum CHORDMODE {
 		CHORD, ARPEGGIATE, SYMBOL, LIST;
 	}
-
 
 	/*------------------------------------------------
 	 *  Internal State
@@ -110,15 +92,12 @@ public class seq extends MaxObject {
 	protected int defaultStep = step;
 	protected CHORDMODE defaultChordmode;
 
-
 	protected int chordIndex = 0;
 	protected boolean iterChanged = true;
-	protected boolean initialized = false;
 
 	protected Parser parser = new Parser();
 
 	protected final seq thisseq = this; // For use in anonymous classes
-
 
 	/*------------------------------------------------
 	 *  Attribute Handlers
@@ -131,7 +110,6 @@ public class seq extends MaxObject {
 		}
 		return atoms;
 	}
-
 
 	public void seq(Atom[] list) {
 		list(list);
@@ -146,7 +124,6 @@ public class seq extends MaxObject {
 		fixIndexBounds();
 		chordIndex = 0;
 	}
-
 
 	public int getiter() {
 		return iter;
@@ -167,7 +144,8 @@ public class seq extends MaxObject {
 			step = s;
 		}
 		else {
-			// undo the last step and apply the new one. the behavior is unintuitive if we don't do this
+			// undo the last step and apply the new one.
+			// the behavior is unintuitive if we don't do this
 			index -= step;
 			step = s;
 			index += step;
@@ -194,11 +172,10 @@ public class seq extends MaxObject {
 				this.chordmode = CHORDMODE.SYMBOL;
 			}
 			else {
-				error("Unknown chordmode: " + chordmode + "");
+				err("Unknown chordmode: " + chordmode + "");
 			}
 		}
 	}
-
 
 	/*------------------------------------------------
 	 *  Sequence Definition Methods
@@ -210,27 +187,39 @@ public class seq extends MaxObject {
 	}
 
 	public void set(Atom[] list) {
-		seq.clear();
-		seq.addAll(parser.parse(list));
-		handleSeqChange();
+		try {
+			List<Item> newSeq = parser.parse(list);
+			seq.clear();
+			seq.addAll(newSeq);
+			onSeqChange();
+		}
+		catch (IllegalStateException e) {
+			err("Could not evaluate: " + toString(list) + "\n" + e.getMessage());
+		}
 	}
 
-	// Max doesn't treat lists starting with a symbol as lists (they're just messages)
+	// Max doesn't treat lists starting with a symbol as lists (they're just
+	// messages)
 	// so we need to handle them here:
 	public void anything(String msg, Atom[] args) {
-		seq.clear();
-		seq.addAll(parser.parse(msg, args));
-		handleSeqChange();
-		outputSeq();
+		try {
+			List<Item> newSeq = parser.parse(msg, args);
+			seq.clear();
+			seq.addAll(newSeq);
+			onSeqChange();
+			outputSeq();
+		}
+		catch (IllegalStateException e) {
+			err("Could not evaluate: " + toString(msg, args) + "\n" + e.getMessage());
+		}
 	}
-
 
 	/*------------------------------------------------
 	 *  Sequence Construction Methods
 	 *------------------------------------------------*/
 	public void append(Atom[] list) {
 		seq.addAll(parser.parse(list));
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
@@ -242,10 +231,10 @@ public class seq extends MaxObject {
 
 	public void insert(Atom[] args) {
 		if (args.length < 2) {
-			error("Invalid call to insert. Expected: insert index list");
+			err("Invalid call to insert. Expected: insert index list");
 		}
-		else if (!args[0].isInt() && !args[0].isFloat()) {
-			error("Invalid call to insert. First argument (index) was not a number.");
+		else if (!isNumber(args[0])) {
+			err("Invalid call to insert. First argument (index) was not a number.");
 		}
 		else {
 			insert(args[0].toInt(), Atom.removeFirst(args));
@@ -259,13 +248,13 @@ public class seq extends MaxObject {
 		if (idx <= index) {
 			index += newSeq.size(); // keep the index at the correct current element
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void insertsort(Atom[] list) {
-		// Note: This does not guarantee the list is sorted, it just inserts the arguments into the first spot
-		// where they are not less then a value.
+		// Note: This does not guarantee the list is sorted, it just inserts the
+		// arguments into the first spot where they are not less then a value.
 		if (list.length > 0) {
 			List<Item> items = parser.parse(list);
 			loop: for (Item item : items) {
@@ -279,10 +268,14 @@ public class seq extends MaxObject {
 							if (i <= index) {
 								// keep the index at the correct current element
 								index++;
-								// TODO: test this, I thought it was supposed to be i<index, but because we
-								// increment the index at the end of bang() I think this is now the correct comparison
-								// keep the index at the correct current element. Except delete still uses i<index,
-								// seemed to give the best results with the arpeggiator (confusing!)
+								// TODO: test this, I thought it was supposed to
+								// be i<index, but because we
+								// increment the index at the end of bang() I
+								// think this is now the correct comparison
+								// keep the index at the correct current
+								// element. Except delete still uses i<index,
+								// seemed to give the best results with the
+								// arpeggiator (confusing!)
 							}
 							continue loop;
 						}
@@ -290,7 +283,7 @@ public class seq extends MaxObject {
 					seq.add(item);
 				}
 			}
-			handleSeqChange();
+			onSeqChange();
 			outputSeq();
 		}
 	}
@@ -298,29 +291,28 @@ public class seq extends MaxObject {
 	public void repeat(Atom[] args) {
 		int n = 1; // the default is one repetition
 		if (args.length > 0) {
-			if (!args[0].isInt() && !args[0].isFloat()) {
-				error("Invalid call to repeat. Argument was not a number.");
+			if (!isNumber(args[0])) {
+				err("Invalid call to repeat. Argument was not a number: " + args[0]);
 				return;
 			}
 			n = args[0].toInt();
-			post("set n to " + n);
 		}
 		if (!seq.isEmpty()) {
 			ArrayList<Item> currVals = new ArrayList<Item>(seq);
 			for (int i = 0; i < n; i++) {
 				seq.addAll(currVals);
 			}
-			handleSeqChange();
+			onSeqChange();
 			outputSeq();
 		}
 	}
 
 	public void length(Atom[] args) {
 		if (args.length < 1) {
-			error("Invalid call to length. Expected: length n [padlist]");
+			err("Invalid call to length. No Arguments. Expected: length n [list]");
 		}
-		else if (!args[0].isInt() && !args[0].isFloat()) {
-			error("Invalid call to length. First argument (n) was not a number: " + args[0]);
+		else if (!isNumber(args[0])) {
+			err("Invalid call to length. First argument (n) was not a number: " + args[0]);
 		}
 		else {
 			int length = args[0].toInt();
@@ -341,48 +333,40 @@ public class seq extends MaxObject {
 				}
 				outputSeq();
 			}
-			handleSeqChange();
+			onSeqChange();
 		}
 	}
 
-	// TODO: what to do if the index moves off the end
-	// probably position at last element, but really I think we
-	// want to go to the first element next if direction is forward
-	// and last element if direction is backward...
-	// probably need a boolean to keep track of this undefined state
-	// and let the list traversal methods (advance, goto, etc) handle it
-	public void delete(int index) {
-		// TODO: // keep the index at the correct current element
-
-		if (index >= 0 && index < seq.size()) {
-			seq.remove(index);
-			handleSeqChange();
-			outputSeq();
-		}
-	}
-
-
-	public void delete(int[] indices) {
-		// TODO: // keep the index at the correct current element
-		// TODO: remove duplicates from the index list!
-
+	public void delete(Atom[] args) {
 		if (!seq.isEmpty()) {
-			Arrays.sort(indices);
-			// delete in reverse order so any index shifting that occurs doesn't affect the result
-			for (int i = indices.length - 1; i >= 0; i--) {
-				int index = indices[i];
-				if (index >= 0 && index < seq.size()) {
-					seq.remove(index);
+			if (args.length == 0) {
+				seq.clear();
+			}
+			else {
+				// Sort in reverse order, so any index shifting that occurs when we start
+				// deleting won't effect indices that still need to be deleted
+				TreeSet<Integer> indices = new TreeSet<Integer>(new Comparator<Integer>() {
+					public int compare(Integer o1, Integer o2) {
+						return -o1.compareTo(o2);
+					}
+
+				});
+				for (Atom arg : args) {
+					if (isNumber(arg)) {
+						indices.add(fixBounds(arg.toInt()));
+					}
+				}
+				for (int idx : indices) {
+					seq.remove(idx);
+					if (idx < index) {
+						index--; // keep the index at the current element
+					}
+
 				}
 			}
-			handleSeqChange();
 			outputSeq();
+			onSeqChange();
 		}
-	}
-
-	public void clear() {
-		seq.clear();
-		handleSeqChange();
 	}
 
 	protected int fixBounds(int idx) {
@@ -398,24 +382,13 @@ public class seq extends MaxObject {
 		return idx;
 	}
 
-	/*
-	 * TODO: make this return an array or arrays [l,r][l2,r2] for the case where we go from say, -1 to 1
-	 * Takes two bounds, and returns an array [left, right] where left and right and both are valid indices for the values list
-	 */
-	@Deprecated
 	protected int[] fixBounds(int left, int right) {
+		left = fixBounds(left);
+		right = fixBounds(right);
 		if (left > right) {
 			int tmp = left;
 			left = right;
 			right = tmp;
-		}
-		// TODO: phase this out, this logic is wrong anyway (what if both left and right are less than 0 or greater than
-		// seq.size()?)
-		if (left < 0) {
-			left = 0;
-		}
-		if (right >= seq.size()) {
-			right = seq.size() - 1;
 		}
 		return new int[] { left, right };
 	}
@@ -452,6 +425,20 @@ public class seq extends MaxObject {
 		return new int[] { start, end };
 	}
 
+	public void subseq(int left, int right) {
+		int lr[] = fixBounds(left, right);
+		left = lr[0];
+		right = lr[1];
+
+		ArrayList<Item> newVals = new ArrayList<Item>(right - left + 1);
+		for (int i = left; i <= right; i++) {
+			newVals.add(seq.get(i));
+		}
+		seq = newVals;
+
+		onSeqChange();
+		outputSeq();
+	}
 
 	public void deleterange(int left, int right) {
 		// TODO: // keep the index at the correct current element
@@ -469,7 +456,7 @@ public class seq extends MaxObject {
 				newVals.add(seq.get(i));
 			}
 			seq = newVals;
-			handleSeqChange();
+			onSeqChange();
 			outputSeq();
 		}
 	}
@@ -503,55 +490,52 @@ public class seq extends MaxObject {
 		}
 	}
 
-
 	public void sort() {
 		Collections.sort(seq);
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void sortrange(int left, int right) {
 		if (seq.size() > 0) {
-
 			int[] lr = fixBounds(left, right);
 			left = lr[0];
 			right = lr[1];
-			// right++; // convert my inclusive range to Java's standard exclusive range
 
 			List<Item> sorted = seq.subList(left, right + 1);
+			// right+1 converts my inclusive range to Java's standard exclusive range
 			Collections.sort(sorted);
 
 			deleterange(left, right);
 			seq.addAll(left, sorted);
-			handleSeqChange();
+			onSeqChange();
 			outputSeq();
 		}
 	}
 
 	public void replace(Atom args[]) {
 		if (args.length < 2) {
-			error("Invalid call to replace. Expected: replace index list");
+			err("Invalid call to replace. Not enough arguments. Expected: replace index list");
 		}
-		else if (!args[0].isInt() && !args[0].isFloat()) {
-			error("Invalid call to replace. First argument (index) was not a number.");
+		else if (!isNumber(args[0])) {
+			err("Invalid call to replace. First argument (index) was not a number: " + args[0]);
 		}
 		else {
-			// TODO: check the index
-			int idx = args[0].toInt();
-			delete(idx);
+			int idx = fixBounds(args[0].toInt());
+			seq.remove(idx);
 			insert(idx, Atom.removeFirst(args));
 		}
 	}
 
 	public void replacerange(Atom args[]) {
 		if (args.length < 2) {
-			error("Invalid call to replacerange. Expected: replace fromIndex toIndex list");
+			err("Invalid call to replacerange. Expected: replace fromIndex toIndex list");
 		}
 		else if (!args[0].isInt() && !args[0].isFloat()) {
-			error("Invalid call to replacerange. First argument (fromIndex) was not a number: " + args[0]);
+			err("Invalid call to replacerange. First argument (fromIndex) was not a number: " + args[0]);
 		}
 		else if (!args[1].isInt() && !args[1].isFloat()) {
-			error("Invalid call to replacerange. Second argument (toIndex) was not a number: " + args[1]);
+			err("Invalid call to replacerange. Second argument (toIndex) was not a number: " + args[1]);
 		}
 		else {
 			int from = args[0].toInt();
@@ -566,23 +550,21 @@ public class seq extends MaxObject {
 		}
 	}
 
-
 	public void swap(int idx1, int idx2) {
 		if (idx1 >= 0 && idx1 < seq.size() && idx2 >= 0 && idx2 < seq.size()) {
 			Item tmp = seq.get(idx1);
 			seq.set(idx1, seq.get(idx2));
 			seq.set(idx2, tmp);
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void reverse() {
 		reverseVals(0, seq.size() - 1);
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
-
 
 	public void reverserange(int idx1, int idx2) {
 		if (seq.size() == 0) {
@@ -590,10 +572,9 @@ public class seq extends MaxObject {
 		}
 		int[] lr = fixBounds(idx1, idx2);
 		reverseVals(lr[0], lr[1]);
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
-
 
 	protected void reverseVals(int left, int right) {
 		while (left < right) {
@@ -605,13 +586,12 @@ public class seq extends MaxObject {
 		}
 	}
 
-
 	public void rotate(int n) {
 		rotaterange(0, seq.size() - 1, n);
 	}
 
-
-	// NOTE: the signature of this method changed (left, right is now before n for consistency)
+	// NOTE: the signature of this method changed (left, right is now before n
+	// for consistency)
 	// TODO: will need to update unit tests
 	public void rotaterange(int left, int right, int n) {
 		if (seq.size() == 0) {
@@ -634,45 +614,45 @@ public class seq extends MaxObject {
 			reverseVals(n, right);
 			reverseVals(left, right);
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
-
 	/*
-	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed.
-	 * The arg list is looped to create a list the same length as the values and applies the addition on an
-	 * element by element basis. Note that chords will have a single arg applied to each chord atom.
+	 * Add the specified value to all numeric values in the sequence. Non-numeric values will not be changed. The arg
+	 * list is looped to create a list the same length as the values and applies the addition on an element by element
+	 * basis. Note that chords will have a single arg applied to each chord atom.
 	 */
 	public void add(Atom[] args) {
 		if (args.length == 0) {
-			error("add command needs at least one argument");
+			err("add command needs at least one argument");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				error("arguments to add command must be numbers");
+				err("arguments to add command must be numbers");
 				return;
 			}
 		}
 		for (int i = 0; i < seq.size(); i++) {
 			seq.set(i, seq.get(i).add(args[i % args.length]));
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
-	/* at least 3 args are required. first arg is left index, second arg is right index, 3rd/remaining args
-	 * acts just like add()
+	/*
+	 * at least 3 args are required. first arg is left index, second arg is right index, 3rd/remaining args acts just
+	 * like add()
 	 */
 	public void addrange(Atom[] args) {
 		if (args.length < 3) {
-			error("addrange command needs at least 3 arguments");
+			err("addrange command needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				error("arguments to add command must be numbers");
+				err("arguments to add command must be numbers");
 				return;
 			}
 		}
@@ -690,18 +670,18 @@ public class seq extends MaxObject {
 			i++;
 			j++;
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void addrevrange(Atom[] args) {
 		if (args.length < 3) {
-			error("addrevrange command needs at least 3 arguments");
+			err("addrevrange command needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				error("arguments to add command must be numbers");
+				err("arguments to add command must be numbers");
 				return;
 			}
 		}
@@ -719,36 +699,36 @@ public class seq extends MaxObject {
 			i--;
 			j++;
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void multiply(Atom[] args) {
 		if (args.length == 0) {
-			error("multiply command needs at least one argument");
+			err("multiply command needs at least one argument");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				error("arguments to multiply command must be numbers");
+				err("arguments to multiply command must be numbers");
 				return;
 			}
 		}
 		for (int i = 0; i < seq.size(); i++) {
 			seq.set(i, seq.get(i).multiply(args[i % args.length]));
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void multiplyrange(Atom[] args) {
 		if (args.length < 3) {
-			error("addrange command needs at least 3 arguments");
+			err("addrange command needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				error("arguments to add command must be numbers");
+				err("arguments to add command must be numbers");
 				return;
 			}
 		}
@@ -759,36 +739,40 @@ public class seq extends MaxObject {
 		for (int i = left; i <= right; i++) {
 			seq.set(i, seq.get(i).multiply(args[(i - left) % args.length]));
 		}
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
 	public void direction() {
-		step *= -1;
+		step(step * -1);
 	}
-
 
 	public void direction(int dir) {
-		// I considered making dir = 0 set increment = 0, but then I feel like we should keep track
-		// of the previous non-zero value so we can get it back when a non-zero dir command comes in
-		step *= (dir >= 0 ? 1 : -1);
+		if (dir > 0) {
+			// force step to be positive
+			if (step < 0) {
+				step(step * -1);
+			}
+		}
+		else {
+			// force step to be negative
+			if (step > 0) {
+				step(step * -1);
+			}
+		}
 	}
-
 
 	public void advance(int n) {
 		index(index + n);
 	}
 
-
 	public void next() {
 		advance(1);
 	}
 
-
 	public void prev() {
 		advance(-1);
 	}
-
 
 	public void bang() {
 		if (!seq.isEmpty()) {
@@ -816,7 +800,6 @@ public class seq extends MaxObject {
 	protected void fixIndexBounds() {
 		if (!seq.isEmpty()) { // prevent infinite loops!
 			int size = seq.size();
-			// if (wrapmode == WRAP_MODE_DEFAULT) {
 			while (index >= size) {
 				iterChanged = true;
 				iter++;
@@ -828,39 +811,6 @@ public class seq extends MaxObject {
 				index += size;
 			}
 		}
-		/*}
-		else {
-			// TODO: I think we need to force increment=1 for wrapmode=1 ??
-			if (index >= size) {
-				index = size - 2;
-				if (index < 0) {
-					index = 0;
-				}
-				increment = -increment;
-			}
-			else if (index < 0) {
-				index = 1;
-				if (index >= size) {
-					index = 0;
-				}
-				increment = -increment;
-			}
-		*/
-		/*
-		int inc = increment < 0 ? -increment : increment;
-		inc %= size;
-		post("inc=" + inc);
-		while (index >= size) {
-			index -= inc;
-		}
-		while (index < 0) {
-			index += inc;
-		}
-		post("now index=" + index);
-
-		post("\n");
-		*/
-		// }
 	}
 
 	/*
@@ -880,18 +830,6 @@ public class seq extends MaxObject {
 		}
 	}
 
-	/* 
-	public void get(int index) {
-		if (index < 0 || index >= values.size()) {
-			error(getClass() + ": invalid index " + index + " (valid indexes for current list are 0 - "
-					+ (values.size() - 1) + ")");
-		}
-		else {
-			output(OUTLET.CURRENT_VAL, values.get(index));
-		}
-	}
-	*/
-
 	protected void outputSeq() {
 		Atom[] atoms = getseq();
 		if (atoms.length > 0) {
@@ -902,36 +840,34 @@ public class seq extends MaxObject {
 		}
 	}
 
-
 	protected void output(OUTLET outlet, int data) {
 		outlet(outlet.outletNumber, data);
 	}
 
-
 	protected void output(OUTLET outlet, Item data) {
 		if (data.isAtomArray()) {
 			switch (chordmode) {
-				case CHORD:
-					for (Atom atom : data.getAtoms()) {
-						outlet(outlet.outletNumber, atom);
-					}
-					break;
+			case CHORD:
+				for (Atom atom : data.getAtoms()) {
+					outlet(outlet.outletNumber, atom);
+				}
+				break;
 
-				case ARPEGGIATE:
-					// probably we should ensure the chordIndex range here, but
-					// it is best it is always correct by the time we reach here!
-					if (data.getAtoms().length > 0) {
-						outlet(outlet.outletNumber, data.getAtoms()[chordIndex]);
-					}
-					break;
+			case ARPEGGIATE:
+				// probably we should ensure the chordIndex range here, but
+				// it is best it is always correct by the time we reach here!
+				if (data.getAtoms().length > 0) {
+					outlet(outlet.outletNumber, data.getAtoms()[chordIndex]);
+				}
+				break;
 
-				case LIST:
-					outlet(outlet.outletNumber, data.getAtoms());
-					break;
+			case LIST:
+				outlet(outlet.outletNumber, data.getAtoms());
+				break;
 
-				case SYMBOL:
-					outlet(outlet.outletNumber, data.getAtom());
-					break;
+			case SYMBOL:
+				outlet(outlet.outletNumber, data.getAtom());
+				break;
 			}
 		}
 		else {
@@ -946,7 +882,6 @@ public class seq extends MaxObject {
 	protected void output(OUTLET outlet, Atom[] data) {
 		outlet(outlet.outletNumber, data);
 	}
-
 
 	public void reset() {
 		resetiter();
@@ -976,19 +911,18 @@ public class seq extends MaxObject {
 	public void resetseq() {
 		seq.clear();
 		seq.addAll(defaultSeq);
-		handleSeqChange();
+		onSeqChange();
 		outputSeq();
 	}
 
-
-	protected void handleSeqChange() {
+	protected void onSeqChange() {
 		// maybe? index = defaultIndex;
 
-		chordIndex = 0;
-		// chordIndex needs to be reset whenever the current value changes, but is this overly aggressive? YES! Try
+		// chordIndex = 0; // maybe this isn't really needed
+		// chordIndex needs to be reset whenever the current value changes, but
+		// is this overly aggressive? YES! Try
 		// changing a list of chords while it is playing. it is not cool...
 	}
-
 
 	public boolean equals(Object obj) {
 		if (obj instanceof seq) {
@@ -999,22 +933,8 @@ public class seq extends MaxObject {
 		}
 	}
 
-
 	public String toString() {
 		return getClass().getName() + seq;
-	}
-
-	// for use with debugging unit tests, must be set from the test after instantiation
-	protected PrintStream debugOut;
-
-	protected void debug(String msg) {
-		if (debugOut != null) {
-			debugOut.println(msg);
-		}
-	}
-
-	protected void setDebugOut(PrintStream debugOut) {
-		this.debugOut = debugOut;
 	}
 
 }

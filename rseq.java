@@ -20,10 +20,9 @@ public class rseq extends seq {
 		setOutletAssist(new String[] { "value", "rhythmic index", "iter", "sequence", "value index" });
 
 		parser.setEvalNotes(false);
-
-		init();
 	}
 
+	@Override
 	protected MaxQelem getInitializer() {
 		return new MaxQelem(new rseqInitializationCallback());
 	}
@@ -32,22 +31,19 @@ public class rseq extends seq {
 		public void execute() {
 			defaultRIndex = rIndex;
 			/*
-			if (!tickMap.isEmpty()) {
-				defaultTickMap = tickMap.clone();
-			}
-			*/
+			 * if (!tickMap.isEmpty()) { defaultTickMap = tickMap.clone(); }
+			 */
 			super.execute();
 		}
 	}
-
 
 	/*------------------------------------------------
 	 *  Internal State
 	 *------------------------------------------------*/
 
 	// Attributes
-	// The rhythmic index, which is the "index" to Max. The index in the superclass (seq) is the "valindex" for this
-	// class.
+	// rIndex is the rhythmic index, which is the "index" to Max.
+	// The index in the superclass (seq) is the "valindex" for this class.
 	protected int rIndex = 0;
 
 	// Defaults (for reset commands)
@@ -83,8 +79,8 @@ public class rseq extends seq {
 	}
 
 	@Override
-	protected void handleSeqChange() {
-		super.handleSeqChange();
+	protected void onSeqChange() {
+		super.onSeqChange();
 		if (seq.size() > 0) {
 			boolean allZeros = true;
 			for (Item item : seq) {
@@ -140,8 +136,8 @@ public class rseq extends seq {
 		return total;
 	}
 
-
-	/* Sets the length of the sequence in terms of the total number of ticks represented by the rhythm. If the new
+	/*
+	 * Sets the length of the sequence in terms of the total number of ticks represented by the rhythm. If the new
 	 * length is longer then the current, the last value will be increased as needed. Otherwise, seq will be removed
 	 * from the end of the sequence, and the last remaining value decreased as needed in order to set the new rhythm
 	 * length.
@@ -151,10 +147,9 @@ public class rseq extends seq {
 		this.maxRIndex = length;
 	}
 
-	/* try just setting a tick offset?
-	public void rrotate(int ticks) {
-		outputVals();
-	}*/
+	/*
+	 * try just setting a tick offset? public void rrotate(int ticks) { outputVals(); }
+	 */
 
 	@Override
 	public void bang() {
@@ -196,7 +191,6 @@ public class rseq extends seq {
 		}
 	}
 
-
 	private void outputValuesAtTick(int tick) {
 		List<Integer> indexes = tickMap.get(tick);
 		if (indexes != null) {
@@ -222,7 +216,6 @@ public class rseq extends seq {
 	public void resetvalindex() {
 		super.resetindex();
 	}
-
 
 	public boolean equals(Object obj) {
 		if (obj instanceof rseq) {

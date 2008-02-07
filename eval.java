@@ -3,13 +3,11 @@ package ajm;
 import java.util.List;
 
 import ajm.data.Item;
-import ajm.util.MaxUtils;
 import ajm.util.Parser;
 
 import com.cycling74.max.Atom;
-import com.cycling74.max.MaxObject;
 
-public class eval extends MaxObject {
+public class eval extends AbstractMaxObject {
 
 	Parser parser = new Parser();
 
@@ -19,7 +17,7 @@ public class eval extends MaxObject {
 		setOutletAssist(new String[] { "evaluated message" });
 
 		// TODO parsing options:
-		// declareAttribute("increment");
+
 	}
 
 	public void list(Atom[] list) {
@@ -36,7 +34,7 @@ public class eval extends MaxObject {
 			outlet(0, atoms);
 		}
 		catch (IllegalStateException e) {
-			error("could not evaluate: " + MaxUtils.toString(msg, args) + "\n" + e.getMessage());
+			err("Could not evaluate: " + toString(msg, args) + "\n" + e.getMessage());
 		}
 	}
 }

@@ -7,8 +7,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.bsf.BSFException;
+
 import ajm.data.Item;
 import ajm.util.Parser;
+import ajm.util.RubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -96,6 +99,7 @@ public class seq extends AbstractMaxObject {
 	protected boolean iterChanged = true;
 
 	protected Parser parser = new Parser();
+	private RubyEvaluator ruby = new RubyEvaluator();
 
 	protected final seq thisseq = this; // For use in anonymous classes
 
@@ -211,6 +215,19 @@ public class seq extends AbstractMaxObject {
 		}
 		catch (IllegalStateException e) {
 			err("Could not evaluate: " + toString(msg, args) + "\n" + e.getMessage());
+		}
+	}
+
+	public void ruby(Atom[] input) {
+		String rubyCode = toString(input);
+		try {
+			Atom[] val = ruby.evalToAtoms(rubyCode);
+			if (val.length > 0 && (val.length > 1 || !"nil".equals(val[0].toString()))) {
+				list(val);
+			}
+		}
+		catch (BSFException e) {
+			err("could not evaluate Ruby: " + rubyCode);
 		}
 	}
 

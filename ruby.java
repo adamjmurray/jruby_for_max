@@ -1,11 +1,14 @@
 package ajm;
 
+import java.io.File;
+
 import org.apache.bsf.BSFException;
 
 import ajm.util.RubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
+import com.cycling74.max.MaxSystem;
 
 /**
  * Embeds a Ruby evaluator in a Max object
@@ -41,6 +44,15 @@ public class ruby extends AbstractMaxObject {
 		declareAttribute("verbose", "getverbose", "verbose");
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 
+		String pathToJRuby = MaxSystem.locateFile("jruby.jar");
+		String pathToCustomRubyScripts = null;
+		if (pathToJRuby != null) {
+			File jRubyDir = new File(pathToJRuby).getParentFile();
+			// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
+			System.setProperty("jruby.home", jRubyDir.getParent());
+			pathToCustomRubyScripts = new File(jRubyDir, "ruby").toString();
+		}
+
 		ruby = new RubyEvaluator();
 		if (getAttrBool("verbose")) {
 			ruby.setVerboseOut(System.out);
@@ -48,8 +60,11 @@ public class ruby extends AbstractMaxObject {
 		ruby.declareBean("MaxObject", this, MaxObject.class);
 		ruby.declareBean("Utils", new Utils(), Utils.class);
 
-		// TODO: it would be much nicer to load this from an init.rb script:
 		CodeBuilder code = new CodeBuilder();
+
+		if (pathToCustomRubyScripts != null) {
+			code.line("$LOAD_PATH << '" + pathToCustomRubyScripts.replace("'", "\\'") + "'");
+		}
 
 		code.line("def puts str");
 		code.line("  $Utils.puts str");
@@ -90,6 +105,10 @@ public class ruby extends AbstractMaxObject {
 	 * protected MaxQelem getInitializer() { return new MaxQelem(new Executable() { public void execute() { } }); }
 	 */
 
+	public void bang() {
+		eval("bang");
+	}
+
 	public int getevaloutlet() {
 		return evaloutlet;
 	}
@@ -113,11 +132,14 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	public void list(Atom[] args) {
-		anything(null, args);
+		eval(toString(args));
 	}
 
 	public void anything(String msg, Atom[] args) {
-		String input = anythingToString(msg, args);
+		eval(toString(msg, args));
+	}
+
+	private void eval(String input) {
 		try {
 			Atom[] value = ruby.evalToAtoms(input);
 			if (evaloutlet >= 0) {
@@ -127,20 +149,6 @@ public class ruby extends AbstractMaxObject {
 		catch (BSFException e) {
 			err("could not evaluate: " + input);
 		}
-	}
-
-	private String anythingToString(String msg, Atom[] args) {
-		StringBuffer input = new StringBuffer();
-		if (msg != null) {
-			input.append(msg).append(" ");
-		}
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0) {
-				input.append(" ");
-			}
-			input.append(args[i]);
-		}
-		return input.toString();
 	}
 
 	private class CodeBuilder {

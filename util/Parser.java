@@ -1,5 +1,25 @@
 package ajm.util;
 
+/*
+ Copyright 2008 Adam Murray
+
+ The files in this ajm package are part of ajm objects.
+
+ This ajm package is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This ajm package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with ajm objects.  If not, see <http://www.gnu.org/licenses/>.
+
+ */
+
 import static ajm.util.Parser.STATE.CHORD;
 import static ajm.util.Parser.STATE.DEFAULT;
 import static ajm.util.Parser.STATE.REPETITION;
@@ -15,6 +35,12 @@ import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 
+/**
+ * A Parser for the ajm objects sequencing syntax.
+ * 
+ * @version 0.7
+ * @author Adam Murray (dev@compusition.com)
+ */
 public class Parser {
 
 	public Parser() {
@@ -82,47 +108,47 @@ public class Parser {
 		nextToken();
 		while (token != null) {
 			switch (token.getType()) {
-				case CHORD_BEGIN:
-					startScope(CHORD);
-					break;
+			case CHORD_BEGIN:
+				startScope(CHORD);
+				break;
 
-				case CHORD_END:
-					endScope(CHORD);
-					break;
+			case CHORD_END:
+				endScope(CHORD);
+				break;
 
-				case REPEAT_BEGIN:
-					startScope(REPETITION);
-					break;
+			case REPEAT_BEGIN:
+				startScope(REPETITION);
+				break;
 
-				case REPEAT_END:
-					endScope(REPETITION);
-					break;
+			case REPEAT_END:
+				endScope(REPETITION);
+				break;
 
-				case REPEAT_STAR:
-					throw new IllegalStateException("Unexpected '*' (index=" + index
-							+ "): Did you forget to put something before the '*'?");
+			case REPEAT_STAR:
+				throw new IllegalStateException("Unexpected '*' (index=" + index
+						+ "): Did you forget to put something before the '*'?");
 
-				case NEXT:
-					evalRepeat(new Item("next"));
-					break;
+			case NEXT:
+				evalRepeat(new Item("next"));
+				break;
 
-				case PREV:
-					evalRepeat(new Item("prev"));
-					break;
+			case PREV:
+				evalRepeat(new Item("prev"));
+				break;
 
-				case TEXT:
-					Item item;
-					if (evalNotes) {
-						item = new Item(token.getValue());
-					}
-					else {
-						item = token.getItem();
-					}
-					evalRepeat(item);
-					break;
+			case TEXT:
+				Item item;
+				if (evalNotes) {
+					item = new Item(token.getValue());
+				}
+				else {
+					item = token.getItem();
+				}
+				evalRepeat(item);
+				break;
 
-				default:
-					throw new IllegalStateException("There is a bug in the parsing algorithm!");
+			default:
+				throw new IllegalStateException("There is a bug in the parsing algorithm!");
 
 			}
 			if (!lookedAhead) {
@@ -167,7 +193,6 @@ public class Parser {
 		evalRepeat(scope);
 	}
 
-
 	private void evalRepeat(Item item) {
 		int repetitions = getRepititions();
 		for (int i = 0; i < repetitions; i++) {
@@ -204,7 +229,6 @@ public class Parser {
 		}
 		return repetitions;
 	}
-
 
 	private static Map<Character, Token> specialCharMap = new HashMap<Character, Token>();
 	static {

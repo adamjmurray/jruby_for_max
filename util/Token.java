@@ -1,9 +1,35 @@
 package ajm.util;
 
+/*
+ Copyright 2008 Adam Murray
+
+ The files in this ajm package are part of ajm objects.
+
+ This ajm package is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This ajm package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with ajm objects.  If not, see <http://www.gnu.org/licenses/>.
+
+ */
+
 import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 
+/**
+ * A token in the ajm objects sequencing syntax.
+ * 
+ * @version 0.7
+ * @author Adam Murray (dev@compusition.com)
+ */
 public class Token {
 
 	enum TYPE {
@@ -66,60 +92,60 @@ public class Token {
 		int val;
 		int quarterSteps = 0;
 		switch (Character.toUpperCase(text.charAt(0))) {
-			case 'C':
-				val = 0;
-				break;
+		case 'C':
+			val = 0;
+			break;
 
-			case 'D':
-				val = 2;
-				break;
+		case 'D':
+			val = 2;
+			break;
 
-			case 'E':
-				val = 4;
-				break;
+		case 'E':
+			val = 4;
+			break;
 
-			case 'F':
-				val = 5;
-				break;
+		case 'F':
+			val = 5;
+			break;
 
-			case 'G':
-				val = 7;
-				break;
+		case 'G':
+			val = 7;
+			break;
 
-			case 'A':
-				val = 9;
-				break;
+		case 'A':
+			val = 9;
+			break;
 
-			case 'B':
-				val = 11;
-				break;
+		case 'B':
+			val = 11;
+			break;
 
-			default:
-				return getAtom();
+		default:
+			return getAtom();
 
 		}
 
 		int i = 1;
 		loop: for (; i < text.length(); i++) {
 			switch (text.charAt(i)) {
-				case '#':
-					val++;
-					break;
+			case '#':
+				val++;
+				break;
 
-				case 'b':
-					val--;
-					break;
+			case 'b':
+				val--;
+				break;
 
-				case '+':
-					quarterSteps++;
-					break;
+			case '+':
+				quarterSteps++;
+				break;
 
-				case '_':
-					quarterSteps--;
-					break;
+			case '_':
+				quarterSteps--;
+				break;
 
-				default:
-					break loop;
+			default:
+				break loop;
 			}
 		}
 

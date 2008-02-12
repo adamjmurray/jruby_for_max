@@ -1,22 +1,29 @@
 package ajm;
 
 /*
- Copyright 2008 Adam Murray
+ Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
- The files in this ajm package are part of ajm objects.
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
 
- This ajm package is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ 1. Redistributions of source code must retain the above copyright notice, 
+ this list of conditions and the following disclaimer.
 
- This ajm package is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+ this list of conditions and the following disclaimer in the documentation
+ and/or other materials provided with the distribution.
 
- You should have received a copy of the GNU General Public License
- along with ajm objects.  If not, see <http://www.gnu.org/licenses/>.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
@@ -41,7 +48,7 @@ import com.cycling74.max.MaxQelem;
  * The ajm.seq MaxObject.
  * 
  * @version 0.7
- * @author Adam Murray (dev@compusition.com)
+ * @author Adam Murray (adam@compusition.com)
  */
 public class seq extends AbstractMaxObject {
 
@@ -514,13 +521,13 @@ public class seq extends AbstractMaxObject {
 						// TODO: test this
 						index--;
 					}
-					break;
+					i--;
 				}
 			}
 		}
-		if (seq.isEmpty()) {
-			index = 0;
-		}
+		/*
+		 * if (seq.isEmpty()) { index = 0; }
+		 */
 		outputSeq();
 	}
 
@@ -574,32 +581,39 @@ public class seq extends AbstractMaxObject {
 		if (args.length < 2) {
 			err("Invalid call to replacerange. Expected: replace fromIndex toIndex list");
 		}
-		else if (!args[0].isInt() && !args[0].isFloat()) {
+		else if (!isNumber(args[0])) {
 			err("Invalid call to replacerange. First argument (fromIndex) was not a number: " + args[0]);
 		}
-		else if (!args[1].isInt() && !args[1].isFloat()) {
+		else if (!isNumber(args[1])) {
 			err("Invalid call to replacerange. Second argument (toIndex) was not a number: " + args[1]);
 		}
 		else {
-			int from = args[0].toInt();
-			int to = args[1].toInt();
-			int[] ft = fixBounds(from, to);
-			from = ft[0];
-			to = ft[1];
-
-			// TODO: range checking?
+			int[] ft = fixBounds(args[0].toInt(), args[1].toInt());
+			int from = ft[0];
+			int to = ft[1];
 			deleterange(from, to);
 			insert(from, Atom.removeFirst(Atom.removeFirst(args)));
 		}
 	}
 
-	public void swap(int idx1, int idx2) {
-		if (idx1 >= 0 && idx1 < seq.size() && idx2 >= 0 && idx2 < seq.size()) {
+	public void swap(Atom args[]) {
+		if (args.length < 2) {
+			err("Invalid call to swap. Expected: swap index1 index2");
+		}
+		else if (!isNumber(args[0])) {
+			err("Invalid call to swap. First argument (index1) was not a number: " + args[0]);
+		}
+		else if (!isNumber(args[1])) {
+			err("Invalid call to swap. Second argument (index2) was not a number: " + args[1]);
+		}
+		int idx1 = fixBounds(args[0].toInt());
+		int idx2 = fixBounds(args[1].toInt());
+		if (idx1 != idx2) {
 			Item tmp = seq.get(idx1);
 			seq.set(idx1, seq.get(idx2));
 			seq.set(idx2, tmp);
+			onSeqChange();
 		}
-		onSeqChange();
 		outputSeq();
 	}
 

@@ -682,12 +682,12 @@ public class seq extends AbstractMaxObject {
 	 */
 	public void add(Atom[] args) {
 		if (args.length == 0) {
-			err("add command needs at least one argument");
+			err("add needs at least one argument");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				err("arguments to add command must be numbers");
+				err("arguments to add must be numbers");
 				return;
 			}
 		}
@@ -704,12 +704,12 @@ public class seq extends AbstractMaxObject {
 	 */
 	public void addrange(Atom[] args) {
 		if (args.length < 3) {
-			err("addrange command needs at least 3 arguments");
+			err("addrange needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				err("arguments to add command must be numbers");
+				err("arguments to addrange must be numbers");
 				return;
 			}
 		}
@@ -733,12 +733,12 @@ public class seq extends AbstractMaxObject {
 
 	public void addrevrange(Atom[] args) {
 		if (args.length < 3) {
-			err("addrevrange command needs at least 3 arguments");
+			err("addrevrange needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				err("arguments to add command must be numbers");
+				err("arguments to addrevrange must be numbers");
 				return;
 			}
 		}
@@ -762,12 +762,12 @@ public class seq extends AbstractMaxObject {
 
 	public void multiply(Atom[] args) {
 		if (args.length == 0) {
-			err("multiply command needs at least one argument");
+			err("multiply needs at least one argument");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				err("arguments to multiply command must be numbers");
+				err("arguments to multiply must be numbers");
 				return;
 			}
 		}
@@ -780,21 +780,57 @@ public class seq extends AbstractMaxObject {
 
 	public void multiplyrange(Atom[] args) {
 		if (args.length < 3) {
-			err("addrange command needs at least 3 arguments");
+			err("multiplyrange needs at least 3 arguments");
 			return;
 		}
 		for (Atom atom : args) {
 			if (!atom.isFloat() && !atom.isInt()) {
-				err("arguments to add command must be numbers");
+				err("arguments to multiplyrange must be numbers");
 				return;
 			}
 		}
 
-		int[] lr = fixBounds(args[0].toInt(), args[1].toInt());
-		int left = lr[0];
-		int right = lr[1];
-		for (int i = left; i <= right; i++) {
-			seq.set(i, seq.get(i).multiply(args[(i - left) % args.length]));
+		int[] range = getRange(args[0].toInt(), args[1].toInt());
+		int start = range[0];
+		int end = range[1];
+		int len = args.length - 2;
+		int i = start;
+		int j = 0;
+		while (i <= end) {
+			Atom multiplicand = args[(j % len) + 2];
+			int idx = i % seq.size();
+			seq.set(idx, seq.get(idx).multiply(multiplicand));
+			i++;
+			j++;
+		}
+		onSeqChange();
+		outputSeq();
+	}
+
+	public void multiplyrevrange(Atom[] args) {
+		if (args.length < 3) {
+			err("multiplyrevrange needs at least 3 arguments");
+			return;
+		}
+		for (Atom atom : args) {
+			if (!atom.isFloat() && !atom.isInt()) {
+				err("arguments to multiplyrevrange must be numbers");
+				return;
+			}
+		}
+
+		int[] range = getReverseRange(args[0].toInt(), args[1].toInt());
+		int start = range[0];
+		int end = range[1];
+		int len = args.length - 2;
+		int i = start;
+		int j = 0;
+		while (i >= end) {
+			Atom multiplicand = args[(j % len) + 2];
+			int idx = i % seq.size();
+			seq.set(idx, seq.get(idx).multiply(multiplicand));
+			i--;
+			j++;
 		}
 		onSeqChange();
 		outputSeq();

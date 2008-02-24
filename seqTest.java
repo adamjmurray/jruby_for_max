@@ -4,13 +4,16 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxQelem;
 
-public class seqTest extends TestCase {
+public class seqTest {
 
 	private boolean DEBUG = false;
 	private PrintStream out = System.out;
@@ -94,12 +97,11 @@ public class seqTest extends TestCase {
 		private void multiply(float... n) {
 			super.multiply(Atom.newAtom(n));
 		}
-		
+
 		public void delete(int... idx) {
-		    super.delete(Atom.newAtom(idx));
+			super.delete(Atom.newAtom(idx));
 		}
 	}
-
 
 	protected seqStub makeSeq(String... vals) {
 		seqStub s = new seqStub(Atom.emptyArray);
@@ -125,11 +127,11 @@ public class seqTest extends TestCase {
 		return makeSeq(DEFAULT_VALS);
 	}
 
-
 	protected seqStub emptySeq() {
 		return makeSeq(new String[] {});
 	}
 
+	@Test
 	public void testBasicIteration() {
 		seqStub s = makeSeq();
 		for (String val : DEFAULT_VALS) {
@@ -140,13 +142,14 @@ public class seqTest extends TestCase {
 		assertEquals(DEFAULT_VALS[0], s.getLastStringValue());
 	}
 
+	@Test
 	public void testReverse() throws Exception {
 		seq s = makeSeq();
 		s.reverse();
 		assertEquals(makeSeq("E", "D", "C", "B", "A"), s);
 	}
 
-
+	@Test
 	public void testReverseRange() throws Exception {
 		seq s = makeSeq();
 		s.reverserange(1, 3);
@@ -155,7 +158,7 @@ public class seqTest extends TestCase {
 		assertEquals(makeSeq("A", "D", "C", "E", "B"), s);
 	}
 
-
+	@Test
 	public void testDelete() throws Exception {
 		seqStub s = makeSeq();
 		s.delete(0);
@@ -173,7 +176,7 @@ public class seqTest extends TestCase {
 		assertEquals(emptySeq(), s);
 	}
 
-
+	@Test
 	public void testDeleteRange() throws Exception {
 		seq s = makeSeq();
 		s.deleterange(1, 3);
@@ -204,7 +207,7 @@ public class seqTest extends TestCase {
 		assertEquals(emptySeq(), s);
 	}
 
-
+	@Test
 	public void testSort() throws Exception {
 		seq s = makeSeq();
 		s.reverse();
@@ -212,8 +215,9 @@ public class seqTest extends TestCase {
 		assertEquals(makeSeq(), s);
 	}
 
-	// It was possible to get an IndexOutOfBoundsException
+	@Test
 	public void testShortenList() throws Exception {
+		// This test is here because it was possible to get an IndexOutOfBoundsException
 		seq s = makeSeq(1, 2);
 		s.step = 0;
 		s.next();
@@ -221,6 +225,7 @@ public class seqTest extends TestCase {
 		s.output();
 	}
 
+	@Test
 	public void testAttributeOrder() throws Exception {
 		seqStub s = emptySeq();
 		s.index(2);
@@ -231,6 +236,7 @@ public class seqTest extends TestCase {
 		assertEquals("C", s.getLastStringValue());
 	}
 
+	@Test
 	public void testRotate() throws Exception {
 		seq s = makeSeq();
 		s.rotate(1);
@@ -257,17 +263,13 @@ public class seqTest extends TestCase {
 	}
 
 	/*
-	public void testDeleteCurrent() {
-		seq s = makeSeq();
-		s.index = 2;
-		s.deletecurrent();
-		assertEquals(makeSeq("A", "B", "D", "E"), s);
+	 * public void testDeleteCurrent() { seq s = makeSeq(); s.index = 2; s.deletecurrent(); assertEquals(makeSeq("A",
+	 * "B", "D", "E"), s);
+	 * 
+	 * s = emptySeq(); s.deletecurrent(); }
+	 */
 
-		s = emptySeq();
-		s.deletecurrent();
-	}
-	*/
-
+	@Test
 	public void testSetIndex() {
 		seqStub s = makeSeq();
 		s.bang();
@@ -291,6 +293,7 @@ public class seqTest extends TestCase {
 		assertEquals("E", s.getLastStringValue());
 	}
 
+	@Test
 	public void testAdd() {
 		seqStub s = makeSeq(1, 2, 3);
 		s.add(2);
@@ -316,6 +319,7 @@ public class seqTest extends TestCase {
 		assertEquals(Atom.newAtom("b"), s.seq.get(3));
 	}
 
+	@Test
 	public void testMultiply() {
 		seqStub s = makeSeq(1, 2, 3);
 		s.multiply(2);
@@ -333,7 +337,6 @@ public class seqTest extends TestCase {
 		s.multiply(2.5f);
 		assertEquals(makeFloatSeq(-2 * 2.5f, 0, -12 * 2.5f), s);
 
-
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
 		s.multiply(2);
 		assertEquals(Atom.newAtom(2), s.seq.get(0));
@@ -342,11 +345,8 @@ public class seqTest extends TestCase {
 		assertEquals(Atom.newAtom("b"), s.seq.get(3));
 	}
 
-
-	public void testInsertNumberAndMaintainIndex() {
-	// TODO!
-	// what is the correct behavior in different situations?
-	// setting a new list vs
-
-	}
+	/*
+	 * public void testInsertNumberAndMaintainIndex() { // TODO! // what is the correct behavior in different
+	 * situations? }
+	 */
 }

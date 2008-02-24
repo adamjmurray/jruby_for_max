@@ -4,12 +4,15 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 
-public class ParserTest extends TestCase {
+public class ParserTest {
 
 	private PrintStream out = System.out;
 	Parser p = new Parser();
@@ -54,23 +57,25 @@ public class ParserTest extends TestCase {
 		return atoms;
 	}
 
-
 	/*------------------------------------------------
 	 *  The Tests
 	 *------------------------------------------------*/
 
+	@Test
 	public void testEmpty() {
 		List<Atom> eval = toAtomList(p.parse(""));
 		assertEquals(eval.size(), 0);
 		assertEquals(eval, toAtomList((Object[]) null));
 	}
 
+	@Test
 	public void testSingleString() {
 		List<Atom> eval = toAtomList(p.parse("hello"));
 		assertEquals(1, eval.size());
 		assertEquals(toAtomList("hello"), eval);
 	}
 
+	@Test
 	public void testMultipleString() {
 		List<Atom> eval = toAtomList(p.parse("hello world"));
 		assertEquals(2, eval.size());
@@ -82,6 +87,7 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList("a", "b", "c", "d", "e", "f", "ggggg"), eval);
 	}
 
+	@Test
 	public void testInt() {
 		List<Atom> eval = toAtomList(p.parse("1"));
 		assertFalse(eval.equals(toAtomList("1"))); // an int is not a string
@@ -90,6 +96,7 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList(1, 0, -1), eval);
 	}
 
+	@Test
 	public void testFloat() {
 		List<Atom> eval = toAtomList(p.parse("1.1"));
 		assertFalse(eval.equals(toAtomList("1.1"))); // a float is not a string
@@ -98,20 +105,23 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList(1.1, 0.9, -1.333), eval);
 	}
 
+	@Test
 	public void testMixed() {
 		assertEquals(toAtomList("hello", 1, "world", 1.3, "pthb"), toAtomList(p.parse("hello 1 world 1.3 pthb")));
 		assertEquals(toAtomList("hello", 1, "world", 1.3, "pthb"), toAtomList(p.parse("hello   1  world     1.3 pthb")));
 	}
 
+	@Test
 	public void testBooleanIsString() {
 		assertEquals(toAtomList("true"), toAtomList(p.parse("true")));
 	}
 
-
+	@Test
 	public void testDegenerateRepetition() {
 		assertEquals(toAtomList(1, 2, 3), toAtomList(p.parse("(1 2 3)")));
 	}
 
+	@Test
 	public void testSingleValueRepetition() {
 		assertEquals(toAtomList(1, 1), toAtomList(p.parse("1*2")));
 		assertEquals(toAtomList(2, 2, 2), toAtomList(p.parse("2 * 3")));
@@ -121,37 +131,40 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList(3, 3, 3, 3), toAtomList(p.parse("(3) * 4")));
 	}
 
+	@Test
 	public void testMultiValueRepetition() {
 		assertEquals(toAtomList(1, 2, 3, 1, 2, 3), toAtomList(p.parse("(1 2 3)*2")));
 		assertEquals(toAtomList(1, 2, 1, 2, 1, 2), toAtomList(p.parse("(1 2)*3")));
 		assertEquals(toAtomList(1, 2, 1, 2, 1, 2), toAtomList(p.parse("(1 2) * 3")));
 	}
 
-
+	@Test
 	public void testMultipleRepetition() {
 		assertEquals(toAtomList(1, 1, 2, 2, 2, 3, 3, 3, 3), toAtomList(p.parse("1*2 2*3 (3)*4")));
 		assertEquals(toAtomList(1, 1, 2, 2, 2, 3, 3, 3, 3), toAtomList(p.parse("1 *2 2* 3 (3) * 4")));
 		assertEquals(toAtomList(1, 1, 2, 2, 2, 3, 3, 3, 3), toAtomList(p.parse("1*2 2   *    3 (3)*4")));
 	}
 
+	@Test
 	public void testNonRepeats() {
 		assertEquals(toAtomList(), toAtomList(p.parse("1*0")));
 		assertEquals(toAtomList(), toAtomList(p.parse("(1 2 3)*0")));
 		assertEquals(toAtomList(), toAtomList(p.parse("[1 2 3]*0")));
 	}
 
+	@Test
 	public void testNestedRepetition() {
 		assertEquals(toAtomList(1, 2, 2, 3, 1, 2, 2, 3), toAtomList(p.parse("(1 2*2 3)*2")));
 		assertEquals(toAtomList(1, 2, 3, 2, 3, 2, 3, 1, 2, 3, 2, 3, 2, 3), toAtomList(p.parse("(1 (2 3)*3)*2")));
 		assertEquals(toAtomList(1, 2, 2, 3, 2, 2, 3, 1, 2, 2, 3, 2, 2, 3), toAtomList(p.parse("(1 (2*2 3)*2)*2")));
 	}
 
-
+	@Test
 	public void testNextPrev() {
 		assertEquals(toAtomList("next", "prev", "next", "next"), toAtomList(p.parse("> < >>")));
 	}
 
-
+	@Test
 	public void testNote() {
 		assertEquals(toAtomList(0), toAtomList(p.parse("C-1")));
 		assertEquals(toAtomList(12), toAtomList(p.parse("C0")));
@@ -175,6 +188,7 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList(71), toAtomList(p.parse("b4")));
 	}
 
+	@Test
 	public void testNoteAccidental() {
 		assertEquals(toAtomList(61), toAtomList(p.parse("C#4")));
 		assertEquals(toAtomList(61), toAtomList(p.parse("Db4")));
@@ -186,28 +200,32 @@ public class ParserTest extends TestCase {
 		assertEquals(toAtomList(63), toAtomList(p.parse("fbb4")));
 	}
 
+	@Test
 	public void testNoteSequence() {
 		assertEquals(toAtomList(60, 64, 67, 72), toAtomList(p.parse("C4 e4 G4 b#4")));
 		assertEquals(toAtomList(60, 67, 64, 72), toAtomList(p.parse("C4 G4 e4 b#4")));
 	}
 
+	@Test
 	public void testNoteRepeat() {
 		assertEquals(toAtomList(60, 64, 67, 72, 60, 64, 67, 72), toAtomList(p.parse("(C4 e4 G4 b#4)*2")));
 		assertEquals(toAtomList(60, 64, 67, 64, 67, 72), toAtomList(p.parse("C4 (e4 G4)*2 b#4")));
 		assertEquals(toAtomList(60, 64, 67, 67, 72), toAtomList(p.parse("C4 e4 G4*2 b#4")));
 	}
 
-
+	@Test
 	public void testChord() {
 		assertEquals(toAtomList("1 2 3"), toAtomList(p.parse("[1 2 3]")));
 		assertEquals(toAtomList("1 2 3"), toAtomList(p.parse(" [ 1 2 3   ]")));
 	}
 
+	@Test
 	public void testMixedChord() {
 		assertEquals(toAtomList("1 2 3", "a b"), toAtomList(p.parse("[1 2 3] [a b]")));
 		assertEquals(toAtomList(p.parse("[1 1.1 a >]")), toAtomList("1 1.1 a next"));
 	}
 
+	@Test
 	public void testChordRepetition() {
 		assertEquals(toAtomList("1 2 3", "1 2 3"), toAtomList(p.parse("[1 2 3]*2")));
 		assertEquals(toAtomList("1 2 2", "3 4", "3 4"), toAtomList(p.parse("[1 2*2] [3 4]*2")));
@@ -220,12 +238,13 @@ public class ParserTest extends TestCase {
 				.parse("(1 2 3)*2 1*2 [1 2 3]*2")));
 	}
 
-
+	@Test
 	public void testNoteChords() {
 		assertEquals(toAtomList("60 67 64 72"), toAtomList(p.parse("[C4 G4 e4 b#4]")));
 		assertEquals(toAtomList(60, "67 64", 72), toAtomList(p.parse("C4 [G4 e4] b#4")));
 	}
 
+	@Test
 	public void testNoNestedChords() {
 		try {
 			p.parse("[1 [2 3]]");

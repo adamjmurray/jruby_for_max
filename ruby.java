@@ -40,7 +40,7 @@ import com.cycling74.max.MaxSystem;
 /**
  * The ajm.ruby MaxObject
  * 
- * @version 0.7
+ * @version 0.75
  * @author Adam Murray (adam@compusition.com)
  */
 public class ruby extends AbstractMaxObject {
@@ -72,12 +72,10 @@ public class ruby extends AbstractMaxObject {
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 
 		String pathToJRuby = MaxSystem.locateFile("jruby.jar");
-		String pathToCustomRubyScripts = null;
 		if (pathToJRuby != null) {
 			File jRubyDir = new File(pathToJRuby).getParentFile();
 			// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
 			System.setProperty("jruby.home", jRubyDir.getParent());
-			pathToCustomRubyScripts = new File(jRubyDir, "ruby").toString();
 		}
 
 		ruby = new RubyEvaluator();
@@ -89,16 +87,16 @@ public class ruby extends AbstractMaxObject {
 
 		CodeBuilder code = new CodeBuilder();
 
-		if (pathToCustomRubyScripts != null) {
-			code.line("$LOAD_PATH << '" + pathToCustomRubyScripts.replace("'", "\\'") + "'");
+		for (String path : MaxSystem.getSearchPath()) {
+			code.line("$LOAD_PATH << '" + path.replace("'", "\\'") + "'");
 		}
 
-		code.line("def puts str");
-		code.line("  $Utils.puts str");
+		code.line("def puts *params");
+		code.line("  $Utils.puts params");
 		code.line("end");
 
-		code.line("def print str");
-		code.line("  $Utils.print str");
+		code.line("def print *params");
+		code.line("  $Utils.print params");
 		code.line("end");
 
 		code.line("def flush");
@@ -117,20 +115,26 @@ public class ruby extends AbstractMaxObject {
 		code.line("  $Utils.flush");
 		code.line("end");
 
-		code.line("def error str");
-		code.line("  $Utils.error str");
+		code.line("def error *params");
+		code.line("  $Utils.error params");
 		code.line("end");
 
 		code.line("def outlet n, *params");
 		code.line("  $Utils.outlet n, params");
 		code.line("end");
 
+		// Placeholders for Max hooks:
+		code.line("def bang");
+		code.line("  puts '" + this.getClass().getName() + " received bang\nRedefine bang() to do something useful.'");
+		code.line("end");
+
+		code.line("def list(array)");
+		code.line("  puts '" + this.getClass().getName()
+				+ " received: list ' + array.inspect + '\nRedefine list(array) to do something useful.'");
+		code.line("end");
+
 		ruby.eval(code.toString());
 	}
-
-	/*
-	 * protected MaxQelem getInitializer() { return new MaxQelem(new Executable() { public void execute() { } }); }
-	 */
 
 	public void bang() {
 		eval("bang");
@@ -159,14 +163,36 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	public void list(Atom[] args) {
-		eval(toString(args));
+		StringBuilder s = new StringBuilder("list [");
+		for (int i = 0; i < args.length; i++) {
+			if (i > 0) {
+				s.append(",");
+			}
+			s.append(args[i]);
+		}
+		s.append("]");
+
+		eval(s);
 	}
 
 	public void anything(String msg, Atom[] args) {
-		eval(toString(msg, args));
+		if (msg.startsWith("fn:")) {
+			StringBuilder s = new StringBuilder(msg.substring(3));
+			s.append(" ");
+			for (int i = 0; i < args.length; i++) {
+				if (i > 0) {
+					s.append(",");
+				}
+				s.append(args[i]);
+			}
+			eval(s);
+		}
+		else {
+			eval(toString(msg, args));
+		}
 	}
 
-	private void eval(String input) {
+	private void eval(CharSequence input) {
 		try {
 			Atom[] value = ruby.evalToAtoms(input);
 			if (evaloutlet >= 0) {
@@ -208,15 +234,25 @@ public class ruby extends AbstractMaxObject {
 		}
 
 		public void puts(Object o) {
-			System.out.println(o.toString());
+			Atom[] atoms = ruby.toAtoms(o);
+			for (Atom a : atoms) {
+				System.out.println(a);
+			}
 		}
 
 		public void print(Object o) {
-			System.out.print(o.toString());
+			Atom[] atoms = ruby.toAtoms(o);
+			for (Atom a : atoms) {
+				System.out.print(a);
+			}
+			flush();
 		}
 
 		public void error(Object o) {
-			thisObj.err(o.toString());
+			Atom[] atoms = ruby.toAtoms(o);
+			for (Atom a : atoms) {
+				thisObj.err(a.toString());
+			}
 		}
 
 		public void flush() {

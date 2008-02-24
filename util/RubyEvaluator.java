@@ -65,11 +65,11 @@ public class RubyEvaluator {
 		manager.declareBean(variableName, obj, clazz);
 	}
 
-	public Object eval(String rubyCode) throws BSFException {
+	public Object eval(CharSequence rubyCode) throws BSFException {
 		return manager.eval("ruby", getClass().getName(), 1, 1, rubyCode);
 	}
 
-	public Atom[] evalToAtoms(String rubyCode) throws BSFException {
+	public Atom[] evalToAtoms(CharSequence rubyCode) throws BSFException {
 		return toAtoms(eval(rubyCode));
 	}
 
@@ -168,4 +168,5 @@ public class RubyEvaluator {
 			return Arrays.toString(atoms);
 		}
 	}
+
 }

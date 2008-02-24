@@ -94,6 +94,10 @@ public class seqTest extends TestCase {
 		private void multiply(float... n) {
 			super.multiply(Atom.newAtom(n));
 		}
+		
+		public void delete(int... idx) {
+		    super.delete(Atom.newAtom(idx));
+		}
 	}
 
 
@@ -153,7 +157,7 @@ public class seqTest extends TestCase {
 
 
 	public void testDelete() throws Exception {
-		seq s = makeSeq();
+		seqStub s = makeSeq();
 		s.delete(0);
 		assertEquals(makeSeq("B", "C", "D", "E"), s);
 		s.delete(-1);

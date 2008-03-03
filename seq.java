@@ -50,14 +50,13 @@ import com.cycling74.max.MaxQelem;
  * @version 0.7
  * @author Adam Murray (adam@compusition.com)
  */
-public class seq extends AbstractMaxObject {
+public class seq extends ruby {
 
 	public seq(Atom[] args) {
 		declareAttrs();
 		declareIO(1, 4);
 		setInletAssist(new String[] { "list / bang / commands" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
-
 	}
 
 	protected seq() { // for subclasses
@@ -90,6 +89,9 @@ public class seq extends AbstractMaxObject {
 				defaultSeq.addAll(seq);
 				outputSeq();
 			}
+
+			// initRuby();
+
 			initialized = true;
 		}
 	}
@@ -132,13 +134,17 @@ public class seq extends AbstractMaxObject {
 	protected boolean iterChanged = true;
 
 	protected Parser parser = new Parser();
-	private RubyEvaluator ruby = new RubyEvaluator();
+	// private RubyEvaluator ruby = new RubyEvaluator();
 
 	protected final seq thisseq = this; // For use in anonymous classes
 
 	/*------------------------------------------------
 	 *  Attribute Handlers
 	 *------------------------------------------------*/
+
+	public List<Item> items() {
+		return seq;
+	}
 
 	public Atom[] getseq() {
 		Atom[] atoms = new Atom[seq.size()];
@@ -262,6 +268,10 @@ public class seq extends AbstractMaxObject {
 		catch (BSFException e) {
 			err("could not evaluate Ruby: " + rubyCode);
 		}
+	}
+
+	public void rubycall(Atom[] input) {
+		eval(toString(input));
 	}
 
 	/*------------------------------------------------
@@ -420,7 +430,7 @@ public class seq extends AbstractMaxObject {
 	}
 
 	protected int fixBounds(int idx) {
-		if (!seq.isEmpty()) { // prevent infinite loops!
+		if (!seq.isEmpty()) { // prevents infinite loops!
 			int size = seq.size();
 			while (idx >= size) {
 				idx -= size;

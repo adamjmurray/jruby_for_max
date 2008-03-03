@@ -48,7 +48,7 @@ public class ruby extends AbstractMaxObject {
 	boolean verbose = false;
 	int evaloutlet = 0;
 
-	private RubyEvaluator ruby;
+	protected RubyEvaluator ruby = new RubyEvaluator();
 	private AbstractMaxObject thisObj = this;
 
 	/**
@@ -60,7 +60,7 @@ public class ruby extends AbstractMaxObject {
 	 * @throws BSFException
 	 *             if a problem occurs evaluating the Ruby initialization code
 	 */
-	public ruby(Atom[] args) throws BSFException {
+	public ruby(Atom[] args) {
 		int outlets = 1;
 		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
 			outlets = args[0].getInt();
@@ -71,69 +71,89 @@ public class ruby extends AbstractMaxObject {
 		declareAttribute("verbose", "getverbose", "verbose");
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 
-		String pathToJRuby = MaxSystem.locateFile("jruby.jar");
-		if (pathToJRuby != null) {
-			File jRubyDir = new File(pathToJRuby).getParentFile();
-			// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
-			System.setProperty("jruby.home", jRubyDir.getParent());
-		}
-
-		ruby = new RubyEvaluator();
 		if (getAttrBool("verbose")) {
 			ruby.setVerboseOut(System.out);
 		}
-		ruby.declareBean("MaxObject", this, MaxObject.class);
-		ruby.declareBean("Utils", new Utils(), Utils.class);
+		initRuby();
+	}
 
-		CodeBuilder code = new CodeBuilder();
+	protected ruby() {
+	}
 
-		for (String path : MaxSystem.getSearchPath()) {
-			code.line("$LOAD_PATH << '" + path.replace("'", "\\'") + "'");
+	private static CodeBuilder code = new CodeBuilder();
+
+	public static final String PROP_JRUBY_HOME = "jruby.home";
+
+	protected void initRuby() {
+		if (System.getProperty(PROP_JRUBY_HOME) == null) {
+			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
+			if (pathToJRuby != null) {
+				File jRubyDir = new File(pathToJRuby).getParentFile();
+				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
+				System.setProperty(PROP_JRUBY_HOME, jRubyDir.getParent());
+			}
 		}
 
-		code.line("def puts *params");
-		code.line("  $Utils.puts params");
-		code.line("end");
+		if (/*code.isEmpty()*/true) {
+			// now we need to zap the object before testing changes here!
 
-		code.line("def print *params");
-		code.line("  $Utils.print params");
-		code.line("end");
+			for (String path : MaxSystem.getSearchPath()) {
+				// did timing tests with this commented out, saves us a bout 12 ms (of ~215 ms eval time)
+				code.line("$LOAD_PATH << '" + path.replace("'", "\\'") + "'");
+			}
 
-		code.line("def flush");
-		code.line("  $Utils.flush");
-		code.line("end");
+			code.line("def puts *params");
+			code.line("  $Utils.puts params");
+			code.line("end");
 
-		code.line("def atom obj");
-		code.line("  if obj==nil");
-		code.line("    $Utils.emptyAtomArray");
-		code.line("  else");
-		code.line("    $Utils.atom obj");
-		code.line("  end");
-		code.line("end");
+			code.line("def print *params");
+			code.line("  $Utils.print params");
+			code.line("end");
 
-		code.line("def flush");
-		code.line("  $Utils.flush");
-		code.line("end");
+			code.line("def flush");
+			code.line("  $Utils.flush");
+			code.line("end");
 
-		code.line("def error *params");
-		code.line("  $Utils.error params");
-		code.line("end");
+			code.line("def atom obj");
+			code.line("  if obj==nil");
+			code.line("    $Utils.emptyAtomArray");
+			code.line("  else");
+			code.line("    $Utils.atom obj");
+			code.line("  end");
+			code.line("end");
 
-		code.line("def outlet n, *params");
-		code.line("  $Utils.outlet n, params");
-		code.line("end");
+			code.line("def error *params");
+			code.line("  $Utils.error params");
+			code.line("end");
 
-		// Placeholders for Max hooks:
-		code.line("def bang");
-		code.line("  puts '" + this.getClass().getName() + " received bang\nRedefine bang() to do something useful.'");
-		code.line("end");
+			code.line("def outlet n, *params");
+			code.line("  $Utils.outlet n, params");
+			code.line("end");
 
-		code.line("def list(array)");
-		code.line("  puts '" + this.getClass().getName()
-				+ " received: list ' + array.inspect + '\nRedefine list(array) to do something useful.'");
-		code.line("end");
+			// Placeholders for Max hooks:
+			code.line("def bang");
+			code.line("  puts '" + this.getClass().getName()
+					+ " received bang\nRedefine bang() to do something useful.'");
+			code.line("end");
 
-		ruby.eval(code.toString());
+			code.line("def list(array)");
+			code.line("  puts '" + this.getClass().getName()
+					+ " received: list ' + array.inspect + '\nRedefine list(array) to do something useful.'");
+			code.line("end");
+		}
+
+		try {
+			ruby.declareBean("MaxObject", this, this.getClass());
+			ruby.declareBean("Utils", new Utils(), Utils.class);
+
+			long time = System.nanoTime();
+			ruby.eval(code);
+			post("evaling ruby took " + (System.nanoTime() - time));
+
+		}
+		catch (BSFException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void bang() {
@@ -176,15 +196,25 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	public void anything(String msg, Atom[] args) {
-		if (msg.startsWith("fn:")) {
-			StringBuilder s = new StringBuilder(msg.substring(3));
-			s.append(" ");
-			for (int i = 0; i < args.length; i++) {
-				if (i > 0) {
+		if (msg.startsWith("call:")) {
+			StringBuilder s = new StringBuilder(msg.substring(5));
+			int i = 0;
+			if (s.length() == 0 && args.length > 0) {
+				s.append(args[0]);
+				i++;
+			}
+			s.append("(");
+			boolean first = true;
+			for (; i < args.length; i++) {
+				if (first) {
+					first = false;
+				}
+				else {
 					s.append(",");
 				}
 				s.append(args[i]);
 			}
+			s.append(")");
 			eval(s);
 		}
 		else {
@@ -192,7 +222,7 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	private void eval(CharSequence input) {
+	protected void eval(CharSequence input) {
 		try {
 			Atom[] value = ruby.evalToAtoms(input);
 			if (evaloutlet >= 0) {
@@ -204,7 +234,7 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	private class CodeBuilder {
+	private static class CodeBuilder implements CharSequence {
 		private StringBuilder code = new StringBuilder();
 
 		public void line(String s) {
@@ -213,6 +243,22 @@ public class ruby extends AbstractMaxObject {
 
 		public String toString() {
 			return code.toString();
+		}
+
+		public boolean isEmpty() {
+			return code.length() == 0;
+		}
+
+		public int length() {
+			return code.length();
+		}
+
+		public char charAt(int index) {
+			return code.charAt(index);
+		}
+
+		public CharSequence subSequence(int start, int end) {
+			return code.subSequence(start, end);
 		}
 	}
 

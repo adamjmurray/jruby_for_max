@@ -191,7 +191,7 @@ public class Item implements Comparable<Item> {
 
 	public String toString() {
 		if (atoms != null) {
-			return Arrays.toString(atoms) + " (\"" + atom + "\")";
+			return "\"" + atom + "\"";
 		}
 		else {
 			return atom + "";

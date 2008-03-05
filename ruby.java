@@ -27,15 +27,11 @@ package ajm;
 
  */
 
-import java.io.File;
-
 import org.apache.bsf.BSFException;
 
-import ajm.util.RubyEvaluator;
+import ajm.util.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
-import com.cycling74.max.MaxObject;
-import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
@@ -48,8 +44,7 @@ public class ruby extends AbstractMaxObject {
 	boolean verbose = false;
 	int evaloutlet = 0;
 
-	protected RubyEvaluator ruby = new RubyEvaluator();
-	private AbstractMaxObject thisObj = this;
+	protected MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
 
 	/**
 	 * The Constructor
@@ -74,90 +69,26 @@ public class ruby extends AbstractMaxObject {
 		if (getAttrBool("verbose")) {
 			ruby.setVerboseOut(System.out);
 		}
-		initRuby();
 	}
 
-	protected ruby() {
-	}
-
-	private static CodeBuilder code = new CodeBuilder();
-
-	public static final String PROP_JRUBY_HOME = "jruby.home";
-
-	protected void initRuby() {
-		if (System.getProperty(PROP_JRUBY_HOME) == null) {
-			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
-			if (pathToJRuby != null) {
-				File jRubyDir = new File(pathToJRuby).getParentFile();
-				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
-				System.setProperty(PROP_JRUBY_HOME, jRubyDir.getParent());
+	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object
+	   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
+	   Maybe I should introduce @autoinit attribute?
+	@Override
+	protected MaxQelem getInitializer() {
+		return new MaxQelem(new Executable() {
+			// see discussion at
+			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
+			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
+			public void execute() {
+				ruby.init();
 			}
-		}
-
-		if (/*code.isEmpty()*/true) {
-			// now we need to zap the object before testing changes here!
-
-			for (String path : MaxSystem.getSearchPath()) {
-				// did timing tests with this commented out, saves us a bout 12 ms (of ~215 ms eval time)
-				code.line("$LOAD_PATH << '" + path.replace("'", "\\'") + "'");
-			}
-
-			code.line("def puts *params");
-			code.line("  $Utils.puts params");
-			code.line("end");
-
-			code.line("def print *params");
-			code.line("  $Utils.print params");
-			code.line("end");
-
-			code.line("def flush");
-			code.line("  $Utils.flush");
-			code.line("end");
-
-			code.line("def atom obj");
-			code.line("  if obj==nil");
-			code.line("    $Utils.emptyAtomArray");
-			code.line("  else");
-			code.line("    $Utils.atom obj");
-			code.line("  end");
-			code.line("end");
-
-			code.line("def error *params");
-			code.line("  $Utils.error params");
-			code.line("end");
-
-			code.line("def outlet n, *params");
-			code.line("  $Utils.outlet n, params");
-			code.line("end");
-
-			// Placeholders for Max hooks:
-			code.line("def bang");
-			code.line("  puts '" + this.getClass().getName()
-					+ " received bang\nRedefine bang() to do something useful.'");
-			code.line("end");
-
-			code.line("def list(array)");
-			code.line("  puts '" + this.getClass().getName()
-					+ " received: list ' + array.inspect + '\nRedefine list(array) to do something useful.'");
-			code.line("end");
-		}
-
-		try {
-			ruby.declareBean("MaxObject", this, this.getClass());
-			ruby.declareBean("Utils", new Utils(), Utils.class);
-
-			long time = System.nanoTime();
-			ruby.eval(code);
-			post("evaling ruby took " + (System.nanoTime() - time));
-
-		}
-		catch (BSFException e) {
-			throw new RuntimeException(e);
-		}
+		});
 	}
+	*/
 
 	public void bang() {
-		eval("bang");
+		eval("bang()");
 	}
 
 	public int getevaloutlet() {
@@ -183,33 +114,24 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	public void list(Atom[] args) {
-		StringBuilder s = new StringBuilder("list [");
+		StringBuilder s = new StringBuilder("list([");
 		for (int i = 0; i < args.length; i++) {
 			if (i > 0) {
 				s.append(",");
 			}
 			s.append(args[i]);
 		}
-		s.append("]");
+		s.append("])");
 
 		eval(s);
 	}
 
-	public void anything(String msg, Atom[] args) {
-		if (msg.startsWith("call:")) {
-			StringBuilder s = new StringBuilder(msg.substring(5));
-			int i = 0;
-			if (s.length() == 0 && args.length > 0) {
-				s.append(args[0]);
-				i++;
-			}
-			s.append("(");
-			boolean first = true;
-			for (; i < args.length; i++) {
-				if (first) {
-					first = false;
-				}
-				else {
+	public void call(Atom[] args) {
+		if (args.length > 0) {
+			StringBuilder s = new StringBuilder();
+			s.append(args[0]).append("(");
+			for (int i = 1; i < args.length; i++) {
+				if (i > 1) {
 					s.append(",");
 				}
 				s.append(args[i]);
@@ -217,14 +139,40 @@ public class ruby extends AbstractMaxObject {
 			s.append(")");
 			eval(s);
 		}
-		else {
-			eval(toString(msg, args));
+	}
+
+	public void set(Atom[] args) {
+		if (args.length == 2) {
+			StringBuilder assignment = new StringBuilder(args[0].toString());
+			assignment.append(" = ");
+			Atom rvalue = args[1];
+			if (isNumber(rvalue)) {
+				assignment.append(rvalue.toString());
+			}
+			else {
+				String r = rvalue.toString();
+				if (!r.startsWith("\"") && !r.startsWith("'")) {
+					assignment.append('"');
+				}
+				assignment.append(r);
+				if (!r.endsWith("\"") && !r.endsWith("'")) {
+					assignment.append('"');
+				}
+			}
+			eval(assignment);
 		}
+		else {
+			err("set expects exactly 2 arguments, got " + args.length);
+		}
+	}
+
+	public void anything(String msg, Atom[] args) {
+		eval(toString(msg, args));
 	}
 
 	protected void eval(CharSequence input) {
 		try {
-			Atom[] value = ruby.evalToAtoms(input);
+			Atom[] value = ruby.eval(input);
 			if (evaloutlet >= 0) {
 				outlet(evaloutlet, value);
 			}
@@ -234,84 +182,4 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	private static class CodeBuilder implements CharSequence {
-		private StringBuilder code = new StringBuilder();
-
-		public void line(String s) {
-			code.append(s).append("\n");
-		}
-
-		public String toString() {
-			return code.toString();
-		}
-
-		public boolean isEmpty() {
-			return code.length() == 0;
-		}
-
-		public int length() {
-			return code.length();
-		}
-
-		public char charAt(int index) {
-			return code.charAt(index);
-		}
-
-		public CharSequence subSequence(int start, int end) {
-			return code.subSequence(start, end);
-		}
-	}
-
-	private class Utils {
-		// JRuby has problems calling some Max Java methods, so I go back into Java-land to do it
-
-		public Object atom(Object o) {
-			Atom[] atoms = ruby.toAtoms(o);
-			if (atoms.length == 1) {
-				return atoms[0];
-			}
-			else {
-				return atoms;
-			}
-		}
-
-		public Atom[] emptyAtomArray() {
-			return Atom.emptyArray;
-		}
-
-		public void puts(Object o) {
-			Atom[] atoms = ruby.toAtoms(o);
-			for (Atom a : atoms) {
-				System.out.println(a);
-			}
-		}
-
-		public void print(Object o) {
-			Atom[] atoms = ruby.toAtoms(o);
-			for (Atom a : atoms) {
-				System.out.print(a);
-			}
-			flush();
-		}
-
-		public void error(Object o) {
-			Atom[] atoms = ruby.toAtoms(o);
-			for (Atom a : atoms) {
-				thisObj.err(a.toString());
-			}
-		}
-
-		public void flush() {
-			System.out.println();
-		}
-
-		public void outlet(int outletIdx, Object output) {
-			if (outletIdx >= thisObj.getNumOutlets()) {
-				err("Invalid outlet index " + outletIdx);
-			}
-			else {
-				thisObj.outlet(outletIdx, ruby.toAtoms(output));
-			}
-		}
-	}
 }

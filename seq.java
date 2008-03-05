@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import org.apache.bsf.BSFException;
 
 import ajm.data.Item;
+import ajm.util.MaxRubyEvaluator;
 import ajm.util.Parser;
 import ajm.util.RubyEvaluator;
 
@@ -50,7 +51,7 @@ import com.cycling74.max.MaxQelem;
  * @version 0.7
  * @author Adam Murray (adam@compusition.com)
  */
-public class seq extends ruby {
+public class seq extends AbstractMaxObject {
 
 	public seq(Atom[] args) {
 		declareAttrs();
@@ -89,8 +90,6 @@ public class seq extends ruby {
 				defaultSeq.addAll(seq);
 				outputSeq();
 			}
-
-			// initRuby();
 
 			initialized = true;
 		}
@@ -134,7 +133,7 @@ public class seq extends ruby {
 	protected boolean iterChanged = true;
 
 	protected Parser parser = new Parser();
-	// private RubyEvaluator ruby = new RubyEvaluator();
+	protected MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
 
 	protected final seq thisseq = this; // For use in anonymous classes
 
@@ -257,21 +256,26 @@ public class seq extends ruby {
 		}
 	}
 
-	public void ruby(Atom[] input) {
+	public void rubyseq(Atom[] input) {
 		String rubyCode = toString(input);
-		try {
-			Atom[] val = ruby.evalToAtoms(rubyCode);
-			if (val.length > 0 && (val.length > 1 || !"nil".equals(val[0].toString()))) {
-				list(val);
-			}
-		}
-		catch (BSFException e) {
-			err("could not evaluate Ruby: " + rubyCode);
+		Atom[] val = evalRuby(rubyCode);
+		if (val != null && val.length > 0 && (val.length > 1 || !"nil".equals(val[0].toString()))) {
+			list(val);
 		}
 	}
 
-	public void rubycall(Atom[] input) {
-		eval(toString(input));
+	public void ruby(Atom[] input) {
+		evalRuby(toString(input));
+	}
+
+	protected Atom[] evalRuby(CharSequence input) {
+		try {
+			return ruby.eval(input);
+		}
+		catch (BSFException e) {
+			err("could not evaluate: " + input);
+			return null;
+		}
 	}
 
 	/*------------------------------------------------

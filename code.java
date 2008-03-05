@@ -13,6 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import com.cycling74.max.Atom;
+
 public class code extends AbstractMaxObject {
 
 	public void dblclick() {
@@ -34,18 +36,43 @@ public class code extends AbstractMaxObject {
 		});
 	}
 
+	public void set(Atom[] args) {
+		String text = toString(args);
+		if (textArea != null) {
+			textArea.setText(text);
+		}
+		else {
+			initText = text;
+		}
+	}
+
+	private String getText() {
+		if (textArea != null) {
+			return textArea.getText();
+		}
+		else {
+			return initText;
+		}
+	}
+
 	public void bang() {
-		outlet(0, textArea.getText());
+		outlet(0, getText());
+	}
+
+	public void save() {
+		embedMessage("set", new Atom[] { Atom.newAtom(getText()) });
 	}
 
 	private JFrame frame;
 	private JTextArea textArea;
+	private String initText = "";
 
 	private void populateFrame(JFrame frame) {
 
 		textArea = new JTextArea();
-		textArea.setTabSize(2);
+		textArea.setTabSize(2); // this probably isn't appropriate for other languages
 		textArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
+		textArea.setText(initText);
 
 		JScrollPane scroller = new JScrollPane(textArea);
 		scroller.setPreferredSize(new Dimension(300, 400));

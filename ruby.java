@@ -172,14 +172,21 @@ public class ruby extends AbstractMaxObject {
 
 	protected void eval(CharSequence input) {
 		try {
-			Atom[] value = ruby.eval(input);
+			Object val = ruby.eval(input);
 			if (evaloutlet >= 0) {
-				outlet(evaloutlet, value);
+				// this check occurs here instead of evaloutlet() because we want
+				// to allow negative numbers to suppress eval output
+
+				if (val instanceof Atom[]) {
+					outlet(evaloutlet, (Atom[]) val);
+				}
+				else {
+					outlet(evaloutlet, (Atom) val);
+				}
 			}
 		}
 		catch (BSFException e) {
 			err("could not evaluate: " + input);
 		}
 	}
-
 }

@@ -30,16 +30,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.apache.bsf.BSFException;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
+import org.jruby.RubyRange;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxSystem;
 
 public class MaxRubyEvaluator extends RubyEvaluator {
+
+	public static final String NIL = "nil";
 
 	public static final String PROP_JRUBY_HOME = "jruby.home";
 
@@ -50,6 +54,8 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	private final MaxObject maxObj;
 
 	private boolean initialized = false;
+
+	private Pattern OMIT_PATHS = Pattern.compile(".*/\\.svn/.*");
 
 	public MaxRubyEvaluator(MaxObject maxObj) {
 		this.maxObj = maxObj;
@@ -63,11 +69,21 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 		this.verboseOut = verboseOut;
 	}
 
-	public Atom[] eval(CharSequence rubyCode) throws BSFException {
+	public Object eval(CharSequence rubyCode) throws BSFException {
 		if (!initialized) {
 			init();
 		}
 		return toAtoms(super.eval(rubyCode));
+	}
+
+	public Atom[] evalToAtoms(CharSequence rubyCode) throws BSFException {
+		Object o = eval(rubyCode);
+		if (o instanceof Atom[]) {
+			return (Atom[]) o;
+		}
+		else {
+			return new Atom[] { (Atom) o };
+		}
 	}
 
 	private void addPath(String path) {
@@ -96,13 +112,16 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 				File ppath = new File(patcherPath);
 				for (File file : ppath.listFiles()) {
 					if (file.isDirectory()) {
-						addPath(file.getAbsolutePath());
+						String path = file.getAbsolutePath();
+						if (!OMIT_PATHS.matcher(path).matches()) {
+							addPath(path);
+						}
 					}
 				}
 			}
 
 			for (String path : MaxSystem.getSearchPath()) {
-				addPath(path);
+				if (!OMIT_PATHS.matcher(path).matches()) addPath(path);
 			}
 
 			code.line("def puts(*params)");
@@ -133,6 +152,11 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			code.line("  $Utils.outlet(n, params)");
 			code.line("end");
 
+			code.line("def out0(*params)");
+			code.line("  $Utils.outlet(0, params)");
+			code.line("end");
+			// Metaprogram a out1, out2,... ??
+
 			// Placeholders for Max hooks:
 			code.line("def bang");
 			code.line("  'bang'");
@@ -161,35 +185,33 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	 * 
 	 * @param obj -
 	 *            A Ruby value
-	 * @return an Atom[]. The calling code should check if this is really just a single Atom and handle that case
-	 *         appropriately.
+	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
-	public Atom[] toAtoms(Object obj) {
+	public Object toAtoms(Object obj) {
+
 		/*
-		 * if (obj != null) { System.out.println(obj.getClass().getName()); }
-		 */
+		if (obj != null) {
+			System.out.println(obj.getClass().getName());
+		}
+		*/
+
 		if (obj == null) {
-			return new Atom[] { Atom.newAtom("nil") };
+			return Atom.newAtom("nil");
 		}
-
-		else if (obj instanceof Atom[]) {
-			return (Atom[]) obj;
-		}
-
-		else if (obj instanceof Atom) {
-			return new Atom[] { (Atom) obj };
+		else if (obj instanceof Atom || obj instanceof Atom[]) {
+			return obj;
 		}
 
 		else if (obj instanceof Double || obj instanceof Float) {
-			return new Atom[] { Atom.newAtom(((Number) obj).doubleValue()) };
+			return Atom.newAtom(((Number) obj).doubleValue());
 		}
 
 		else if (obj instanceof Long || obj instanceof Integer) {
-			return new Atom[] { Atom.newAtom(((Number) obj).longValue()) };
+			return Atom.newAtom(((Number) obj).longValue());
 		}
 
 		else if (obj instanceof Boolean) {
-			return new Atom[] { Atom.newAtom(((Boolean) obj).booleanValue()) };
+			return Atom.newAtom(((Boolean) obj).booleanValue());
 		}
 
 		else if (obj instanceof RubyArray) {
@@ -200,16 +222,26 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			else {
 				Atom[] out = new Atom[array.size()];
 				for (int i = 0; i < array.size(); i++) {
-					Atom[] val = toAtoms(array.get(i));
-					if (val.length == 1) {
-						out[i] = val[0];
+					Object val = toAtoms(array.get(i));
+					if (val instanceof Atom) {
+						out[i] = (Atom) val;
 					}
 					else {
-						if (verboseOut != null) {
-							verboseOut.println("Ruby: coerced a nested Array to String");
+						Atom[] vals = (Atom[]) val;
+						if (vals.length == 1) {
+							out[i] = vals[0];
 						}
-						out[i] = Atom.newAtom(Arrays.toString(val));
+						else {
+							// TODO: it is probably ok if we only have one level of nesting (an array inside an array)
+							// to return a space separated string e.g. [1, [2,3], 4] => 1 "2 3" 4
+							// Further nesting should insert array brackets: [1, [2, [3,4]], 5] => 1 "2 [3,4]" 5
+							if (verboseOut != null) {
+								verboseOut.println("Ruby: coerced a nested Array to String");
+							}
+							out[i] = Atom.newAtom(Arrays.toString(vals));
+						}
 					}
+
 				}
 				return out;
 			}
@@ -243,12 +275,18 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 
 	}
 
-	private String toArrayString(Atom[] atoms) {
-		if (atoms.length == 1) {
-			return atoms[0].toString();
+	private String toArrayString(Object o) {
+		if (o instanceof Atom[]) {
+			Atom[] atoms = (Atom[]) o;
+			if (atoms.length == 1) {
+				return atoms[0].toString();
+			}
+			else {
+				return Arrays.toString(atoms);
+			}
 		}
 		else {
-			return Arrays.toString(atoms);
+			return o.toString();
 		}
 	}
 
@@ -256,13 +294,7 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 		// JRuby has problems calling some Max Java methods, so I go back into Java-land to do it
 
 		public Object atom(Object o) {
-			Atom[] atoms = toAtoms(o);
-			if (atoms.length == 1) {
-				return atoms[0];
-			}
-			else {
-				return atoms;
-			}
+			return toAtoms(o);
 		}
 
 		public Atom[] emptyAtomArray() {
@@ -270,24 +302,39 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 		}
 
 		public void puts(Object o) {
-			Atom[] atoms = toAtoms(o);
-			for (Atom a : atoms) {
-				System.out.println(a);
+			Object atom = toAtoms(o);
+			if (atom instanceof Atom[]) {
+				for (Atom a : (Atom[]) atom) {
+					System.out.println(a);
+				}
+			}
+			else {
+				System.out.println(o);
 			}
 		}
 
 		public void print(Object o) {
-			Atom[] atoms = toAtoms(o);
-			for (Atom a : atoms) {
-				System.out.print(a);
+			Object atom = toAtoms(o);
+			if (atom instanceof Atom[]) {
+				for (Atom a : (Atom[]) atom) {
+					System.out.print(a);
+				}
+			}
+			else {
+				System.out.print(o);
 			}
 			flush();
 		}
 
 		public void error(Object o) {
-			Atom[] atoms = toAtoms(o);
-			for (Atom a : atoms) {
-				MaxSystem.error(a.toString());
+			Object atom = toAtoms(o);
+			if (atom instanceof Atom[]) {
+				for (Atom a : (Atom[]) atom) {
+					MaxSystem.error(a.toString());
+				}
+			}
+			else {
+				System.out.println(atom.toString());
 			}
 		}
 
@@ -300,7 +347,13 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 				MaxSystem.error("Invalid outlet index " + outletIdx);
 			}
 			else {
-				maxObj.outlet(outletIdx, toAtoms(output));
+				Object atoms = toAtoms(output);
+				if (atoms instanceof Atom[]) {
+					maxObj.outlet(outletIdx, (Atom[]) atoms);
+				}
+				else {
+					maxObj.outlet(outletIdx, (Atom) atoms);
+				}
 			}
 		}
 	}

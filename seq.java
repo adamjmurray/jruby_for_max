@@ -257,10 +257,23 @@ public class seq extends AbstractMaxObject {
 	}
 
 	public void rubyseq(Atom[] input) {
+		// TODO: it seems questionable that I do my ajm.eval logic on the Atom(s) returned by Ruby.
+		// Maybe it should use the raw results.
 		String rubyCode = toString(input);
-		Atom[] val = evalRuby(rubyCode);
-		if (val != null && val.length > 0 && (val.length > 1 || !"nil".equals(val[0].toString()))) {
-			list(val);
+		Object val = evalRuby(rubyCode);
+		if (val != null) {
+			if (val instanceof Atom[]) {
+				Atom[] vals = (Atom[]) val;
+				if (vals.length > 0 && (vals.length > 1 || !MaxRubyEvaluator.NIL.equals(vals[0].toString()))) {
+					list(vals);
+				}
+			}
+			else {
+				Atom a = (Atom) val;
+				if (!MaxRubyEvaluator.NIL.equals(a.toString())) {
+					list(new Atom[] { a });
+				}
+			}
 		}
 	}
 
@@ -268,7 +281,7 @@ public class seq extends AbstractMaxObject {
 		evalRuby(toString(input));
 	}
 
-	protected Atom[] evalRuby(CharSequence input) {
+	protected Object evalRuby(CharSequence input) {
 		try {
 			return ruby.eval(input);
 		}

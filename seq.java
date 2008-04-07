@@ -956,6 +956,7 @@ public class seq extends AbstractMaxObject {
 			output(OUTLET.SEQ, getseq());
 		}
 		else {
+			// " " is pattr friendly (pattr will not send out a message on preset recall if it is empty string)
 			output(OUTLET.SEQ, Atom.newAtom(" "));
 		}
 	}

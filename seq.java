@@ -956,7 +956,7 @@ public class seq extends AbstractMaxObject {
 			output(OUTLET.SEQ, getseq());
 		}
 		else {
-			output(OUTLET.SEQ, Atom.newAtom(""));
+			output(OUTLET.SEQ, Atom.newAtom(" "));
 		}
 	}
 

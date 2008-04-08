@@ -27,11 +27,15 @@ package ajm;
 
  */
 
+import java.io.File;
+
 import org.apache.bsf.BSFException;
 
 import ajm.util.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
+import com.cycling74.max.MaxQelem;
 
 /**
  * The ajm.ruby MaxObject
@@ -43,6 +47,7 @@ public class ruby extends AbstractMaxObject {
 
 	boolean verbose = false;
 	int evaloutlet = 0;
+	boolean autoinit = false;
 
 	protected MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
 
@@ -65,15 +70,17 @@ public class ruby extends AbstractMaxObject {
 
 		declareAttribute("verbose", "getverbose", "verbose");
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
+		declareAttribute("autoinit");
 
 		if (getAttrBool("verbose")) {
 			ruby.setVerboseOut(System.out);
 		}
 	}
 
-	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object
+	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
+	   Thus autoinit is false by default.
 	   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-	   Maybe I should introduce @autoinit attribute?
+	   The hang delay got much better with JRuby 1.1. */
 	@Override
 	protected MaxQelem getInitializer() {
 		return new MaxQelem(new Executable() {
@@ -81,14 +88,12 @@ public class ruby extends AbstractMaxObject {
 			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
 			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
 			public void execute() {
-				ruby.init();
+				if (autoinit) {
+					post("initing");
+					ruby.init();
+				}
 			}
 		});
-	}
-	*/
-
-	public void bang() {
-		eval("bang()");
 	}
 
 	public int getevaloutlet() {
@@ -113,19 +118,6 @@ public class ruby extends AbstractMaxObject {
 		ruby.setVerboseOut(verbose ? System.out : null);
 	}
 
-	public void list(Atom[] args) {
-		StringBuilder s = new StringBuilder("list([");
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0) {
-				s.append(",");
-			}
-			s.append(args[i]);
-		}
-		s.append("])");
-
-		eval(s);
-	}
-
 	public void call(Atom[] args) {
 		if (args.length > 0) {
 			StringBuilder s = new StringBuilder();
@@ -141,29 +133,25 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	public void set(Atom[] args) {
-		if (args.length == 2) {
-			StringBuilder assignment = new StringBuilder(args[0].toString());
-			assignment.append(" = ");
-			Atom rvalue = args[1];
-			if (isNumber(rvalue)) {
-				assignment.append(rvalue.toString());
+	public void scriptfile(String path) {
+		File script = new File(path);
+		post(script + ": " + script.exists());
+	}
+
+	public void bang() {
+		eval("bang()");
+	}
+
+	public void list(Atom[] args) {
+		StringBuilder s = new StringBuilder("list([");
+		for (int i = 0; i < args.length; i++) {
+			if (i > 0) {
+				s.append(",");
 			}
-			else {
-				String r = rvalue.toString();
-				if (!r.startsWith("\"") && !r.startsWith("'")) {
-					assignment.append('"');
-				}
-				assignment.append(r);
-				if (!r.endsWith("\"") && !r.endsWith("'")) {
-					assignment.append('"');
-				}
-			}
-			eval(assignment);
+			s.append(args[i]);
 		}
-		else {
-			err("set expects exactly 2 arguments, got " + args.length);
-		}
+		s.append("])");
+		eval(s);
 	}
 
 	public void anything(String msg, Atom[] args) {

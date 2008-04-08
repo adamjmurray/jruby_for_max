@@ -152,10 +152,12 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			code.line("  $Utils.outlet(n, params)");
 			code.line("end");
 
-			code.line("def out0(*params)");
-			code.line("  $Utils.outlet(0, params)");
-			code.line("end");
-			// Metaprogram a out1, out2,... ??
+			for (int i = 0; i < 10; i++) {
+				// TODO: better handled with metaprogramming?
+				code.line("def out" + i + "(*params)");
+				code.line("  $Utils.outlet(" + i + ", params)");
+				code.line("end");
+			}
 
 			// Placeholders for Max hooks:
 			code.line("def bang");

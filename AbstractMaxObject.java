@@ -27,11 +27,13 @@ package ajm;
 
  */
 
+import java.io.File;
 import java.io.PrintStream;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
+import com.cycling74.max.MaxSystem;
 
 /**
  * Common behavior for ajm objects.
@@ -71,6 +73,39 @@ public abstract class AbstractMaxObject extends MaxObject {
 		if (initializer != null) {
 			initializer.release();
 		}
+	}
+
+	/**
+	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
+	 * path will be searched to locate the file.
+	 * 
+	 * @param path -
+	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
+	 * @return a File object referencing an existing file, otherwise null
+	 */
+	public static File getFile(String path) {
+		if (path == null || path.length() == 0) {
+			path = MaxSystem.openDialog();
+		}
+
+		if (path != null) {
+			String location = null;
+			if (path.contains(File.separator)) {
+				location = MaxSystem.maxPathToNativePath(path);
+			}
+			else {
+				location = MaxSystem.locateFile(path);
+			}
+
+			if (location != null) {
+				File file = new File(location);
+				if (file != null && file.isFile()) {
+					return file;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public static String toString(Atom[] args) {

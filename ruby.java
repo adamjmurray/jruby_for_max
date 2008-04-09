@@ -43,7 +43,7 @@ import com.cycling74.max.MaxSystem;
 /**
  * The ajm.ruby MaxObject
  * 
- * @version 0.75
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class ruby extends AbstractMaxObject {

@@ -42,7 +42,7 @@ import com.cycling74.max.MaxSystem;
 /**
  * Common behavior for ajm objects.
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public abstract class AbstractMaxObject extends MaxObject {

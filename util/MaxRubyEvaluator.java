@@ -41,6 +41,12 @@ import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxSystem;
 
+/**
+ * The bridge between Max and Ruby.
+ * 
+ * @version 0.85
+ * @author Adam Murray (adam@compusition.com)
+ */
 public class MaxRubyEvaluator extends RubyEvaluator {
 
 	public static final String NIL = "nil";

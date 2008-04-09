@@ -33,7 +33,7 @@ import org.apache.bsf.BSFManager;
 /**
  * JRuby/BSF wrapper.
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class RubyEvaluator {

@@ -91,6 +91,11 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	}
 
 	public void init() {
+		init(null);
+	}
+
+	public void init(String script) {
+		super.init();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -99,12 +104,13 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
 				System.setProperty(PROP_JRUBY_HOME, jRubyDir.getParent());
 			}
+			else {
+				MaxSystem.error("jruby.jar not found! Maybe it was not installed correctly?");
+			}
 		}
 
-		if (true) {
-			// now we need to zap the object before testing changes here!
-			// did timing tests with this commented out, saves us a bout 12 ms (of ~215 ms eval time)
-
+		if (code.isEmpty()) {
+			// Setup the path:
 			String patcherPath = maxObj.getParentPatcher().getPath();
 			if (patcherPath != null) {
 				// Add the patch's folder and subfolders
@@ -121,9 +127,12 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			}
 
 			for (String path : MaxSystem.getSearchPath()) {
-				if (!OMIT_PATHS.matcher(path).matches()) addPath(path);
+				if (!OMIT_PATHS.matcher(path).matches()) {
+					addPath(path);
+				}
 			}
 
+			// Setup the default functions:
 			code.line("def puts(*params)");
 			code.line("  $Utils.puts(params)");
 			code.line("end");
@@ -173,8 +182,12 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			declareBean("MaxObject", maxObj, maxObj.getClass());
 			declareBean("Utils", new Utils(), Utils.class);
 			initialized = true;
+
 			eval(code);
 
+			if (script != null) {
+				eval(script);
+			}
 		}
 		catch (BSFException e) {
 			throw new RuntimeException(e);
@@ -325,7 +338,6 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 			else {
 				System.out.print(o);
 			}
-			flush();
 		}
 
 		public void error(Object o) {

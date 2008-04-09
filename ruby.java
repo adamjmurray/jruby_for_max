@@ -28,14 +28,17 @@ package ajm;
  */
 
 import java.io.File;
+import java.util.Date;
 
 import org.apache.bsf.BSFException;
 
+import ajm.util.FileWatcher;
 import ajm.util.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
 import com.cycling74.max.MaxQelem;
+import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
@@ -45,11 +48,16 @@ import com.cycling74.max.MaxQelem;
  */
 public class ruby extends AbstractMaxObject {
 
-	boolean verbose = false;
-	int evaloutlet = 0;
-	boolean autoinit = false;
+	private boolean verbose = false;
+	private int evaloutlet = 0;
+	private boolean autoinit = false;
+	private boolean autowatch = false;
 
-	protected MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
+	private String scriptFilePath;
+	private File scriptFile;
+	private FileWatcher fileWatcher;
+
+	private MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
 
 	/**
 	 * The Constructor
@@ -71,6 +79,8 @@ public class ruby extends AbstractMaxObject {
 		declareAttribute("verbose", "getverbose", "verbose");
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("autoinit");
+		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
+		declareAttribute("autowatch", "getautowatch", "autowatch");
 
 		if (getAttrBool("verbose")) {
 			ruby.setVerboseOut(System.out);
@@ -80,7 +90,7 @@ public class ruby extends AbstractMaxObject {
 	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
 	   Thus autoinit is false by default.
 	   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-	   The hang delay got much better with JRuby 1.1. */
+	   The hang delay got much shorter with JRuby 1.1. */
 	@Override
 	protected MaxQelem getInitializer() {
 		return new MaxQelem(new Executable() {
@@ -88,12 +98,24 @@ public class ruby extends AbstractMaxObject {
 			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
 			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
 			public void execute() {
-				if (autoinit) {
-					post("initing");
+				if (scriptFile != null) {
+					loadFile(); // this also initializes ruby
+					initFileWatcher();
+				}
+				else if (autoinit) {
 					ruby.init();
 				}
+				initialized = true;
 			}
 		});
+	}
+
+	@Override
+	public void notifyDeleted() {
+		if (fileWatcher != null) {
+			fileWatcher.stopWatching();
+		}
+		super.notifyDeleted();
 	}
 
 	public int getevaloutlet() {
@@ -118,6 +140,42 @@ public class ruby extends AbstractMaxObject {
 		ruby.setVerboseOut(verbose ? System.out : null);
 	}
 
+	public boolean getautowatch() {
+		return autowatch;
+	}
+
+	public void autowatch(boolean autowatch) {
+		this.autowatch = autowatch;
+		if (initialized) {
+			if (autowatch) {
+				initFileWatcher();
+			}
+			else {
+				stopFileWatcher();
+			}
+		}
+	}
+
+	private void initFileWatcher() {
+		if (fileWatcher == null && scriptFile != null && autowatch) {
+			fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
+			fileWatcher.start();
+		}
+	}
+
+	private void stopFileWatcher() {
+		if (fileWatcher != null) {
+			fileWatcher.stopWatching();
+			fileWatcher = null;
+		}
+	}
+
+	private Executable fileWatcherCallback = new Executable() {
+		public void execute() {
+			loadFile();
+		}
+	};
+
 	public void call(Atom[] args) {
 		if (args.length > 0) {
 			StringBuilder s = new StringBuilder();
@@ -133,9 +191,47 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
+	public String getscriptfile() {
+		return scriptFilePath;
+	}
+
 	public void scriptfile(String path) {
-		File script = new File(path);
-		post(script + ": " + script.exists());
+		if (path == null || path.length() == 0) {
+			path = MaxSystem.openDialog();
+		}
+		scriptFilePath = path;
+
+		if (scriptFilePath != null) {
+			scriptFile = getFile(path);
+			if (scriptFile != null) {
+				if (initialized) {
+					loadFile();
+					initFileWatcher();
+				}
+			}
+			else {
+				if (verbose) {
+					MaxSystem.error("File not found: " + path);
+				}
+			}
+		}
+		else {
+			scriptFile = null;
+		}
+
+		if (scriptFile == null) {
+			stopFileWatcher();
+		}
+	}
+
+	public synchronized void loadFile() {
+		String script = getFileAsString(scriptFile);
+		if (script != null) {
+			if (verbose) {
+				info("loading script '" + scriptFile + "' on " + new Date());
+			}
+			ruby.init(script);
+		}
 	}
 
 	public void bang() {

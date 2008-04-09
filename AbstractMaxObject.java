@@ -27,7 +27,11 @@ package ajm;
 
  */
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import com.cycling74.max.Atom;
@@ -108,6 +112,42 @@ public abstract class AbstractMaxObject extends MaxObject {
 		return null;
 	}
 
+	public static String getFileAsString(String path) {
+		return getFileAsString(getFile(path));
+	}
+
+	public static String getFileAsString(File file) {
+		if (file == null || !file.exists()) {
+			return null;
+		}
+
+		StringBuilder text = new StringBuilder(5000);
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			char[] buf = new char[1024];
+			int charsRead = 0;
+			while ((charsRead = reader.read(buf)) != -1) {
+				text.append(buf, 0, charsRead);
+			}
+			return text.toString();
+		}
+		catch (IOException e) {
+			MaxSystem.error(e.getMessage());
+			return null;
+		}
+		finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				}
+				catch (IOException e) {
+					MaxSystem.error(e.getMessage());
+				}
+			}
+		}
+	}
+
 	public static String toString(Atom[] args) {
 		return toString(null, args);
 	}
@@ -148,6 +188,16 @@ public abstract class AbstractMaxObject extends MaxObject {
 	 */
 	protected void setDebugOut(PrintStream debugOut) {
 		this.debugOut = debugOut;
+	}
+
+	/**
+	 * Automatically prepends the object name to the beginning of error messages.
+	 * 
+	 * @param message
+	 *            the error message
+	 */
+	protected void info(String message) {
+		post(this.getClass().getName() + ": " + message);
 	}
 
 	/**

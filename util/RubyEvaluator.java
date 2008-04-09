@@ -42,6 +42,9 @@ public class RubyEvaluator {
 
 	public RubyEvaluator() {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
+	}
+
+	public void init() {
 		manager = new BSFManager();
 	}
 

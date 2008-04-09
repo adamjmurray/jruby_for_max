@@ -48,11 +48,13 @@ import com.cycling74.max.MaxSystem;
  * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
-public class MaxRubyEvaluator extends RubyEvaluator {
+public class MaxRubyEvaluator {
 
 	public static final String NIL = "nil";
 
 	public static final String PROP_JRUBY_HOME = "jruby.home";
+
+	private RubyEvaluator ruby;
 
 	private LineBuilder code = new LineBuilder();
 
@@ -60,7 +62,7 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 
 	private final MaxObject maxObj;
 
-	private boolean initialized = false;
+	// private boolean initialized = false;
 
 	private Pattern OMIT_PATHS = Pattern.compile(".*/\\.svn/.*");
 
@@ -69,8 +71,8 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	}
 
 	public MaxRubyEvaluator(MaxObject maxObj, String context) {
-		System.out.println("Context = " + context);
 		this.maxObj = maxObj;
+		ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
 	}
 
 	public PrintStream getVerboseOut() {
@@ -85,10 +87,10 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
 	public Object eval(CharSequence rubyCode) throws BSFException {
-		if (!initialized) {
+		if (!ruby.isInitialized()) {
 			init();
 		}
-		return toAtoms(super.eval(rubyCode));
+		return toAtoms(ruby.eval(rubyCode));
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 	}
 
 	public void init(String script) {
-		super.init();
+		ruby.init();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -197,9 +199,9 @@ public class MaxRubyEvaluator extends RubyEvaluator {
 		}
 
 		try {
-			declareBean("MaxObject", maxObj, maxObj.getClass());
-			declareBean("Utils", new Utils(), Utils.class);
-			initialized = true;
+			ruby.declareBean("MaxObject", maxObj, maxObj.getClass());
+			ruby.declareBean("Utils", new Utils(), Utils.class);
+			ruby.setInitialized(true);
 
 			eval(code);
 

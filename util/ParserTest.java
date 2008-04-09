@@ -14,6 +14,7 @@ import com.cycling74.max.Atom;
 
 public class ParserTest {
 
+	@SuppressWarnings("unused")
 	private PrintStream out = System.out;
 	Parser p = new Parser();
 
@@ -41,6 +42,7 @@ public class ParserTest {
 		return list;
 	}
 
+	/*
 	private Atom[] toAtomArray(Object... objs) {
 		return toAtomList(objs).toArray(new Atom[] {});
 	}
@@ -48,7 +50,7 @@ public class ParserTest {
 	private Item toItem(Object... objs) {
 		return new Item(toAtomArray(objs));
 	}
-
+	*/
 	private List<Atom> toAtomList(List<Item> items) {
 		List<Atom> atoms = new ArrayList<Atom>(items.size());
 		for (Item item : items) {

@@ -39,6 +39,7 @@ import org.apache.bsf.BSFManager;
 public class RubyEvaluator {
 
 	private BSFManager manager;
+	private boolean initialized = false;
 
 	public RubyEvaluator() {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
@@ -46,6 +47,15 @@ public class RubyEvaluator {
 
 	public void init() {
 		manager = new BSFManager();
+		// not fully initialized until some initialization scripts are run, responsibility of calling code
+	}
+
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
 	}
 
 	@SuppressWarnings("unchecked")

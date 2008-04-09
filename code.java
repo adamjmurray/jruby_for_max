@@ -43,8 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.cycling74.max.Atom;
 
@@ -173,6 +171,7 @@ public class code extends AbstractMaxObject {
 		return scroller;
 	}
 
+	@SuppressWarnings("serial")
 	private static class RunAction extends AbstractAction {
 		private code thisObj;
 

@@ -33,7 +33,7 @@ import java.util.Date;
 import org.apache.bsf.BSFException;
 
 import ajm.util.FileWatcher;
-import ajm.util.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -48,6 +48,8 @@ import com.cycling74.max.MaxSystem;
  */
 public class ruby extends AbstractMaxObject {
 
+	private String context = null;
+
 	private boolean verbose = false;
 	private int evaloutlet = 0;
 	private boolean autoinit = false;
@@ -57,7 +59,7 @@ public class ruby extends AbstractMaxObject {
 	private File scriptFile;
 	private FileWatcher fileWatcher;
 
-	private MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
+	private MaxRubyEvaluator ruby;
 
 	/**
 	 * The Constructor
@@ -73,6 +75,14 @@ public class ruby extends AbstractMaxObject {
 		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
 			outlets = args[0].getInt();
 		}
+		if (args.length > 1) {
+			context = args[1].toString();
+			ruby = new MaxRubyEvaluator(this, context);
+		}
+		else {
+			ruby = new MaxRubyEvaluator(this);
+		}
+
 		declareIO(1, outlets);
 		createInfoOutlet(false);
 

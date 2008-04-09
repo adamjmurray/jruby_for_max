@@ -37,9 +37,8 @@ import java.util.TreeSet;
 import org.apache.bsf.BSFException;
 
 import ajm.data.Item;
-import ajm.util.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyEvaluator;
 import ajm.util.Parser;
-import ajm.util.RubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -153,6 +152,7 @@ public class seq extends AbstractMaxObject {
 		return atoms;
 	}
 
+	@SuppressWarnings("all")
 	public void seq(Atom[] list) {
 		list(list);
 	}

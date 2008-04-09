@@ -209,11 +209,7 @@ public class ruby extends AbstractMaxObject {
 					initFileWatcher();
 				}
 			}
-			else {
-				if (verbose) {
-					MaxSystem.error("File not found: " + path);
-				}
-			}
+			else MaxSystem.error("File not found: " + path);
 		}
 		else {
 			scriptFile = null;

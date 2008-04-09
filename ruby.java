@@ -224,7 +224,7 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	public synchronized void loadFile() {
+	private synchronized void loadFile() {
 		String script = getFileAsString(scriptFile);
 		if (script != null) {
 			if (verbose) {

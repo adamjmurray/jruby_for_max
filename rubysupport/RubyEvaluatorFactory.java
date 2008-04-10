@@ -13,12 +13,8 @@ public class RubyEvaluatorFactory {
 	public static RubyEvaluator getRubyEvaluator(String context) {
 		RubyEvaluator evaluator = contexts.get(context);
 		if (evaluator == null) {
-			System.out.println("Creating context for " + context);
 			evaluator = new RubyEvaluator();
 			contexts.put(context, evaluator);
-		}
-		else {
-			System.out.println("Found existing context for " + context);
 		}
 		return evaluator;
 	}

@@ -186,21 +186,6 @@ public class ruby extends AbstractMaxObject {
 		}
 	};
 
-	public void call(Atom[] args) {
-		if (args.length > 0) {
-			StringBuilder s = new StringBuilder();
-			s.append(args[0]).append("(");
-			for (int i = 1; i < args.length; i++) {
-				if (i > 1) {
-					s.append(",");
-				}
-				s.append(args[i]);
-			}
-			s.append(")");
-			eval(s);
-		}
-	}
-
 	public String getscriptfile() {
 		return scriptFilePath;
 	}
@@ -257,7 +242,23 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	public void anything(String msg, Atom[] args) {
-		eval(toString(msg, args));
+		StringBuilder input = new StringBuilder();
+		input.append(atomToString(msg));
+		for (Atom arg : args) {
+			input.append(" ").append(atomToString(arg.toString()));
+		}
+		eval(input);
+	}
+
+	private String atomToString(String str) {
+		// The startsWith/endsWith " check is because Max includes the quotes if a space is not contained
+		// in the symbol. The check for newlines (\n or \r depending on OS) is for compatibility with
+		// textedit's output one symbol mode
+		if (!str.startsWith("\"") && !str.endsWith("\"") && str.contains(" ") && str.indexOf('\n') < 0
+				&& str.indexOf('\r') < 0) {
+			return '"' + str + '"';
+		}
+		else return str;
 	}
 
 	protected void eval(CharSequence input) {

@@ -64,7 +64,12 @@ public class FileWatcher extends Thread {
 		while (keepWatching) {
 			long currLastMod = file.lastModified();
 			if (currLastMod > prevLastModified) {
-				callback.execute();
+				try {
+					callback.execute();
+				}
+				catch (Exception e) {
+					System.err.println(e.getMessage());
+				}
 				prevLastModified = currLastMod;
 			}
 			try {

@@ -86,7 +86,7 @@ public class MaxRubyEvaluator {
 	/**
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
-	public Object eval(CharSequence rubyCode) throws BSFException {
+	public Object eval(CharSequence rubyCode) {
 		if (!ruby.isInitialized()) {
 			init();
 		}
@@ -96,7 +96,7 @@ public class MaxRubyEvaluator {
 	/**
 	 * Less efficient version of eval will always return an Atom[]
 	 */
-	public Atom[] evalToAtoms(CharSequence rubyCode) throws BSFException {
+	public Atom[] evalToAtoms(CharSequence rubyCode) {
 		Object o = eval(rubyCode);
 		if (o instanceof Atom[]) {
 			return (Atom[]) o;
@@ -198,19 +198,14 @@ public class MaxRubyEvaluator {
 			code.line("end");
 		}
 
-		try {
-			ruby.declareBean("MaxObject", maxObj, maxObj.getClass());
-			ruby.declareBean("Utils", new Utils(), Utils.class);
-			ruby.setInitialized(true);
+		ruby.declareBean("MaxObject", maxObj, maxObj.getClass());
+		ruby.declareBean("Utils", new Utils(), Utils.class);
+		ruby.setInitialized(true);
 
-			eval(code);
+		eval(code);
 
-			if (script != null) {
-				eval(script);
-			}
-		}
-		catch (BSFException e) {
-			throw new RuntimeException(e);
+		if (script != null) {
+			eval(script);
 		}
 
 	}

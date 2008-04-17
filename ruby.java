@@ -221,7 +221,12 @@ public class ruby extends AbstractMaxObject {
 			if (verbose) {
 				info("loading script '" + scriptFile + "' on " + new Date());
 			}
-			ruby.init(script);
+			try {
+				ruby.init(script);
+			}
+			catch (Exception e) {
+				err("Error evaluating script file: " + scriptFilePath);
+			}
 		}
 	}
 
@@ -276,7 +281,7 @@ public class ruby extends AbstractMaxObject {
 				}
 			}
 		}
-		catch (BSFException e) {
+		catch (Exception e) {
 			err("could not evaluate: " + input);
 		}
 	}

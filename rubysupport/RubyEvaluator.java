@@ -59,11 +59,23 @@ public class RubyEvaluator {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void declareBean(String variableName, Object obj, Class clazz) throws BSFException {
-		manager.declareBean(variableName, obj, clazz);
+	public void declareBean(String variableName, Object obj, Class clazz) {
+		try {
+			manager.declareBean(variableName, obj, clazz);
+		}
+		catch (BSFException e) {
+			// convert to unchecked exception to better encapsulate this evaluator
+			throw new RuntimeException(e);
+		}
 	}
 
-	public Object eval(CharSequence rubyCode) throws BSFException {
-		return manager.eval("ruby", getClass().getName(), 1, 1, rubyCode);
+	public Object eval(CharSequence rubyCode) {
+		try {
+			return manager.eval("ruby", getClass().getName(), 1, 1, rubyCode);
+		}
+		catch (BSFException e) {
+			// convert to unchecked exception to better encapsulate this evaluator
+			throw new RuntimeException(e);
+		}
 	}
 }

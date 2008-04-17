@@ -285,7 +285,7 @@ public class seq extends AbstractMaxObject {
 		try {
 			return ruby.eval(input);
 		}
-		catch (BSFException e) {
+		catch (Exception e) {
 			err("could not evaluate: " + input);
 			return null;
 		}

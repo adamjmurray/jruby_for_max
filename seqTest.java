@@ -164,7 +164,7 @@ public class seqTest {
 		s.delete(0);
 		assertEquals(makeSeq("B", "C", "D", "E"), s);
 		s.delete(-1);
-		assertEquals(makeSeq("B", "C", "D", "E"), s);
+		assertEquals(makeSeq("B", "C", "D"), s);
 		s.delete(5);
 		assertEquals(makeSeq("B", "C", "D", "E"), s);
 		s.delete(new int[] { 1, 3 });

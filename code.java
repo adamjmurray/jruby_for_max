@@ -44,6 +44,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import ajm.maxsupport.AbstractMaxObject;
+
 import com.cycling74.max.Atom;
 
 /**

@@ -28,15 +28,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import org.apache.bsf.BSFException;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
 import ajm.util.LineBuilder;
+import ajm.util.Logger;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
@@ -58,29 +58,54 @@ public class MaxRubyEvaluator {
 
 	private LineBuilder code = new LineBuilder();
 
-	private PrintStream verboseOut;
-
 	private final MaxObject maxObj;
+
+	private Logger logger;
+
+	private String context;
 
 	// private boolean initialized = false;
 
 	private Pattern OMIT_PATHS = Pattern.compile(".*/\\.svn/.*");
 
 	public MaxRubyEvaluator(MaxObject maxObj) {
-		this(maxObj, "__" + Integer.toHexString(maxObj.hashCode()));
+		this(maxObj, null);
 	}
 
 	public MaxRubyEvaluator(MaxObject maxObj, String context) {
+		if (context == null) {
+			context = "__" + Integer.toHexString(maxObj.hashCode());
+		}
 		this.maxObj = maxObj;
+		if (maxObj instanceof Logger) {
+			this.logger = (Logger) maxObj;
+		}
+		this.context = context;
 		ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
 	}
 
-	public PrintStream getVerboseOut() {
-		return verboseOut;
+	public Logger getLogger() {
+		return logger;
 	}
 
-	public void setVerboseOut(PrintStream verboseOut) {
-		this.verboseOut = verboseOut;
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	public String getContext() {
+		return context;
+	}
+
+	public void setContext(String context) {
+		if (!Utils.equals(this.context, context)) {
+			RubyEvaluatorFactory.removeRubyEvaluator(this.context);
+			ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
+			this.context = context;
+		}
+	}
+
+	public void notifyDeleted() {
+		RubyEvaluatorFactory.removeRubyEvaluator(this.context);
 	}
 
 	/**
@@ -115,7 +140,7 @@ public class MaxRubyEvaluator {
 	}
 
 	public void init(String script) {
-		ruby.init();
+		ruby.createContext();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -199,7 +224,7 @@ public class MaxRubyEvaluator {
 		}
 
 		ruby.declareBean("MaxObject", maxObj, maxObj.getClass());
-		ruby.declareBean("Utils", new Utils(), Utils.class);
+		ruby.declareBean("Utils", new RubyUtils(), RubyUtils.class);
 		ruby.setInitialized(true);
 
 		eval(code);
@@ -265,8 +290,8 @@ public class MaxRubyEvaluator {
 							// TODO: it is probably ok if we only have one level of nesting (an array inside an array)
 							// to return a space separated string e.g. [1, [2,3], 4] => 1 "2 3" 4
 							// Further nesting should insert array brackets: [1, [2, [3,4]], 5] => 1 "2 [3,4]" 5
-							if (verboseOut != null) {
-								verboseOut.println("Ruby: coerced a nested Array to String");
+							if (logger != null) {
+								logger.info("Ruby: coerced a nested Array to String");
 							}
 							out[i] = Atom.newAtom(Arrays.toString(vals));
 						}
@@ -278,8 +303,8 @@ public class MaxRubyEvaluator {
 		}
 
 		else if (obj instanceof RubyHash) {
-			if (verboseOut != null) {
-				verboseOut.println("Ruby: coerced a Hash to String");
+			if (logger != null) {
+				logger.info("Ruby: coerced a Hash to String");
 			}
 			RubyHash hash = (RubyHash) obj;
 			StringBuilder s = new StringBuilder();
@@ -297,8 +322,8 @@ public class MaxRubyEvaluator {
 		}
 
 		else {
-			if (verboseOut != null && !(obj instanceof String)) {
-				verboseOut.println("Ruby: coerced type " + obj.getClass().getName() + " to String");
+			if (logger != null && !(obj instanceof String)) {
+				logger.info("Ruby: coerced type " + obj.getClass().getName() + " to String");
 			}
 			return new Atom[] { Atom.newAtom(obj.toString()) };
 		}
@@ -320,7 +345,7 @@ public class MaxRubyEvaluator {
 		}
 	}
 
-	private class Utils {
+	private class RubyUtils {
 		// JRuby has problems calling some Max Java methods, so I go back into Java-land to do it
 
 		public Object atom(Object o) {

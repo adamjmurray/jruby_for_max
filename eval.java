@@ -30,6 +30,7 @@ package ajm;
 import java.util.List;
 
 import ajm.data.Item;
+import ajm.maxsupport.AbstractMaxObject;
 import ajm.util.Parser;
 
 import com.cycling74.max.Atom;

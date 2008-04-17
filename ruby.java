@@ -30,10 +30,9 @@ package ajm;
 import java.io.File;
 import java.util.Date;
 
-import org.apache.bsf.BSFException;
-
+import ajm.maxsupport.AbstractMaxRubyObject;
+import ajm.rubysupport.RubyException;
 import ajm.util.FileWatcher;
-import ajm.rubysupport.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -46,11 +45,8 @@ import com.cycling74.max.MaxSystem;
  * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
-public class ruby extends AbstractMaxObject {
+public class ruby extends AbstractMaxRubyObject {
 
-	private String context = null;
-
-	private boolean verbose = false;
 	private int evaloutlet = 0;
 	private boolean autoinit = false;
 	private boolean autowatch = false;
@@ -59,42 +55,27 @@ public class ruby extends AbstractMaxObject {
 	private File scriptFile;
 	private FileWatcher fileWatcher;
 
-	private MaxRubyEvaluator ruby;
-
 	/**
 	 * The Constructor
 	 * 
 	 * @param args
 	 *            1 optional integer arg specifies the number of outlets
 	 * 
-	 * @throws BSFException
-	 *             if a problem occurs evaluating the Ruby initialization code
 	 */
 	public ruby(Atom[] args) {
-		int outlets = 1;
-		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
-			outlets = args[0].getInt();
-		}
-		if (args.length > 1) {
-			context = args[1].toString();
-			ruby = new MaxRubyEvaluator(this, context);
-		}
-		else {
-			ruby = new MaxRubyEvaluator(this);
-		}
+		super();
 
-		declareIO(1, outlets);
-		createInfoOutlet(false);
-
-		declareAttribute("verbose", "getverbose", "verbose");
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("autoinit");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
 		declareAttribute("autowatch", "getautowatch", "autowatch");
 
-		if (getAttrBool("verbose")) {
-			ruby.setVerboseOut(System.out);
+		int outlets = 1;
+		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
+			outlets = args[0].getInt();
 		}
+		declareIO(1, outlets);
+		createInfoOutlet(false);
 	}
 
 	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
@@ -108,8 +89,9 @@ public class ruby extends AbstractMaxObject {
 			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
 			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
 			public void execute() {
+				contructRubyEvaluator();
 				if (scriptFile != null) {
-					loadFile(); // this also initializes ruby
+					loadFile(); // this initializes ruby so we can ignore autoinit
 					initFileWatcher();
 				}
 				else if (autoinit) {
@@ -141,15 +123,6 @@ public class ruby extends AbstractMaxObject {
 		}
 	}
 
-	public boolean getverbose() {
-		return verbose;
-	}
-
-	public void verbose(boolean verbose) {
-		this.verbose = verbose;
-		ruby.setVerboseOut(verbose ? System.out : null);
-	}
-
 	public boolean getautowatch() {
 		return autowatch;
 	}
@@ -167,6 +140,8 @@ public class ruby extends AbstractMaxObject {
 	}
 
 	private void initFileWatcher() {
+		// TODO: I think this check won't work if the scriptfile changes
+		// Need to let me set the file being watched without nulling out the file watcher!
 		if (fileWatcher == null && scriptFile != null && autowatch) {
 			fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
 			fileWatcher.start();
@@ -204,7 +179,7 @@ public class ruby extends AbstractMaxObject {
 					initFileWatcher();
 				}
 			}
-			else MaxSystem.error("File not found: " + path);
+			else err("File not found: " + path);
 		}
 		else {
 			scriptFile = null;
@@ -218,13 +193,11 @@ public class ruby extends AbstractMaxObject {
 	private synchronized void loadFile() {
 		String script = getFileAsString(scriptFile);
 		if (script != null) {
-			if (verbose) {
-				info("loading script '" + scriptFile + "' on " + new Date());
-			}
+			info("loading script '" + scriptFile + "' on " + new Date());
 			try {
 				ruby.init(script);
 			}
-			catch (Exception e) {
+			catch (RubyException e) {
 				err("Error evaluating script file: " + scriptFilePath);
 			}
 		}
@@ -255,17 +228,6 @@ public class ruby extends AbstractMaxObject {
 		eval(input);
 	}
 
-	private String atomToString(String str) {
-		// The startsWith/endsWith " check is because Max includes the quotes if a space is not contained
-		// in the symbol. The check for newlines (\n or \r depending on OS) is for compatibility with
-		// textedit's output one symbol mode
-		if (!str.startsWith("\"") && !str.endsWith("\"") && str.contains(" ") && str.indexOf('\n') < 0
-				&& str.indexOf('\r') < 0) {
-			return '"' + str + '"';
-		}
-		else return str;
-	}
-
 	protected void eval(CharSequence input) {
 		try {
 			Object val = ruby.eval(input);
@@ -281,7 +243,7 @@ public class ruby extends AbstractMaxObject {
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (RubyException e) {
 			err("could not evaluate: " + input);
 		}
 	}

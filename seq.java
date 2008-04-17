@@ -37,6 +37,8 @@ import java.util.TreeSet;
 import org.apache.bsf.BSFException;
 
 import ajm.data.Item;
+import ajm.maxsupport.AbstractMaxObject;
+import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.MaxRubyEvaluator;
 import ajm.util.Parser;
 
@@ -50,7 +52,7 @@ import com.cycling74.max.MaxQelem;
  * @version 0.7
  * @author Adam Murray (adam@compusition.com)
  */
-public class seq extends AbstractMaxObject {
+public class seq extends AbstractMaxRubyObject {
 
 	public seq(Atom[] args) {
 		declareAttrs();
@@ -89,6 +91,7 @@ public class seq extends AbstractMaxObject {
 				defaultSeq.addAll(seq);
 				outputSeq();
 			}
+			contructRubyEvaluator();
 
 			initialized = true;
 		}
@@ -132,7 +135,6 @@ public class seq extends AbstractMaxObject {
 	protected boolean iterChanged = true;
 
 	protected Parser parser = new Parser();
-	protected MaxRubyEvaluator ruby = new MaxRubyEvaluator(this);
 
 	protected final seq thisseq = this; // For use in anonymous classes
 

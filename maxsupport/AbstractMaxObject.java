@@ -1,4 +1,4 @@
-package ajm;
+package ajm.maxsupport;
 
 /*
  Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
@@ -33,6 +33,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import ajm.util.Logger;
+
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
@@ -44,12 +46,15 @@ import com.cycling74.max.MaxSystem;
  * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
-public abstract class AbstractMaxObject extends MaxObject {
+public abstract class AbstractMaxObject extends MaxObject implements Logger {
+
+	protected boolean verbose = false;
 
 	protected boolean initialized = false;
 	protected MaxQelem initializer = getInitializer();
 
 	public AbstractMaxObject() {
+		declareAttribute("verbose");
 		if (initializer == null) {
 			initialized = true;
 		}
@@ -132,7 +137,7 @@ public abstract class AbstractMaxObject extends MaxObject {
 			return text.toString();
 		}
 		catch (IOException e) {
-			MaxSystem.error(e.getMessage());
+			System.err.println(e.getMessage());
 			return null;
 		}
 		finally {
@@ -141,7 +146,7 @@ public abstract class AbstractMaxObject extends MaxObject {
 					reader.close();
 				}
 				catch (IOException e) {
-					MaxSystem.error(e.getMessage());
+					System.err.println(e.getMessage());
 				}
 			}
 		}
@@ -154,15 +159,30 @@ public abstract class AbstractMaxObject extends MaxObject {
 	public static String toString(String msg, Atom[] args) {
 		StringBuilder input = new StringBuilder();
 		if (msg != null) {
-			input.append(msg).append(" ");
+			input.append(atomToString(msg)).append(" ");
 		}
 		for (int i = 0; i < args.length; i++) {
 			if (i > 0) {
 				input.append(" ");
 			}
-			input.append(args[i]);
+			input.append(atomToString(args[i]));
 		}
 		return input.toString();
+	}
+
+	public static String atomToString(Atom atom) {
+		return atomToString(atom.toString());
+	}
+
+	public static String atomToString(String str) {
+		// The startsWith/endsWith " check is because Max includes the quotes if a space is not contained
+		// in the symbol. The check for newlines (\n or \r depending on OS) is for compatibility with
+		// textedit's output one symbol mode
+		if (!str.startsWith("\"") && !str.endsWith("\"") && str.contains(" ") && str.indexOf('\n') < 0
+				&& str.indexOf('\r') < 0) {
+			return '"' + str + '"';
+		}
+		else return str;
 	}
 
 	public static boolean isNumber(Atom atom) {
@@ -171,12 +191,6 @@ public abstract class AbstractMaxObject extends MaxObject {
 
 	// for use with debugging unit tests, must be set from the test after instantiation
 	private PrintStream debugOut;
-
-	protected void debug(String msg) {
-		if (debugOut != null) {
-			debugOut.println(msg);
-		}
-	}
 
 	/**
 	 * Unit tests can set this output stream back to system.out (or a log file) for testing purposes outside of the Max
@@ -189,14 +203,10 @@ public abstract class AbstractMaxObject extends MaxObject {
 		this.debugOut = debugOut;
 	}
 
-	/**
-	 * Automatically prepends the object name to the beginning of error messages.
-	 * 
-	 * @param message
-	 *            the error message
-	 */
-	protected void info(String message) {
-		post(this.getClass().getName() + ": " + message);
+	public void debug(String message) {
+		if (verbose && debugOut != null) {
+			debugOut.println(message);
+		}
 	}
 
 	/**
@@ -205,7 +215,19 @@ public abstract class AbstractMaxObject extends MaxObject {
 	 * @param message
 	 *            the error message
 	 */
-	protected void err(String message) {
+	public void info(String message) {
+		if (verbose) {
+			post(this.getClass().getName() + ": " + message);
+		}
+	}
+
+	/**
+	 * Automatically prepends the object name to the beginning of error messages.
+	 * 
+	 * @param message
+	 *            the error message
+	 */
+	public void err(String message) {
 		error(this.getClass().getName() + ": " + message);
 	}
 

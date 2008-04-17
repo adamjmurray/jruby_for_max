@@ -45,9 +45,8 @@ public class RubyEvaluator {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
 	}
 
-	public void init() {
+	public void createContext() {
 		manager = new BSFManager();
-		// not fully initialized until some initialization scripts are run, responsibility of calling code
 	}
 
 	public boolean isInitialized() {
@@ -64,8 +63,8 @@ public class RubyEvaluator {
 			manager.declareBean(variableName, obj, clazz);
 		}
 		catch (BSFException e) {
-			// convert to unchecked exception to better encapsulate this evaluator
-			throw new RuntimeException(e);
+			// convert to unchecked and hide the details of the BSF implementation
+			throw new RubyException(e);
 		}
 	}
 
@@ -74,8 +73,8 @@ public class RubyEvaluator {
 			return manager.eval("ruby", getClass().getName(), 1, 1, rubyCode);
 		}
 		catch (BSFException e) {
-			// convert to unchecked exception to better encapsulate this evaluator
-			throw new RuntimeException(e);
+			// convert to unchecked and hide the details of the BSF implementation
+			throw new RubyException(e);
 		}
 	}
 }

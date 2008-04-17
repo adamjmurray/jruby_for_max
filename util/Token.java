@@ -97,7 +97,6 @@ public class Token {
 
 	public Atom getValue() {
 		int val;
-		int quarterSteps = 0;
 		switch (Character.toUpperCase(text.charAt(0))) {
 		case 'C':
 			val = 0;
@@ -133,6 +132,7 @@ public class Token {
 		}
 
 		int i = 1;
+		int quarterSteps = 0;
 		loop: for (; i < text.length(); i++) {
 			switch (text.charAt(i)) {
 			case '#':
@@ -158,7 +158,7 @@ public class Token {
 
 		try {
 			int octave = Integer.parseInt(text.substring(i));
-			val += (octave + 1) * 12;
+			val += (octave + 2) * 12;
 			// only convert to float if absolutely necessary (floats introduce round off error)
 			if (quarterSteps % 2 == 0) {
 				return Atom.newAtom(val + quarterSteps / 2);

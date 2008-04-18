@@ -1,4 +1,4 @@
-package ajm.data;
+package ajm.util;
 
 /*
  Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.

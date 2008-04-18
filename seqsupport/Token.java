@@ -1,4 +1,4 @@
-package ajm.util;
+package ajm.seqsupport;
 
 /*
  Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
@@ -27,7 +27,6 @@ package ajm.util;
 
  */
 
-import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 

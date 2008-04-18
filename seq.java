@@ -36,11 +36,11 @@ import java.util.TreeSet;
 
 import org.apache.bsf.BSFException;
 
-import ajm.data.Item;
 import ajm.maxsupport.AbstractMaxObject;
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.MaxRubyEvaluator;
-import ajm.util.Parser;
+import ajm.seqsupport.Item;
+import ajm.seqsupport.Parser;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;

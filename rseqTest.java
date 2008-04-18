@@ -1,6 +1,7 @@
 package ajm;
 
-import ajm.data.Item;
+import ajm.seqsupport.Item;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;

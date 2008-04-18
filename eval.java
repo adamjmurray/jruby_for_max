@@ -29,9 +29,9 @@ package ajm;
 
 import java.util.List;
 
-import ajm.data.Item;
 import ajm.maxsupport.AbstractMaxObject;
-import ajm.util.Parser;
+import ajm.seqsupport.Item;
+import ajm.seqsupport.Parser;
 
 import com.cycling74.max.Atom;
 

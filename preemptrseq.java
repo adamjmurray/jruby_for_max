@@ -3,7 +3,7 @@ package ajm;
 import java.util.ArrayList;
 import java.util.List;
 
-import ajm.data.Item;
+import ajm.seqsupport.Item;
 
 import com.cycling74.max.Atom;
 

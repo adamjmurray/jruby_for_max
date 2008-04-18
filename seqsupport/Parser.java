@@ -1,4 +1,4 @@
-package ajm.util;
+package ajm.seqsupport;
 
 /*
  Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
@@ -27,10 +27,10 @@ package ajm.util;
 
  */
 
-import static ajm.util.Parser.STATE.CHORD;
-import static ajm.util.Parser.STATE.DEFAULT;
-import static ajm.util.Parser.STATE.REPETITION;
-import static ajm.util.Token.TYPE.*;
+import static ajm.seqsupport.Parser.STATE.CHORD;
+import static ajm.seqsupport.Parser.STATE.DEFAULT;
+import static ajm.seqsupport.Parser.STATE.REPETITION;
+import static ajm.seqsupport.Token.TYPE.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 

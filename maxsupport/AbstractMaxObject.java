@@ -182,7 +182,7 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 				&& str.indexOf('\r') < 0) {
 			return '"' + str + '"';
 		}
-		else return str;
+		else return str.trim();
 	}
 
 	public static boolean isNumber(Atom atom) {

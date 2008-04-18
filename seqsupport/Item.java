@@ -1,4 +1,4 @@
-package ajm.data;
+package ajm.seqsupport;
 
 /*
  Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
@@ -29,6 +29,8 @@ package ajm.data;
 
 import java.util.Arrays;
 
+import ajm.maxsupport.Atomizer;
+
 import com.cycling74.max.Atom;
 
 /**
@@ -37,7 +39,7 @@ import com.cycling74.max.Atom;
  * @version 0.7
  * @author Adam Murray (adam@compusition.com)
  */
-public class Item implements Comparable<Item> {
+public class Item implements Comparable<Item>, Atomizer {
 
 	private Atom atom;
 	private Atom[] atoms;
@@ -80,6 +82,10 @@ public class Item implements Comparable<Item> {
 	}
 
 	public Atom getAtom() {
+		return atom;
+	}
+
+	public Atom toAtom() {
 		return atom;
 	}
 

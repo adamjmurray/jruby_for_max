@@ -1,4 +1,4 @@
-package ajm.util;
+package ajm.seqsupport;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import ajm.data.Item;
 
 import com.cycling74.max.Atom;
 

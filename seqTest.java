@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import ajm.data.Item;
+import ajm.seqsupport.Item;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxQelem;

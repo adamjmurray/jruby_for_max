@@ -30,8 +30,8 @@ package ajm;
 import java.util.Arrays;
 import java.util.List;
 
-import ajm.data.Item;
 import ajm.data.MappedList;
+import ajm.seqsupport.Item;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxQelem;

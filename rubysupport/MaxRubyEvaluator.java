@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
+import ajm.maxsupport.Atomizer;
 import ajm.util.LineBuilder;
 import ajm.util.Logger;
 import ajm.util.Utils;
@@ -279,8 +280,12 @@ public class MaxRubyEvaluator {
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
+
 		else if (obj instanceof Atom || obj instanceof Atom[]) {
 			return obj;
+		}
+		else if (obj instanceof Atomizer) {
+			return ((Atomizer) obj).toAtom();
 		}
 
 		else if (obj instanceof Double || obj instanceof Float) {

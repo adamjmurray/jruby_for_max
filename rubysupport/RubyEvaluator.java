@@ -27,6 +27,9 @@ package ajm.rubysupport;
 
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 
@@ -40,13 +43,18 @@ public class RubyEvaluator {
 
 	private BSFManager manager;
 	private boolean initialized = false;
+	private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
 	public RubyEvaluator() {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
+		resetContext();
 	}
 
-	public void createContext() {
+	public void resetContext() {
 		manager = new BSFManager();
+		for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
+			declareGlobal(global.getKey(), global.getValue());
+		}
 	}
 
 	public boolean isInitialized() {
@@ -57,10 +65,25 @@ public class RubyEvaluator {
 		this.initialized = initialized;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void declareBean(String variableName, Object obj, Class clazz) {
+	public void declareGlobal(String variableName, Object obj) {
 		try {
-			manager.declareBean(variableName, obj, clazz);
+			manager.declareBean(variableName, obj, obj.getClass());
+		}
+		catch (BSFException e) {
+			// convert to unchecked and hide the details of the BSF implementation
+			throw new RubyException(e);
+		}
+	}
+
+	public void declarePersistentGlobal(String variableName, Object obj) {
+		declareGlobal(variableName, obj);
+		persitentGlobals.put(variableName, obj);
+	}
+
+	public void undeclareGlobal(String variableName) {
+		try {
+			manager.undeclareBean(variableName);
+			persitentGlobals.remove(variableName);
 		}
 		catch (BSFException e) {
 			// convert to unchecked and hide the details of the BSF implementation

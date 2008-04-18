@@ -60,6 +60,8 @@ public class MaxRubyEvaluator {
 
 	private final MaxObject maxObj;
 
+	private final String maxObjVar;
+
 	private Logger logger;
 
 	private String context;
@@ -77,11 +79,14 @@ public class MaxRubyEvaluator {
 			context = "__" + Integer.toHexString(maxObj.hashCode());
 		}
 		this.maxObj = maxObj;
+		this.maxObjVar = "MaxObject_" + maxObj.hashCode();
 		if (maxObj instanceof Logger) {
 			this.logger = (Logger) maxObj;
 		}
 		this.context = context;
 		ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
+
+		ruby.declarePersistentGlobal(maxObjVar, maxObj);
 	}
 
 	public Logger getLogger() {
@@ -99,7 +104,10 @@ public class MaxRubyEvaluator {
 	public void setContext(String context) {
 		if (!Utils.equals(this.context, context)) {
 			RubyEvaluatorFactory.removeRubyEvaluator(this.context);
+			ruby.undeclareGlobal(maxObjVar);
+
 			ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
+			ruby.declarePersistentGlobal(maxObjVar, maxObj);
 			this.context = context;
 		}
 	}
@@ -115,7 +123,13 @@ public class MaxRubyEvaluator {
 		if (!ruby.isInitialized()) {
 			init();
 		}
-		return toAtoms(ruby.eval(rubyCode));
+		Object result;
+		synchronized (ruby) {
+			// set the $MaxObject global correctly, this indirection is needed when using shared contexts
+			ruby.eval("$MaxObject = $" + maxObjVar);
+			result = ruby.eval(rubyCode);
+		}
+		return toAtoms(result);
 	}
 
 	/**
@@ -140,7 +154,7 @@ public class MaxRubyEvaluator {
 	}
 
 	public void init(String script) {
-		ruby.createContext();
+		ruby.resetContext();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -207,7 +221,6 @@ public class MaxRubyEvaluator {
 			code.line("end");
 
 			for (int i = 0; i < 10; i++) {
-				// TODO: better handled with metaprogramming?
 				code.line("def out" + i + "(*params)");
 				code.line("  $Utils.outlet(" + i + ", params)");
 				code.line("end");
@@ -221,10 +234,24 @@ public class MaxRubyEvaluator {
 			code.line("def list(array)");
 			code.line("  array");
 			code.line("end");
+
+			// for use with shared contexts:
+			code.line("$LocalStorage = {}");
+			code.line("def setLocal(name,obj)");
+			code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
+			code.line("  if(!storage)");
+			code.line("    storage = {}");
+			code.line("    $LocalStorage[$MaxObject.hashCode] = storage");
+			code.line("  end");
+			code.line("  storage[name] = obj");
+			code.line("end");
+			code.line("def getLocal(name)");
+			code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
+			code.line("  storage[name] if storage");
+			code.line("end");
 		}
 
-		ruby.declareBean("MaxObject", maxObj, maxObj.getClass());
-		ruby.declareBean("Utils", new RubyUtils(), RubyUtils.class);
+		ruby.declareGlobal("Utils", new RubyUtils());
 		ruby.setInitialized(true);
 
 		eval(code);
@@ -249,7 +276,6 @@ public class MaxRubyEvaluator {
 			System.out.println(obj.getClass().getName());
 		}
 		*/
-
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
@@ -364,7 +390,7 @@ public class MaxRubyEvaluator {
 				}
 			}
 			else {
-				System.out.println(o);
+				System.out.println(atom);
 			}
 		}
 
@@ -376,7 +402,7 @@ public class MaxRubyEvaluator {
 				}
 			}
 			else {
-				System.out.print(o);
+				System.out.print(atom);
 			}
 		}
 

@@ -40,7 +40,7 @@ public class preemptrseq extends rseq {
 			Atom atom = item.getAtom();
 			if (isNumber(atom)) {
 				int val = atom.toInt();
-				if (val > 0) {
+				if (val > 1) {
 					seq.add(new Item(-(val - 1)));
 					seq.add(new Item(1));
 				}

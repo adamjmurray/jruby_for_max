@@ -27,7 +27,6 @@ package ajm.seqsupport;
 
  */
 
-
 import com.cycling74.max.Atom;
 
 /**
@@ -157,7 +156,7 @@ public class Token {
 
 		try {
 			int octave = Integer.parseInt(text.substring(i));
-			val += (octave + 2) * 12;
+			val += (octave + 1) * 12;
 			// only convert to float if absolutely necessary (floats introduce round off error)
 			if (quarterSteps % 2 == 0) {
 				return Atom.newAtom(val + quarterSteps / 2);

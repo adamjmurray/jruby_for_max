@@ -38,7 +38,7 @@ import com.cycling74.max.Atom;
 /**
  * The ajm.eval MaxObject
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class eval extends AbstractMaxObject {

@@ -39,7 +39,7 @@ import com.cycling74.max.MaxQelem;
 /**
  * The ajm.rseq MaxObject
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class rseq extends seq {

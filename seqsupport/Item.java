@@ -36,7 +36,7 @@ import com.cycling74.max.Atom;
 /**
  * A single sequenced item: either be a single atom or a list of atoms (for example, a chord)
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class Item implements Comparable<Item>, Atomizer {

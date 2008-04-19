@@ -49,9 +49,9 @@ import ajm.maxsupport.AbstractMaxObject;
 import com.cycling74.max.Atom;
 
 /**
- * Experimental multi-tab code editor.
+ * Multi-tab plaintext editor.
  * 
- * @version 0.1
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class code extends AbstractMaxObject {

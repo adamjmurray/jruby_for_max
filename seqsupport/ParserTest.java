@@ -8,7 +8,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-
 import com.cycling74.max.Atom;
 
 public class ParserTest {
@@ -184,7 +183,7 @@ public class ParserTest {
 		assertEquals(toAtomList(62), toAtomList(p.parse("d4")));
 		assertEquals(toAtomList(64), toAtomList(p.parse("e4")));
 		assertEquals(toAtomList(65), toAtomList(p.parse("f4")));
-		assertEquals(toAtomList(67), toAtomList(p.parse("G4")));
+		assertEquals(toAtomList(67), toAtomList(p.parse("g4")));
 		assertEquals(toAtomList(69), toAtomList(p.parse("a4")));
 		assertEquals(toAtomList(71), toAtomList(p.parse("b4")));
 	}
@@ -223,7 +222,7 @@ public class ParserTest {
 	@Test
 	public void testMixedChord() {
 		assertEquals(toAtomList("1 2 3", "a b"), toAtomList(p.parse("[1 2 3] [a b]")));
-		assertEquals(toAtomList(p.parse("[1 1.1 a >]")), toAtomList("1 1.1 a next"));
+		assertEquals(toAtomList("1 1.1 a next"), toAtomList(p.parse("[1 1.1 a >]")));
 	}
 
 	@Test

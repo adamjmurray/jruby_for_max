@@ -1,5 +1,11 @@
 package ajm.util;
 
+/**
+ * Builds text one line at a time.
+ * 
+ * @version 0.85
+ * @author Adam Murray (adam@compusition.com)
+ */
 public class LineBuilder implements CharSequence {
 
 	private StringBuilder lines = new StringBuilder();

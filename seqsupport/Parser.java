@@ -38,13 +38,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-
 import com.cycling74.max.Atom;
 
 /**
  * A Parser for the ajm objects sequencing syntax.
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class Parser {

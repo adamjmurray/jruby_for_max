@@ -34,7 +34,7 @@ import java.util.TreeMap;
 /**
  * A Map where all the values are Lists.
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")

@@ -34,9 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.bsf.BSFException;
-
-import ajm.maxsupport.AbstractMaxObject;
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.MaxRubyEvaluator;
 import ajm.seqsupport.Item;
@@ -49,7 +46,7 @@ import com.cycling74.max.MaxQelem;
 /**
  * The ajm.seq MaxObject.
  * 
- * @version 0.7
+ * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
 public class seq extends AbstractMaxRubyObject {

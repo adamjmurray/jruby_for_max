@@ -1,5 +1,11 @@
 package ajm.util;
 
+import java.util.Collection;
+
+import ajm.maxsupport.Atomizer;
+
+import com.cycling74.max.Atom;
+
 /*
 Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
@@ -45,5 +51,15 @@ public class Utils {
 		else {
 			return o1.equals(o2);
 		}
+	}
+
+	public static Atom[] toAtoms(Collection<? extends Atomizer> objs) {
+		Atom[] atoms = new Atom[objs.size()];
+		int i = 0;
+		for (Atomizer obj : objs) {
+			atoms[i] = obj.toAtom();
+			i++;
+		}
+		return atoms;
 	}
 }

@@ -64,6 +64,16 @@ public class preemptrseq extends rseq {
 		}
 	}
 
+	// This shouldn't be necessary
+	@Override
+	public void resetseq() {
+		actualSeq.clear();
+		actualSeq.addAll(defaultSeq);
+		setPreemptiveSeq();
+		onSeqChange();
+		outputSeq();
+	}
+
 	// The seq needs to look the same externally
 	// but internally transform positive numbers n into -(n-1), -1
 	// e.g. 16 4 3 -> -15 1 -3 1 -2 1

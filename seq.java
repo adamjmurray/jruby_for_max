@@ -38,6 +38,7 @@ import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.MaxRubyEvaluator;
 import ajm.seqsupport.Item;
 import ajm.seqsupport.Parser;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -64,6 +65,7 @@ public class seq extends AbstractMaxRubyObject {
 
 	protected void declareAttrs() {
 		declareAttribute("seq", "getseq", "seq");
+		declareAttribute("defaultseq", "getdefaultseq", "defaultseq");
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("cmode", "getchordmode", "chordmode");
 		declareAttribute("iter", "getiter", "iter");
@@ -84,10 +86,11 @@ public class seq extends AbstractMaxRubyObject {
 			defaultIter = iter;
 			defaultStep = step;
 			defaultChordmode = chordmode;
-			if (!seq.isEmpty()) {
-				defaultSeq.addAll(seq);
-				outputSeq();
+			if (seq.isEmpty()) {
+				seq.addAll(defaultSeq);
 			}
+			outputSeq();
+
 			contructRubyEvaluator();
 
 			initialized = true;
@@ -144,16 +147,27 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	public Atom[] getseq() {
-		Atom[] atoms = new Atom[seq.size()];
-		for (int i = 0; i < seq.size(); i++) {
-			atoms[i] = seq.get(i).getAtom();
-		}
-		return atoms;
+		return Utils.toAtoms(seq);
 	}
 
 	@SuppressWarnings("all")
 	public void seq(Atom[] list) {
 		list(list);
+	}
+
+	public Atom[] getdefaultseq() {
+		return Utils.toAtoms(defaultSeq);
+	}
+
+	public void defaultseq(Atom[] list) {
+		try {
+			List<Item> newSeq = parser.parse(list);
+			defaultSeq.clear();
+			defaultSeq.addAll(newSeq);
+		}
+		catch (IllegalStateException e) {
+			err("Could not evaluate: " + toString(list) + "\n" + e.getMessage());
+		}
 	}
 
 	public int getindex() {
@@ -239,9 +253,8 @@ public class seq extends AbstractMaxRubyObject {
 		}
 	}
 
-	// Max doesn't treat lists starting with a symbol as lists (they're just
-	// messages)
-	// so we need to handle them here:
+	// Max doesn't treat lists starting with a symbol as lists (they're
+	// messages) so we need to handle them here:
 	public void anything(String msg, Atom[] args) {
 		try {
 			List<Item> newSeq = parser.parse(msg, args);

@@ -160,9 +160,11 @@ public class MaxRubyEvaluator {
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
 			if (pathToJRuby != null) {
-				File jRubyDir = new File(pathToJRuby).getParentFile();
+				File jRubyLibDir = new File(pathToJRuby).getParentFile();
 				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
-				System.setProperty(PROP_JRUBY_HOME, jRubyDir.getParent());
+				System.setProperty(PROP_JRUBY_HOME, jRubyLibDir.getParent());
+				System.setProperty("jruby.lib", jRubyLibDir.getPath());
+				System.setProperty("jruby.script", "jruby"); // seems pointless but gems won't work without it
 			}
 			else {
 				MaxSystem.error("jruby.jar not found! Maybe it was not installed correctly?");

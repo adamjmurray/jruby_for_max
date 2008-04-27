@@ -166,7 +166,7 @@ public class seq extends AbstractMaxRubyObject {
 			defaultSeq.addAll(newSeq);
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + toString(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 
@@ -249,7 +249,7 @@ public class seq extends AbstractMaxRubyObject {
 			onSeqChange();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + toString(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 
@@ -264,14 +264,14 @@ public class seq extends AbstractMaxRubyObject {
 			outputSeq();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + toString(msg, args) + "\n" + e.getMessage());
+			err("Could not evaluate: " + detokenize(msg, args) + "\n" + e.getMessage());
 		}
 	}
 
 	public void rubyseq(Atom[] input) {
 		// TODO: it seems questionable that I do my ajm.eval logic on the Atom(s) returned by Ruby.
 		// Maybe it should use the raw results.
-		String rubyCode = toString(input);
+		String rubyCode = detokenize(input);
 		Object val = evalRuby(rubyCode);
 		if (val != null) {
 			if (val instanceof Atom[]) {
@@ -290,7 +290,7 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	public void ruby(Atom[] input) {
-		evalRuby(toString(input));
+		evalRuby(detokenize(input));
 	}
 
 	protected Object evalRuby(CharSequence input) {

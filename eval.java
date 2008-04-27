@@ -66,7 +66,7 @@ public class eval extends AbstractMaxObject {
 			outlet(0, atoms);
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + toString(msg, args) + "\n" + e.getMessage());
+			err("Could not evaluate: " + detokenize(msg, args) + "\n" + e.getMessage());
 		}
 	}
 }

@@ -60,7 +60,7 @@ public class preemptrseq extends rseq {
 			onSeqChange();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + toString(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 

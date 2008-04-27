@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.Date;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
+import ajm.maxsupport.TextBlock;
 import ajm.rubysupport.RubyException;
 import ajm.util.FileWatcher;
 
@@ -221,11 +222,22 @@ public class ruby extends AbstractMaxRubyObject {
 
 	public void anything(String msg, Atom[] args) {
 		StringBuilder input = new StringBuilder();
-		input.append(atomToString(msg));
+		input.append(detokenize(msg));
 		for (Atom arg : args) {
-			input.append(" ").append(atomToString(arg.toString()));
+			input.append(" ").append(detokenize(arg.toString()));
 		}
 		eval(input);
+	}
+
+	public void text(String script) {
+		eval(script.trim());
+	}
+
+	public void textblock(String name) {
+		String script = TextBlock.get(name);
+		if (script != null) {
+			eval(script);
+		}
 	}
 
 	protected void eval(CharSequence input) {

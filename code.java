@@ -45,6 +45,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import ajm.maxsupport.AbstractMaxObject;
+import ajm.maxsupport.TextBlock;
 
 import com.cycling74.max.Atom;
 
@@ -62,65 +63,7 @@ public class code extends AbstractMaxObject {
 	// tried it doesn't work, maybe TextArea needs to be made focusable?
 	// try focusing on something else and see if it's just broken in max
 
-	public void dblclick() {
-		open();
-	}
-
-	public void open() {
-		// if (frame != null) {
-		frame.setVisible(true);
-		// }
-	}
-
-	public void set(Atom[] args) {
-		if (args.length > 1 && args[0].isInt()) {
-			int index = args[0].getInt();
-			if (index > 0 && index < textAreas.size()) {
-				textAreas.get(index).setText(toString(Atom.removeFirst(args)));
-				return;
-			}
-		}
-		activeTextArea().setText(toString(args));
-
-	}
-
-	public void run(Atom[] args) {
-		int index = tabs.getSelectedIndex();
-		if (args.length > 0 && args[0].isInt()) {
-			int i = args[0].getInt();
-			if (i > 0 && i < textAreas.size()) {
-				index = i;
-			}
-		}
-		outlet(1, index);
-		outlet(0, textAreas.get(index).getText());
-	}
-
-	public void bang() {
-		int activeIndex = tabs.getSelectedIndex();
-		outlet(1, activeIndex);
-		outlet(0, textAreas.get(activeIndex).getText());
-	}
-
-	private JTextArea activeTextArea() {
-		return textAreas.get(tabs.getSelectedIndex());
-	}
-
-	public void save() {
-		Atom[] contents = new Atom[NUM_TABS];
-		for (int i = 0; i < NUM_TABS; i++) {
-			contents[i] = Atom.newAtom(textAreas.get(i).getText());
-		}
-		embedMessage("settabs", contents);
-	}
-
-	public void settabs(Atom[] args) {
-		for (int i = 0; i < args.length && i < NUM_TABS; i++) {
-			textAreas.get(i).setText(args[i].toString());
-		}
-	}
-
-	private static final int NUM_TABS = 6;
+	private static int NUM_TABS = 6;
 
 	private JFrame frame;
 	private JTabbedPane tabs;
@@ -128,9 +71,13 @@ public class code extends AbstractMaxObject {
 	// private String initText = "";
 	private RunAction run = new RunAction(this);
 
-	public code() {
+	public code(Atom[] args) {
 
 		declareIO(1, 2);
+
+		if (args.length > 0 && args[0].isInt()) {
+			NUM_TABS = args[0].getInt();
+		}
 
 		frame = new JFrame("Editor");
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -161,6 +108,86 @@ public class code extends AbstractMaxObject {
 		});
 	}
 
+	@Override
+	protected void notifyDeleted() {
+		/*
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				frame.dispose();
+			}
+		});
+		*/
+		super.notifyDeleted();
+	};
+
+	private String getTextBlockName(int tabIndex) {
+		return OBJ_ID + "::tab." + tabIndex;
+	}
+
+	private final String OBJ_ID = hashCode() + "";
+
+	public void dblclick() {
+		open();
+	}
+
+	public void open() {
+		// if (frame != null) {
+		frame.setVisible(true);
+		// }
+	}
+
+	public void set(Atom[] args) {
+		if (args.length > 1 && args[0].isInt()) {
+			int index = args[0].getInt();
+			if (index > 0 && index < textAreas.size()) {
+				textAreas.get(index).setText(detokenize(Atom.removeFirst(args)));
+				return;
+			}
+		}
+		activeTextArea().setText(detokenize(args));
+
+	}
+
+	public void run(Atom[] args) {
+		int index = tabs.getSelectedIndex();
+		if (args.length > 0 && args[0].isInt()) {
+			int i = args[0].getInt();
+			if (i > 0 && i < textAreas.size()) {
+				index = i;
+			}
+		}
+		output(index);
+	}
+
+	public void bang() {
+		output(tabs.getSelectedIndex());
+	}
+
+	private void output(int index) {
+		String scriptID = OBJ_ID + "::tab." + index;
+		TextBlock.set(scriptID, textAreas.get(index).getText());
+		outlet(1, index);
+		outlet(0, "textblock", scriptID);
+	}
+
+	private JTextArea activeTextArea() {
+		return textAreas.get(tabs.getSelectedIndex());
+	}
+
+	public void save() {
+		Atom[] contents = new Atom[NUM_TABS];
+		for (int i = 0; i < NUM_TABS; i++) {
+			contents[i] = Atom.newAtom(textAreas.get(i).getText());
+		}
+		embedMessage("settabs", contents);
+	}
+
+	public void settabs(Atom[] args) {
+		for (int i = 0; i < args.length && i < NUM_TABS; i++) {
+			textAreas.get(i).setText(args[i].toString());
+		}
+	}
+
 	private JComponent createEditor() {
 		JTextArea textArea = new JTextArea();
 		textArea.setTabSize(2); // this probably isn't appropriate for other languages
@@ -187,15 +214,5 @@ public class code extends AbstractMaxObject {
 			thisObj.bang();
 		}
 	}
-
-	@Override
-	protected void notifyDeleted() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				frame.dispose();
-			}
-		});
-		super.notifyDeleted();
-	};
 
 }

@@ -152,37 +152,38 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 		}
 	}
 
-	public static String toString(Atom[] args) {
-		return toString(null, args);
+	public static String detokenize(Atom[] args) {
+		return detokenize(null, args);
 	}
 
-	public static String toString(String msg, Atom[] args) {
+	public static String detokenize(String msg, Atom[] args) {
 		StringBuilder input = new StringBuilder();
 		if (msg != null) {
-			input.append(atomToString(msg)).append(" ");
+			input.append(detokenize(msg)).append(" ");
 		}
 		for (int i = 0; i < args.length; i++) {
 			if (i > 0) {
 				input.append(" ");
 			}
-			input.append(atomToString(args[i]));
+			input.append(detokenize(args[i]));
 		}
 		return input.toString();
 	}
 
-	public static String atomToString(Atom atom) {
-		return atomToString(atom.toString());
+	public static String detokenize(Atom atom) {
+		return detokenize(atom.toString());
 	}
 
-	public static String atomToString(String str) {
+	public static String detokenize(String str) {
 		// The startsWith/endsWith " check is because Max includes the quotes if a space is not contained
-		// in the symbol. The check for newlines (\n or \r depending on OS) is for compatibility with
-		// textedit's output one symbol mode
-		if (!str.startsWith("\"") && !str.endsWith("\"") && str.contains(" ") && str.indexOf('\n') < 0
-				&& str.indexOf('\r') < 0) {
+		// in the symbol.
+		if (str.contains(" ")) {
 			return '"' + str + '"';
 		}
-		else return str.trim();
+		else {
+			return str;
+			// return str.trim();
+		}
 	}
 
 	public static boolean isNumber(Atom atom) {

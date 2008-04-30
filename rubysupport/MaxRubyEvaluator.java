@@ -69,7 +69,7 @@ public class MaxRubyEvaluator {
 
 	// private boolean initialized = false;
 
-	private Pattern OMIT_PATHS = Pattern.compile(".*/\\.svn/.*");
+	private String OMIT_PATHS = ".*/\\.svn/.*";
 
 	public MaxRubyEvaluator(MaxObject maxObj) {
 		this(maxObj, null);
@@ -172,7 +172,8 @@ public class MaxRubyEvaluator {
 		}
 
 		if (code.isEmpty()) {
-			// Setup the path:
+			/* This chunk of code used to add the current patches folders and immediate subfolders to the ruby path,
+			 * but it is inconsistent with the scriptfile and ajm.scriptfilewatch behaviors, so I disabled it:
 			String patcherPath = maxObj.getParentPatcher().getPath();
 			if (patcherPath != null) {
 				// Add the patch's folder and subfolders
@@ -187,9 +188,12 @@ public class MaxRubyEvaluator {
 					}
 				}
 			}
+			 */
 
+			// Setup the path:
 			for (String path : MaxSystem.getSearchPath()) {
-				if (!OMIT_PATHS.matcher(path).matches()) {
+				if (!path.matches(OMIT_PATHS)) {
+					// if (!OMIT_PATHS.matcher(path).matches()) {
 					addPath(path);
 				}
 			}

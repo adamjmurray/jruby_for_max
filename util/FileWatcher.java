@@ -53,31 +53,63 @@ public class FileWatcher extends Thread {
 	}
 
 	public FileWatcher(File file, Executable callback, long watchPeriod) {
+		setFile(file);
+		setWatchPeriod(watchPeriod);
+		setCallback(callback);
+	}
+
+	public void setFile(File file) {
 		this.file = file;
+		if (file == null) {
+			prevLastModified = -1;
+		}
+		else {
+			prevLastModified = file.lastModified();
+		}
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public long getWatchPeriod() {
+		return watchPeriod;
+	}
+
+	public void setWatchPeriod(long watchPeriod) {
 		this.watchPeriod = watchPeriod;
+	}
+
+	public Executable getCallback() {
+		return callback;
+	}
+
+	public void setCallback(Executable callback) {
 		this.callback = callback;
-		prevLastModified = file.lastModified();
-		keepWatching = true;
 	}
 
 	public void run() {
+		keepWatching = true;
 		while (keepWatching) {
-			long currLastMod = file.lastModified();
-			if (currLastMod > prevLastModified) {
+			if (file != null) {
+				long currLastMod = file.lastModified();
+				System.out.println("Last modified = " + currLastMod);
+				if (currLastMod > prevLastModified) {
+					try {
+						callback.execute();
+					}
+					catch (Exception e) {
+						System.err.println(e.getMessage());
+					}
+					prevLastModified = currLastMod;
+				}
 				try {
-					callback.execute();
+					Thread.sleep(watchPeriod);
 				}
-				catch (Exception e) {
-					System.err.println(e.getMessage());
+				catch (InterruptedException e) {
+					System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
+					e.printStackTrace();
 				}
-				prevLastModified = currLastMod;
-			}
-			try {
-				Thread.sleep(watchPeriod);
-			}
-			catch (InterruptedException e) {
-				System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
-				e.printStackTrace();
 			}
 		}
 	}

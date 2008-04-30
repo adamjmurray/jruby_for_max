@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 
 import ajm.maxsupport.AbstractMaxObject;
 import ajm.maxsupport.TextBlock;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 
@@ -120,11 +121,11 @@ public class code extends AbstractMaxObject {
 		super.notifyDeleted();
 	};
 
+	private final String OBJ_ID = hashCode() + "";
+
 	private String getTextBlockName(int tabIndex) {
 		return OBJ_ID + "::tab." + tabIndex;
 	}
-
-	private final String OBJ_ID = hashCode() + "";
 
 	public void dblclick() {
 		open();
@@ -140,11 +141,11 @@ public class code extends AbstractMaxObject {
 		if (args.length > 1 && args[0].isInt()) {
 			int index = args[0].getInt();
 			if (index > 0 && index < textAreas.size()) {
-				textAreas.get(index).setText(detokenize(Atom.removeFirst(args)));
+				textAreas.get(index).setText(Utils.detokenize(Atom.removeFirst(args)));
 				return;
 			}
 		}
-		activeTextArea().setText(detokenize(args));
+		activeTextArea().setText(Utils.detokenize(args));
 
 	}
 
@@ -163,27 +164,40 @@ public class code extends AbstractMaxObject {
 		output(tabs.getSelectedIndex());
 	}
 
-	private void output(int index) {
-		String scriptID = OBJ_ID + "::tab." + index;
-		TextBlock.set(scriptID, textAreas.get(index).getText());
-		outlet(1, index);
-		outlet(0, "textblock", scriptID);
+	private void output(int tabIndex) {
+		String textblock = getTextBlockName(tabIndex);
+		TextBlock.set(textblock, textAreas.get(tabIndex).getText());
+		outlet(1, tabIndex);
+		outlet(0, "textblock", getTextBlockName(tabIndex));
 	}
 
 	private JTextArea activeTextArea() {
 		return textAreas.get(tabs.getSelectedIndex());
 	}
 
+	private String getText(int tabIndex) {
+		return textAreas.get(tabIndex).getText();
+	}
+
 	public void save() {
 		Atom[] contents = new Atom[NUM_TABS];
 		for (int i = 0; i < NUM_TABS; i++) {
-			contents[i] = Atom.newAtom(textAreas.get(i).getText());
+			String text = getText(i);
+			// This is completely broken. Max pretty much makes it impossible for me to embed
+			// arbitrary strings. Maybe it will work in Max 5...
+			System.out.println("TEXT = " + text);
+			// text = text.replaceAll("\"", "\\\\\"");
+			// text = text.replaceAll(" ", "\\\\ ");
+			System.out.println("Escaped text = " + text);
+			contents[i] = Atom.newAtom(text);
+			System.out.println(contents[i].toString());
 		}
 		embedMessage("settabs", contents);
 	}
 
 	public void settabs(Atom[] args) {
 		for (int i = 0; i < args.length && i < NUM_TABS; i++) {
+			System.out.println("Setting text: " + args[i].toString());
 			textAreas.get(i).setText(args[i].toString());
 		}
 	}

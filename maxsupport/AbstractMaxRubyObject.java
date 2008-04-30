@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import com.cycling74.max.Executable;
-import com.cycling74.max.MaxQelem;
 
 import ajm.rubysupport.MaxRubyEvaluator;
 
@@ -49,18 +48,17 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		declareAttribute("context", "getcontext", "context");
 	}
 
-	// TODO: make a class? see seq vs. rseq. I think it's cleaner to just call initializer.super()
 	@Override
-	protected MaxQelem getInitializer() {
-		return new MaxQelem(new Executable() {
-			// see discussion at
-			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
-			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
-			public void execute() {
-				contructRubyEvaluator();
-				initialized = true;
-			}
-		});
+	protected Executable getInitializer() {
+		return new DefaultRubyInitializer();
+	}
+
+	protected class DefaultRubyInitializer extends DefaultInitializer {
+		@Override
+		public void execute() {
+			super.execute();
+			contructRubyEvaluator();
+		}
 	}
 
 	protected void contructRubyEvaluator() {

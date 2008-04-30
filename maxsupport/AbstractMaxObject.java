@@ -27,18 +27,13 @@ package ajm.maxsupport;
 
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintStream;
 
 import ajm.util.Logger;
 
-import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
-import com.cycling74.max.MaxSystem;
 
 /**
  * Common behavior for ajm objects.
@@ -51,7 +46,9 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 	protected boolean verbose = false;
 
 	protected boolean initialized = false;
-	protected MaxQelem initializer = getInitializer();
+	protected MaxQelem initializer = getInitializerQelem();
+
+	// The initializer should never be null inside Max, but needs to be null in unit tests
 
 	public AbstractMaxObject() {
 		declareAttribute("verbose");
@@ -63,17 +60,27 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 		}
 	}
 
+	private final MaxQelem getInitializerQelem() {
+		Executable initializer = getInitializer();
+		return initializer == null ? null : new MaxQelem(initializer);
+	}
+
 	/**
 	 * A subclass can override this method to return a MaxQelem that can do operations not normally available in the
 	 * constructor, such as outputting messages. See discussion at
 	 * http://www.cycling74.com/forums/index.php?t=rview&goto=114649 Note that if this method is overriden, it is the
 	 * responsibility of the initializer code to set initialized = true.
 	 * 
-	 * @return a MaxQelem that executes initialization code
+	 * @return an Executable that executes initialization code. Must not be null.
 	 */
-	protected MaxQelem getInitializer() {
-		// Override in a subclass to output something just after object construction.
-		return null;
+	protected Executable getInitializer() {
+		return new DefaultInitializer();
+	}
+
+	protected class DefaultInitializer implements Executable {
+		public void execute() {
+			initialized = true;
+		}
 	}
 
 	@Override
@@ -81,113 +88,6 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 		if (initializer != null) {
 			initializer.release();
 		}
-	}
-
-	/**
-	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
-	 * path will be searched to locate the file.
-	 * 
-	 * @param path -
-	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
-	 * @return a File object referencing an existing file, otherwise null
-	 */
-	public static File getFile(String path) {
-		if (path == null || path.length() == 0) {
-			path = MaxSystem.openDialog();
-		}
-
-		if (path != null) {
-			String location = null;
-			if (path.contains(File.separator)) {
-				location = MaxSystem.maxPathToNativePath(path);
-			}
-			else {
-				location = MaxSystem.locateFile(path);
-			}
-
-			if (location != null) {
-				File file = new File(location);
-				if (file != null && file.isFile()) {
-					return file;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static String getFileAsString(String path) {
-		return getFileAsString(getFile(path));
-	}
-
-	public static String getFileAsString(File file) {
-		if (file == null || !file.exists()) {
-			return null;
-		}
-
-		StringBuilder text = new StringBuilder(5000);
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
-			char[] buf = new char[1024];
-			int charsRead = 0;
-			while ((charsRead = reader.read(buf)) != -1) {
-				text.append(buf, 0, charsRead);
-			}
-			return text.toString();
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
-			return null;
-		}
-		finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				}
-				catch (IOException e) {
-					System.err.println(e.getMessage());
-				}
-			}
-		}
-	}
-
-	public static String detokenize(Atom[] args) {
-		return detokenize(null, args);
-	}
-
-	public static String detokenize(String msg, Atom[] args) {
-		StringBuilder input = new StringBuilder();
-		if (msg != null) {
-			input.append(detokenize(msg)).append(" ");
-		}
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0) {
-				input.append(" ");
-			}
-			input.append(detokenize(args[i]));
-		}
-		return input.toString();
-	}
-
-	public static String detokenize(Atom atom) {
-		return detokenize(atom.toString());
-	}
-
-	public static String detokenize(String str) {
-		// The startsWith/endsWith " check is because Max includes the quotes if a space is not contained
-		// in the symbol.
-		if (str.contains(" ")) {
-			return '"' + str + '"';
-		}
-		else {
-			return str;
-			// return str.trim();
-		}
-	}
-
-	public static boolean isNumber(Atom atom) {
-		return atom.isInt() || atom.isFloat();
 	}
 
 	// for use with debugging unit tests, must be set from the test after instantiation

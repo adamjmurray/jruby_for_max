@@ -34,7 +34,7 @@ import ajm.seqsupport.Item;
 import ajm.util.MappedList;
 
 import com.cycling74.max.Atom;
-import com.cycling74.max.MaxQelem;
+import com.cycling74.max.Executable;
 
 /**
  * The ajm.rseq MaxObject
@@ -56,17 +56,18 @@ public class rseq extends seq {
 	}
 
 	@Override
-	protected MaxQelem getInitializer() {
-		return new MaxQelem(new rseqInitializationCallback());
+	protected Executable getInitializer() {
+		return new RseqInitializer();
 	}
 
-	protected class rseqInitializationCallback extends seqInitializationCallback {
+	protected class RseqInitializer extends SeqInitializer {
+		@Override
 		public void execute() {
+			super.execute();
 			defaultRIndex = rIndex;
 			/*
 			 * if (!tickMap.isEmpty()) { defaultTickMap = tickMap.clone(); }
 			 */
-			super.execute();
 		}
 	}
 

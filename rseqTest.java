@@ -15,7 +15,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.cycling74.max.Atom;
-import com.cycling74.max.MaxQelem;
+import com.cycling74.max.Executable;
 
 public class rseqTest {
 
@@ -62,7 +62,7 @@ public class rseqTest {
 		}
 
 		@Override
-		protected MaxQelem getInitializer() {
+		protected Executable getInitializer() {
 			return null;
 		}
 

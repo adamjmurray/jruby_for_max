@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ajm.seqsupport.Item;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 
@@ -60,7 +61,7 @@ public class preemptrseq extends rseq {
 			onSeqChange();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + Utils.detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 
@@ -81,7 +82,7 @@ public class preemptrseq extends rseq {
 		seq.clear();
 		for (Item item : actualSeq) {
 			Atom atom = item.getAtom();
-			if (isNumber(atom)) {
+			if (Utils.isNumber(atom)) {
 				int val = atom.toInt();
 				if (val > 1) {
 					seq.add(new Item(-(val - 1)));

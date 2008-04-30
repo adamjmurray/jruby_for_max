@@ -32,6 +32,7 @@ import java.util.List;
 import ajm.maxsupport.AbstractMaxObject;
 import ajm.seqsupport.Item;
 import ajm.seqsupport.Parser;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 
@@ -66,7 +67,7 @@ public class eval extends AbstractMaxObject {
 			outlet(0, atoms);
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + detokenize(msg, args) + "\n" + e.getMessage());
+			err("Could not evaluate: " + Utils.detokenize(msg, args) + "\n" + e.getMessage());
 		}
 	}
 }

@@ -33,12 +33,10 @@ import java.util.Date;
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.maxsupport.TextBlock;
 import ajm.rubysupport.RubyException;
-import ajm.util.FileWatcher;
+import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
-import com.cycling74.max.MaxQelem;
-import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
@@ -50,11 +48,9 @@ public class ruby extends AbstractMaxRubyObject {
 
 	private int evaloutlet = 0;
 	private boolean autoinit = false;
-	private boolean autowatch = false;
 
 	private String scriptFilePath;
 	private File scriptFile;
-	private FileWatcher fileWatcher;
 
 	/**
 	 * The Constructor
@@ -69,7 +65,6 @@ public class ruby extends AbstractMaxRubyObject {
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("autoinit");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
-		declareAttribute("autowatch", "getautowatch", "autowatch");
 
 		int outlets = 1;
 		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
@@ -79,36 +74,26 @@ public class ruby extends AbstractMaxRubyObject {
 		createInfoOutlet(false);
 	}
 
-	/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
-	   Thus autoinit is false by default.
-	   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-	   The hang delay got much shorter with JRuby 1.1. */
 	@Override
-	protected MaxQelem getInitializer() {
-		return new MaxQelem(new Executable() {
-			// see discussion at
-			// http://www.cycling74.com/forums/index.php?t=msg&th=31680&rid=5266
-			// we need to defer execution of ruby.init() so we can resolve the path to this patch properly
-			public void execute() {
-				contructRubyEvaluator();
-				if (scriptFile != null) {
-					loadFile(); // this initializes ruby so we can ignore autoinit
-					initFileWatcher();
-				}
-				else if (autoinit) {
-					ruby.init();
-				}
-				initialized = true;
-			}
-		});
+	protected Executable getInitializer() {
+		return new RubyInitializer();
 	}
 
-	@Override
-	public void notifyDeleted() {
-		if (fileWatcher != null) {
-			fileWatcher.stopWatching();
+	protected class RubyInitializer extends DefaultRubyInitializer {
+		@Override
+		public void execute() {
+			super.execute();
+			if (scriptFile != null) {
+				loadFile(); // this initializes ruby so we can ignore autoinit
+			}
+			else if (autoinit) {
+				ruby.init();
+			}
+			/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
+			   Thus autoinit is false by default.
+			   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
+			   The hang delay got much shorter with JRuby 1.1. */
 		}
-		super.notifyDeleted();
 	}
 
 	public int getevaloutlet() {
@@ -124,75 +109,27 @@ public class ruby extends AbstractMaxRubyObject {
 		}
 	}
 
-	public boolean getautowatch() {
-		return autowatch;
-	}
-
-	public void autowatch(boolean autowatch) {
-		this.autowatch = autowatch;
-		if (initialized) {
-			if (autowatch) {
-				initFileWatcher();
-			}
-			else {
-				stopFileWatcher();
-			}
-		}
-	}
-
-	private void initFileWatcher() {
-		// TODO: I think this check won't work if the scriptfile changes
-		// Need to let me set the file being watched without nulling out the file watcher!
-		if (fileWatcher == null && scriptFile != null && autowatch) {
-			fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
-			fileWatcher.start();
-		}
-	}
-
-	private void stopFileWatcher() {
-		if (fileWatcher != null) {
-			fileWatcher.stopWatching();
-			fileWatcher = null;
-		}
-	}
-
-	private Executable fileWatcherCallback = new Executable() {
-		public void execute() {
-			loadFile();
-		}
-	};
-
 	public String getscriptfile() {
 		return scriptFilePath;
 	}
 
 	public void scriptfile(String path) {
-		if (path == null || path.length() == 0) {
-			path = MaxSystem.openDialog();
-		}
 		scriptFilePath = path;
-
-		if (scriptFilePath != null) {
-			scriptFile = getFile(path);
-			if (scriptFile != null) {
-				if (initialized) {
-					loadFile();
-					initFileWatcher();
-				}
+		scriptFile = Utils.getFile(path);
+		if (scriptFile != null) {
+			if (path == null) {
+				// then the user was prompted to select a file:
+				scriptFilePath = scriptFile.getPath();
 			}
-			else err("File not found: " + path);
-		}
-		else {
-			scriptFile = null;
-		}
-
-		if (scriptFile == null) {
-			stopFileWatcher();
+			if (initialized) {
+				loadFile();
+			}
+			// else it'll be handled by the Initializer
 		}
 	}
 
 	private synchronized void loadFile() {
-		String script = getFileAsString(scriptFile);
+		String script = Utils.getFileAsString(scriptFile);
 		if (script != null) {
 			info("loading script '" + scriptFile + "' on " + new Date());
 			try {
@@ -222,9 +159,9 @@ public class ruby extends AbstractMaxRubyObject {
 
 	public void anything(String msg, Atom[] args) {
 		StringBuilder input = new StringBuilder();
-		input.append(detokenize(msg));
+		input.append(Utils.detokenize(msg));
 		for (Atom arg : args) {
-			input.append(" ").append(detokenize(arg.toString()));
+			input.append(" ").append(Utils.detokenize(arg.toString()));
 		}
 		eval(input);
 	}
@@ -237,6 +174,9 @@ public class ruby extends AbstractMaxRubyObject {
 		String script = TextBlock.get(name);
 		if (script != null) {
 			eval(script);
+		}
+		else {
+			error("No textblock named '" + name + "'");
 		}
 	}
 

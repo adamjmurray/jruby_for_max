@@ -42,7 +42,6 @@ import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
-import com.cycling74.max.MaxQelem;
 
 /**
  * The ajm.seq MaxObject.
@@ -73,14 +72,14 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	@Override
-	protected MaxQelem getInitializer() {
-		return new MaxQelem(new seqInitializationCallback());
+	protected Executable getInitializer() {
+		return new SeqInitializer();
 	}
 
-	protected class seqInitializationCallback implements Executable {
-		// see discussion at
-		// http://www.cycling74.com/forums/index.php?t=rview&goto=114649
+	protected class SeqInitializer extends DefaultRubyInitializer {
+		@Override
 		public void execute() {
+			super.execute();
 			// handle attributes used to construct the object
 			defaultIndex = index;
 			defaultIter = iter;
@@ -90,10 +89,6 @@ public class seq extends AbstractMaxRubyObject {
 				seq.addAll(defaultSeq);
 			}
 			outputSeq();
-
-			contructRubyEvaluator();
-
-			initialized = true;
 		}
 	}
 
@@ -166,7 +161,7 @@ public class seq extends AbstractMaxRubyObject {
 			defaultSeq.addAll(newSeq);
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + Utils.detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 
@@ -249,7 +244,7 @@ public class seq extends AbstractMaxRubyObject {
 			onSeqChange();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + detokenize(list) + "\n" + e.getMessage());
+			err("Could not evaluate: " + Utils.detokenize(list) + "\n" + e.getMessage());
 		}
 	}
 
@@ -264,14 +259,14 @@ public class seq extends AbstractMaxRubyObject {
 			outputSeq();
 		}
 		catch (IllegalStateException e) {
-			err("Could not evaluate: " + detokenize(msg, args) + "\n" + e.getMessage());
+			err("Could not evaluate: " + Utils.detokenize(msg, args) + "\n" + e.getMessage());
 		}
 	}
 
 	public void rubyseq(Atom[] input) {
 		// TODO: it seems questionable that I do my ajm.eval logic on the Atom(s) returned by Ruby.
 		// Maybe it should use the raw results.
-		String rubyCode = detokenize(input);
+		String rubyCode = Utils.detokenize(input);
 		Object val = evalRuby(rubyCode);
 		if (val != null) {
 			if (val instanceof Atom[]) {
@@ -290,7 +285,7 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	public void ruby(Atom[] input) {
-		evalRuby(detokenize(input));
+		evalRuby(Utils.detokenize(input));
 	}
 
 	protected Object evalRuby(CharSequence input) {
@@ -322,7 +317,7 @@ public class seq extends AbstractMaxRubyObject {
 		if (args.length < 2) {
 			err("Invalid call to insert. Expected: insert index list");
 		}
-		else if (!isNumber(args[0])) {
+		else if (!Utils.isNumber(args[0])) {
 			err("Invalid call to insert. First argument (index) was not a number.");
 		}
 		else {
@@ -380,7 +375,7 @@ public class seq extends AbstractMaxRubyObject {
 	public void repeat(Atom[] args) {
 		int n = 1; // the default is one repetition
 		if (args.length > 0) {
-			if (!isNumber(args[0])) {
+			if (!Utils.isNumber(args[0])) {
 				err("Invalid call to repeat. Argument was not a number: " + args[0]);
 				return;
 			}
@@ -400,7 +395,7 @@ public class seq extends AbstractMaxRubyObject {
 		if (args.length < 1) {
 			err("Invalid call to length. No Arguments. Expected: length n [list]");
 		}
-		else if (!isNumber(args[0])) {
+		else if (!Utils.isNumber(args[0])) {
 			err("Invalid call to length. First argument (n) was not a number: " + args[0]);
 		}
 		else {
@@ -441,7 +436,7 @@ public class seq extends AbstractMaxRubyObject {
 
 				});
 				for (Atom arg : args) {
-					if (isNumber(arg)) {
+					if (Utils.isNumber(arg)) {
 						indices.add(fixBounds(arg.toInt()));
 					}
 				}
@@ -606,7 +601,7 @@ public class seq extends AbstractMaxRubyObject {
 		if (args.length < 2) {
 			err("Invalid call to replace. Not enough arguments. Expected: replace index list");
 		}
-		else if (!isNumber(args[0])) {
+		else if (!Utils.isNumber(args[0])) {
 			err("Invalid call to replace. First argument (index) was not a number: " + args[0]);
 		}
 		else {
@@ -620,10 +615,10 @@ public class seq extends AbstractMaxRubyObject {
 		if (args.length < 2) {
 			err("Invalid call to replacerange. Expected: replace fromIndex toIndex list");
 		}
-		else if (!isNumber(args[0])) {
+		else if (!Utils.isNumber(args[0])) {
 			err("Invalid call to replacerange. First argument (fromIndex) was not a number: " + args[0]);
 		}
-		else if (!isNumber(args[1])) {
+		else if (!Utils.isNumber(args[1])) {
 			err("Invalid call to replacerange. Second argument (toIndex) was not a number: " + args[1]);
 		}
 		else {
@@ -639,10 +634,10 @@ public class seq extends AbstractMaxRubyObject {
 		if (args.length < 2) {
 			err("Invalid call to swap. Expected: swap index1 index2");
 		}
-		else if (!isNumber(args[0])) {
+		else if (!Utils.isNumber(args[0])) {
 			err("Invalid call to swap. First argument (index1) was not a number: " + args[0]);
 		}
-		else if (!isNumber(args[1])) {
+		else if (!Utils.isNumber(args[1])) {
 			err("Invalid call to swap. Second argument (index2) was not a number: " + args[1]);
 		}
 		int idx1 = fixBounds(args[0].toInt());

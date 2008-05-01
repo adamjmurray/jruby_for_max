@@ -266,26 +266,45 @@ public class seq extends AbstractMaxRubyObject {
 	public void rubyseq(Atom[] input) {
 		// TODO: it seems questionable that I do my ajm.eval logic on the Atom(s) returned by Ruby.
 		// Maybe it should use the raw results.
-		String rubyCode = Utils.detokenize(input);
-		Object val = evalRuby(rubyCode);
-		if (val != null) {
-			if (val instanceof Atom[]) {
-				Atom[] vals = (Atom[]) val;
-				if (vals.length > 0 && (vals.length > 1 || !MaxRubyEvaluator.NIL.equals(vals[0].toString()))) {
-					list(vals);
-				}
+		Atom[] atoms = null;
+		if (input.length > 0) {
+			String rubyCode;
+			if (input[0].isString() && "text".equals(input[0].getString())) {
+				rubyCode = input[1].getString();
 			}
 			else {
-				Atom a = (Atom) val;
-				if (!MaxRubyEvaluator.NIL.equals(a.toString())) {
-					list(new Atom[] { a });
+				rubyCode = Utils.detokenize(input);
+			}
+			Object result = evalRuby(rubyCode);
+			if (result != null) {
+				if (result instanceof Atom[]) {
+					atoms = (Atom[]) result;
+				}
+				else {
+					atoms = new Atom[] { (Atom) result };
 				}
 			}
 		}
+
+		if (atoms == null || atoms.length == 0
+				|| (atoms.length == 1 && MaxRubyEvaluator.NIL.equals(atoms[0].toString()))) {
+			atoms = Atom.emptyArray;
+		}
+		list(atoms);
 	}
 
 	public void ruby(Atom[] input) {
-		evalRuby(Utils.detokenize(input));
+		// TODO: I've reused this logic in a few places now. Can I refactor it into MaxRubyEvaluator?
+		String rubyCode = "";
+		if (input.length > 0) {
+			if (input[0].isString() && "text".equals(input[0].getString())) {
+				rubyCode = input[1].getString();
+			}
+			else {
+				rubyCode = Utils.detokenize(input);
+			}
+		}
+		evalRuby(rubyCode);
 	}
 
 	protected Object evalRuby(CharSequence input) {
@@ -565,15 +584,6 @@ public class seq extends AbstractMaxRubyObject {
 		outputSeq();
 	}
 
-	public void clearvalue(Atom[] args) {
-		for (Atom a : args) {
-			while (seq.remove(a)) {
-				// keep looping until all values have been removed
-			}
-			outputSeq();
-		}
-	}
-
 	public void sort() {
 		Collections.sort(seq);
 		onSeqChange();
@@ -736,6 +746,7 @@ public class seq extends AbstractMaxRubyObject {
 	 * at least 3 args are required. first arg is left index, second arg is right index, 3rd/remaining args acts just
 	 * like add()
 	 */
+	@Deprecated
 	public void addrange(Atom[] args) {
 		if (args.length < 3) {
 			err("addrange needs at least 3 arguments");
@@ -765,6 +776,7 @@ public class seq extends AbstractMaxRubyObject {
 		outputSeq();
 	}
 
+	@Deprecated
 	public void addrevrange(Atom[] args) {
 		if (args.length < 3) {
 			err("addrevrange needs at least 3 arguments");
@@ -812,6 +824,7 @@ public class seq extends AbstractMaxRubyObject {
 		outputSeq();
 	}
 
+	@Deprecated
 	public void multiplyrange(Atom[] args) {
 		if (args.length < 3) {
 			err("multiplyrange needs at least 3 arguments");
@@ -841,6 +854,7 @@ public class seq extends AbstractMaxRubyObject {
 		outputSeq();
 	}
 
+	@Deprecated
 	public void multiplyrevrange(Atom[] args) {
 		if (args.length < 3) {
 			err("multiplyrevrange needs at least 3 arguments");

@@ -29,7 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -121,6 +120,10 @@ public class MaxRubyEvaluator {
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
 	public Object eval(CharSequence rubyCode) {
+		return eval(rubyCode, true);
+	}
+
+	public Object eval(CharSequence rubyCode, boolean returnResult) {
 		if (!ruby.isInitialized()) {
 			init();
 		}
@@ -130,7 +133,12 @@ public class MaxRubyEvaluator {
 			ruby.eval("$MaxObject = $" + maxObjVar);
 			result = ruby.eval(rubyCode);
 		}
-		return toAtoms(result);
+		if (returnResult) {
+			return toAtoms(result);
+		}
+		else {
+			return null;
+		}
 	}
 
 	/**
@@ -200,11 +208,11 @@ public class MaxRubyEvaluator {
 
 			// Setup the default functions:
 			code.line("def puts(*params)");
-			code.line("  $Utils.puts(params)");
+			code.line("  $Utils.puts(*params)");
 			code.line("end");
 
 			code.line("def print(*params)");
-			code.line("  $Utils.print(params)");
+			code.line("  $Utils.print(*params)");
 			code.line("end");
 
 			code.line("def flush");
@@ -220,16 +228,16 @@ public class MaxRubyEvaluator {
 			code.line("end");
 
 			code.line("def error(*params)");
-			code.line("  $Utils.error(params)");
+			code.line("  $Utils.error(*params)");
 			code.line("end");
 
 			code.line("def outlet(n, *params)");
-			code.line("  $Utils.outlet(n, params)");
+			code.line("  $Utils.outlet(n, *params)");
 			code.line("end");
 
 			for (int i = 0; i < 10; i++) {
 				code.line("def out" + i + "(*params)");
-				code.line("  $Utils.outlet(" + i + ", params)");
+				code.line("  $Utils.outlet(" + i + ", *params)");
 				code.line("end");
 			}
 
@@ -277,12 +285,16 @@ public class MaxRubyEvaluator {
 	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
 	public Object toAtoms(Object obj) {
+		return toAtoms(obj, false);
+	}
+
+	private Object toAtoms(Object obj, boolean nested) {
 
 		/*
 		if (obj != null) {
-			System.out.println(obj.getClass().getName());
-		}
-		*/
+			System.out.println("Class: " + obj.getClass().getName());
+		}*/
+
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
@@ -302,40 +314,39 @@ public class MaxRubyEvaluator {
 			return Atom.newAtom(((Number) obj).longValue());
 		}
 
+		else if (obj instanceof CharSequence) {
+			return Atom.newAtom(obj.toString());
+		}
+
 		else if (obj instanceof Boolean) {
 			return Atom.newAtom(((Boolean) obj).booleanValue());
 		}
 
 		else if (obj instanceof RubyArray) {
 			RubyArray array = (RubyArray) obj;
-			if (array.size() == 1) {
-				return toAtoms(array.get(0));
+
+			Object[] atomsArray = new Object[array.size()];
+			boolean isFlatArray = true;
+			for (int i = 0; i < array.size(); i++) {
+				Object val = toAtoms(array.get(i), true);
+				if (!(val instanceof Atom)) {
+					isFlatArray = false;
+				}
+				atomsArray[i] = val;
+			}
+
+			if (nested == true || isFlatArray) {
+				Atom[] atoms = new Atom[array.size()];
+				for (int i = 0; i < atomsArray.length; i++) {
+					atoms[i] = (Atom) atomsArray[i];
+				}
+				return atoms;
 			}
 			else {
-				Atom[] out = new Atom[array.size()];
-				for (int i = 0; i < array.size(); i++) {
-					Object val = toAtoms(array.get(i));
-					if (val instanceof Atom) {
-						out[i] = (Atom) val;
-					}
-					else {
-						Atom[] vals = (Atom[]) val;
-						if (vals.length == 1) {
-							out[i] = vals[0];
-						}
-						else {
-							// TODO: it is probably ok if we only have one level of nesting (an array inside an array)
-							// to return a space separated string e.g. [1, [2,3], 4] => 1 "2 3" 4
-							// Further nesting should insert array brackets: [1, [2, [3,4]], 5] => 1 "2 [3,4]" 5
-							if (logger != null) {
-								logger.info("Ruby: coerced a nested Array to String");
-							}
-							out[i] = Atom.newAtom(Arrays.toString(vals));
-						}
-					}
-
+				if (logger != null) {
+					logger.info("Ruby: coerced a nested Array to String");
 				}
-				return out;
+				return Atom.newAtom(toArrayString(atomsArray));
 			}
 		}
 
@@ -359,26 +370,34 @@ public class MaxRubyEvaluator {
 		}
 
 		else {
-			if (logger != null && !(obj instanceof String)) {
+			if (logger != null) {
 				logger.info("Ruby: coerced type " + obj.getClass().getName() + " to String");
 			}
-			return new Atom[] { Atom.newAtom(obj.toString()) };
+			return Atom.newAtom(obj.toString());
 		}
 
 	}
 
 	private String toArrayString(Object o) {
-		if (o instanceof Atom[]) {
-			Atom[] atoms = (Atom[]) o;
-			if (atoms.length == 1) {
-				return atoms[0].toString();
+		StringBuilder s = new StringBuilder();
+		buildArrayString(o, s);
+		return s.toString();
+	}
+
+	private void buildArrayString(Object o, StringBuilder s) {
+		if (o instanceof Object[]) {
+			s.append("[");
+			Object[] objs = (Object[]) o;
+			for (int i = 0; i < objs.length; i++) {
+				if (i > 0) {
+					s.append(",");
+				}
+				buildArrayString(objs[i], s);
 			}
-			else {
-				return Arrays.toString(atoms);
-			}
+			s.append("]");
 		}
 		else {
-			return o.toString();
+			s.append(o.toString());
 		}
 	}
 

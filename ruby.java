@@ -37,6 +37,7 @@ import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
+import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
@@ -158,12 +159,26 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 
 	public void anything(String msg, Atom[] args) {
-		StringBuilder input = new StringBuilder();
-		input.append(Utils.detokenize(msg));
-		for (Atom arg : args) {
-			input.append(" ").append(Utils.detokenize(arg.toString()));
+		if (true) {
+			// actually, maybe this behavior is for the best
+			// MaxSystem.getMaxVersion() < 1200
+			// deal with Max 4's bugs with a hackish detokenizer routine:
+			StringBuilder input = new StringBuilder();
+			input.append(Utils.detokenize(msg));
+			for (Atom arg : args) {
+				input.append(" ").append(Utils.detokenize(arg.toString()));
+			}
+			eval(input.toString().trim());
 		}
-		eval(input);
+		else {
+			// Yay! Max 5 works much better.
+			StringBuilder input = new StringBuilder();
+			input.append(msg);
+			for (Atom arg : args) {
+				input.append(" ").append(arg.toString());
+			}
+			eval(input.toString());
+		}
 	}
 
 	public void text(String script) {
@@ -182,7 +197,11 @@ public class ruby extends AbstractMaxRubyObject {
 
 	protected void eval(CharSequence input) {
 		try {
-			Object val = ruby.eval(input);
+			if (ruby == null) {
+				err("not initialized yet. If you are loadbanging a script, try using a deferlow.");
+				return;
+			}
+			Object val = ruby.eval(input, evaloutlet >= 0);
 			if (evaloutlet >= 0) {
 				// this check occurs here instead of evaloutlet() because we want
 				// to allow negative numbers to suppress eval output

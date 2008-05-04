@@ -105,7 +105,7 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 	}
 
 	public void debug(String message) {
-		if (verbose && debugOut != null) {
+		if (debugOut != null) {
 			debugOut.println(message);
 		}
 	}

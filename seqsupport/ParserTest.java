@@ -8,13 +8,23 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.util.DummyMaxObject;
+
 import com.cycling74.max.Atom;
 
 public class ParserTest {
 
-	@SuppressWarnings("unused")
-	private PrintStream out = System.out;
-	Parser p = new Parser();
+	static PrintStream out = System.out;
+
+	static MaxRubyEvaluator ruby = new MaxRubyEvaluator(new DummyMaxObject(), null);
+
+	static Parser p = new Parser();
+
+	static {
+		p.setRubyEvaluator(ruby);
+		p.setDebugOut(out);
+	}
 
 	private List<Atom> toAtomList(Object... objs) {
 		List<Atom> list = new ArrayList<Atom>();
@@ -253,6 +263,11 @@ public class ParserTest {
 		catch (IllegalStateException e) {
 			// should make it here
 		}
+	}
+
+	@Test
+	public void testRubySupport() {
+		p.parse("{1+2}");
 	}
 
 	// TODO: other bad syntax

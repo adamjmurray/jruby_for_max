@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -86,6 +85,8 @@ public class MaxRubyEvaluator {
 		this.context = context;
 		ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
 
+		// System.out.println("Got ruby evaluator " + ruby);
+
 		ruby.declarePersistentGlobal(maxObjVar, maxObj);
 	}
 
@@ -105,7 +106,6 @@ public class MaxRubyEvaluator {
 		if (!Utils.equals(this.context, context)) {
 			RubyEvaluatorFactory.removeRubyEvaluator(this.context);
 			ruby.undeclareGlobal(maxObjVar);
-
 			ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
 			ruby.declarePersistentGlobal(maxObjVar, maxObj);
 			this.context = context;

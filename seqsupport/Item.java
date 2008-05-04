@@ -30,6 +30,7 @@ package ajm.seqsupport;
 import java.util.Arrays;
 
 import ajm.maxsupport.Atomizer;
+import ajm.rubysupport.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
 
@@ -43,6 +44,12 @@ public class Item implements Comparable<Item>, Atomizer {
 
 	private Atom atom;
 	private Atom[] atoms;
+
+	private Atom rubyCodeAtom;
+	private String rubyCode;
+	private MaxRubyEvaluator ruby;
+
+	private boolean reeval = true;
 
 	private Item() {
 	}
@@ -63,8 +70,19 @@ public class Item implements Comparable<Item>, Atomizer {
 		this.atom = Atom.newAtom(s);
 	}
 
+	public Item(String rubyCode, MaxRubyEvaluator ruby) {
+		// System.out.println("SET new ruby code: " + rubyCode + ruby);
+		this.rubyCode = rubyCode;
+		this.rubyCodeAtom = Atom.newAtom("{" + rubyCode + "}");
+		this.ruby = ruby;
+	}
+
 	public Item(Atom[] atoms) {
 		this.atoms = atoms;
+		setAtomFromAtoms();
+	}
+
+	private void setAtomFromAtoms() {
 		// Each item needs to be representable as a single Atom, so the underlying single Atom is
 		// a symbol wrapped in quotes, like "60 64 67" for a C Major chord.
 		StringBuilder s = new StringBuilder();
@@ -77,20 +95,64 @@ public class Item implements Comparable<Item>, Atomizer {
 		this.atom = Atom.newAtom(s.toString());
 	}
 
+	@Deprecated
 	public boolean isAtomArray() {
 		return atoms != null;
 	}
 
+	@Deprecated
 	public Atom getAtom() {
 		return atom;
 	}
 
-	public Atom toAtom() {
-		return atom;
-	}
-
+	/*
+	@Deprecated
 	public Atom[] getAtoms() {
 		return atoms;
+	}
+	*/
+
+	/**
+	 * @return either Atom[] or Atom
+	 */
+	public Object getValue() {
+		if (rubyCode != null && ruby != null) {
+			// System.out.println("RUBY CODE");
+			if (reeval) {
+				// System.out.println("EVALUATING");
+				Object value = ruby.eval(rubyCode);
+				if (value instanceof Atom[]) {
+					atoms = (Atom[]) value;
+					setAtomFromAtoms();
+				}
+				else {
+					atoms = null;
+					atom = (Atom) value;
+				}
+				// TODO: reeval = false;
+				// then need to explicitly set reeval true from the seq when appropriate
+			}
+		}
+
+		if (atoms != null) {
+			return atoms;
+		}
+		else {
+			return atom;
+		}
+	}
+
+	/**
+	 * Convert the internal representation to an atom. If this is a dynamic Item (ruby code), then return the ruby code
+	 * as a string, not the evaluated value.
+	 */
+	public Atom toAtom() {
+		if (rubyCodeAtom != null) {
+			return rubyCodeAtom;
+		}
+		else {
+			return atom;
+		}
 	}
 
 	// these kinds of operation must return a new item. otherwise we overwrite the defaultSeq values
@@ -186,6 +248,7 @@ public class Item implements Comparable<Item>, Atomizer {
 		return i;
 	}
 
+	// TODO: this seems wrong...
 	public boolean equals(Object obj) {
 		if (obj instanceof Item) {
 			return Arrays.equals(this.atoms, ((Item) obj).atoms);
@@ -198,6 +261,9 @@ public class Item implements Comparable<Item>, Atomizer {
 	public String toString() {
 		if (atoms != null) {
 			return "\"" + atom + "\"";
+		}
+		else if (rubyCodeAtom != null) {
+			return rubyCodeAtom.toString();
 		}
 		else {
 			return atom + "";

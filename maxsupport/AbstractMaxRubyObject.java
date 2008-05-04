@@ -78,7 +78,9 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 
 	@Override
 	public void notifyDeleted() {
-		ruby.notifyDeleted();
+		if (ruby != null) {
+			ruby.notifyDeleted();
+		}
 		super.notifyDeleted();
 	}
 }

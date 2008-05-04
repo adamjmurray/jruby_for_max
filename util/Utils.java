@@ -91,6 +91,9 @@ public class Utils {
 	}
 
 	public static String detokenize(Atom atom) {
+		if (atom == null) {
+			return "";
+		}
 		return detokenize(atom.toString());
 	}
 

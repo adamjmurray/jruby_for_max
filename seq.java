@@ -80,6 +80,7 @@ public class seq extends AbstractMaxRubyObject {
 		@Override
 		public void execute() {
 			super.execute();
+			parser.setRubyEvaluator(ruby);
 			// handle attributes used to construct the object
 			defaultIndex = index;
 			defaultIter = iter;
@@ -567,7 +568,7 @@ public class seq extends AbstractMaxRubyObject {
 	public void deletevalue(Atom[] args) {
 		for (Atom a : args) {
 			for (int i = 0; i < seq.size(); i++) {
-				if (seq.get(i).getAtom().equals(a)) {
+				if (seq.get(i).toAtom().equals(a)) {
 					seq.remove(i);
 					// keep the index at the correct current element
 					if (i < index) {
@@ -919,13 +920,16 @@ public class seq extends AbstractMaxRubyObject {
 		if (!seq.isEmpty()) {
 			output();
 			Item currentItem = seq.get(this.index);
-			if (currentItem.isAtomArray() && chordmode == CHORDMODE.ARPEGGIATE) {
-				if (currentItem.getAtoms().length == 0) {
+			Object currentVal = currentItem.getValue();
+
+			if (currentVal instanceof Atom[] && chordmode == CHORDMODE.ARPEGGIATE) {
+				Atom[] atoms = (Atom[]) currentVal;
+				if (atoms.length == 0) {
 					// [], the empty chord noop
 					index += step;
 				}
 				else {
-					chordIndex = (chordIndex + 1) % currentItem.getAtoms().length;
+					chordIndex = (chordIndex + 1) % atoms.length;
 					if (chordIndex == 0) {
 						// we wrapped around
 						index += step;
@@ -987,10 +991,12 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	protected void output(OUTLET outlet, Item data) {
-		if (data.isAtomArray()) {
+		Object value = data.getValue();
+		if (value instanceof Atom[]) {
+			Atom[] atoms = (Atom[]) value;
 			switch (chordmode) {
 			case CHORD:
-				for (Atom atom : data.getAtoms()) {
+				for (Atom atom : atoms) {
 					outlet(outlet.outletNumber, atom);
 				}
 				break;
@@ -998,22 +1004,22 @@ public class seq extends AbstractMaxRubyObject {
 			case ARPEGGIATE:
 				// probably we should ensure the chordIndex range here, but
 				// it is best it is always correct by the time we reach here!
-				if (data.getAtoms().length > 0) {
-					outlet(outlet.outletNumber, data.getAtoms()[chordIndex]);
+				if (atoms.length > 0) {
+					outlet(outlet.outletNumber, atoms[chordIndex]);
 				}
 				break;
 
 			case LIST:
-				outlet(outlet.outletNumber, data.getAtoms());
+				outlet(outlet.outletNumber, atoms);
 				break;
 
 			case SYMBOL:
-				outlet(outlet.outletNumber, data.getAtom());
+				outlet(outlet.outletNumber, atoms);
 				break;
 			}
 		}
 		else {
-			outlet(outlet.outletNumber, data.getAtom());
+			outlet(outlet.outletNumber, (Atom) value);
 		}
 	}
 

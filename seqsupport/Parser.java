@@ -27,16 +27,17 @@ package ajm.seqsupport;
 
  */
 
-import static ajm.seqsupport.Parser.STATE.CHORD;
-import static ajm.seqsupport.Parser.STATE.DEFAULT;
-import static ajm.seqsupport.Parser.STATE.REPETITION;
+import static ajm.seqsupport.Parser.STATE.*;
 import static ajm.seqsupport.Token.TYPE.*;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
+import ajm.rubysupport.MaxRubyEvaluator;
 
 import com.cycling74.max.Atom;
 
@@ -52,8 +53,14 @@ public class Parser {
 		evalNotes = true;
 	}
 
+	private MaxRubyEvaluator ruby;
+
+	public void setRubyEvaluator(MaxRubyEvaluator ruby) {
+		this.ruby = ruby;
+	}
+
 	enum STATE {
-		CHORD, REPETITION, DEFAULT;
+		CHORD, REPETITION, RUBY, DEFAULT;
 	}
 
 	private boolean evalNotes = true;
@@ -141,9 +148,23 @@ public class Parser {
 				evalRepeat(new Item("prev"));
 				break;
 
+			case RUBY_BEGIN:
+				startScope(RUBY);
+				break;
+
+			case RUBY_END:
+				endScope(RUBY);
+				break;
+
 			case TEXT:
 				Item item;
-				if (evalNotes) {
+
+				if (states.peek() == RUBY) {
+					String rubyCode = token.getText();
+					// debug("RUBY CODE = " + rubyCode);
+					item = new Item(rubyCode, ruby);
+				}
+				else if (evalNotes) {
 					item = new Item(token.getValue());
 				}
 				else {
@@ -186,7 +207,7 @@ public class Parser {
 		}
 		List<Item> scope = currentScope;
 		if (state == CHORD) {
-			// TODO: this is bad! If we know we're in the chord state, then we should be adding to the current Item!
+			// TODO: this could be optimized
 			Atom[] chord = new Atom[scope.size()];
 			for (int i = 0; i < scope.size(); i++) {
 				chord[i] = scope.get(i).getAtom();
@@ -235,6 +256,9 @@ public class Parser {
 		return repetitions;
 	}
 
+	private static final char RUBY_END_CHAR = '}';
+	private static final Token RUBY_END_TOKEN = new Token(RUBY_END);
+
 	private static Map<Character, Token> specialCharMap = new HashMap<Character, Token>();
 	static {
 		specialCharMap.put('[', new Token(CHORD_BEGIN));
@@ -244,14 +268,34 @@ public class Parser {
 		specialCharMap.put('*', new Token(REPEAT_STAR));
 		specialCharMap.put('>', new Token(NEXT));
 		specialCharMap.put('<', new Token(PREV));
+		specialCharMap.put('{', new Token(RUBY_BEGIN));
+		specialCharMap.put(RUBY_END_CHAR, RUBY_END_TOKEN);
 	}
 
 	private void nextToken() {
 		token = null;
 
 		StringBuilder buf = new StringBuilder();
+		if (states.peek() == RUBY) {
+			for (index++; index < input.length(); index++) {
+				char c = input.charAt(index);
 
-		for (index++; index < input.length(); index++) {
+				// TODO: need to handle escaped } character
+				if (c == RUBY_END_CHAR) {
+					if (buf.length() == 0) {
+						token = RUBY_END_TOKEN;
+					}
+					else {
+						index--;
+					}
+					break;
+				}
+				else {
+					buf.append(c);
+				}
+			}
+		}
+		else for (index++; index < input.length(); index++) {
 			char c = input.charAt(index);
 
 			if (Character.isWhitespace(c)) {
@@ -288,5 +332,18 @@ public class Parser {
 
 	public void setEvalNotes(boolean evalNotes) {
 		this.evalNotes = evalNotes;
+	}
+
+	// for use with debugging unit tests, must be set from the test after instantiation
+	private PrintStream debugOut;
+
+	protected void setDebugOut(PrintStream debugOut) {
+		this.debugOut = debugOut;
+	}
+
+	public void debug(String message) {
+		if (debugOut != null) {
+			debugOut.println(message);
+		}
 	}
 }

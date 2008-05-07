@@ -52,23 +52,15 @@ import com.cycling74.max.Executable;
 public class seq extends AbstractMaxRubyObject {
 
 	public seq(Atom[] args) {
-		declareAttrs();
-		declareIO(1, 4);
-		setInletAssist(new String[] { "list / bang / commands" });
-		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
-	}
-
-	protected seq() { // for subclasses
-		declareAttrs();
-	}
-
-	protected void declareAttrs() {
 		declareAttribute("seq", "getseq", "seq");
 		declareAttribute("defaultseq", "getdefaultseq", "defaultseq");
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("cmode", "getchordmode", "chordmode");
 		declareAttribute("iter", "getiter", "iter");
 		declareAttribute("step", "getstep", "step");
+		declareIO(2, 4);
+		setInletAssist(new String[] { "list / bang / commands", "cold inlet" });
+		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
 	}
 
 	@Override
@@ -347,7 +339,17 @@ public class seq extends AbstractMaxRubyObject {
 
 	protected void insert(int idx, Atom[] list) {
 		List<Item> newSeq = parser.parse(list);
-		idx = fixBounds(idx);
+
+		// this is almost the fixBounds() logic, except we can insert at idx==size
+		int size = seq.size();
+		if (idx < -size || idx > size) {
+			info("cannot insert. insert index (" + idx + ") must be >= -size and <= size (current size=" + size + ")");
+			return;
+		}
+		if (idx < 0) {
+			idx += size;
+		}
+
 		seq.addAll(idx, newSeq);
 		if (idx <= index) {
 			index += newSeq.size(); // keep the index at the correct current element
@@ -447,17 +449,21 @@ public class seq extends AbstractMaxRubyObject {
 				seq.clear();
 			}
 			else {
+
 				// Sort in reverse order, so any index shifting that occurs when we start
 				// deleting won't effect indices that still need to be deleted
 				TreeSet<Integer> indices = new TreeSet<Integer>(new Comparator<Integer>() {
 					public int compare(Integer o1, Integer o2) {
 						return -o1.compareTo(o2);
 					}
-
 				});
+
 				for (Atom arg : args) {
 					if (Utils.isNumber(arg)) {
-						indices.add(fixBounds(arg.toInt()));
+						int idx = fixBounds(arg.toInt());
+						if (idx >= 0) {
+							indices.add(idx);
+						}
 					}
 				}
 				for (int idx : indices) {
@@ -474,14 +480,13 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	protected int fixBounds(int idx) {
-		if (!seq.isEmpty()) { // prevents infinite loops!
-			int size = seq.size();
-			while (idx >= size) {
-				idx -= size;
-			}
-			while (idx < 0) {
-				idx += size;
-			}
+		int size = seq.size();
+		if (idx < -size || idx > size) {
+			info("index (" + idx + ") must be >= -size and < size (current size=" + size + ")");
+			return -1;
+		}
+		else if (idx < 0) {
+			idx += size;
 		}
 		return idx;
 	}
@@ -489,6 +494,9 @@ public class seq extends AbstractMaxRubyObject {
 	protected int[] fixBounds(int left, int right) {
 		left = fixBounds(left);
 		right = fixBounds(right);
+		if (left < 0 || right < 0) {
+			return null;
+		}
 		if (left > right) {
 			int tmp = left;
 			left = right;
@@ -497,6 +505,7 @@ public class seq extends AbstractMaxRubyObject {
 		return new int[] { left, right };
 	}
 
+	@Deprecated
 	protected int[] getRange(int start, int end) {
 		if (seq.isEmpty()) {
 			return new int[] { 0, 0 };
@@ -513,6 +522,7 @@ public class seq extends AbstractMaxRubyObject {
 		return new int[] { start, end };
 	}
 
+	@Deprecated
 	protected int[] getReverseRange(int start, int end) {
 		if (seq.isEmpty()) {
 			return new int[] { 0, 0 };
@@ -531,6 +541,9 @@ public class seq extends AbstractMaxRubyObject {
 
 	public void subseq(int left, int right) {
 		int lr[] = fixBounds(left, right);
+		if (lr == null) {
+			return;
+		}
 		left = lr[0];
 		right = lr[1];
 
@@ -549,6 +562,9 @@ public class seq extends AbstractMaxRubyObject {
 
 		if (!seq.isEmpty()) {
 			int[] lr = fixBounds(left, right);
+			if (lr == null) {
+				return;
+			}
 			left = lr[0];
 			right = lr[1];
 
@@ -594,6 +610,9 @@ public class seq extends AbstractMaxRubyObject {
 	public void sortrange(int left, int right) {
 		if (seq.size() > 0) {
 			int[] lr = fixBounds(left, right);
+			if (lr == null) {
+				return;
+			}
 			left = lr[0];
 			right = lr[1];
 
@@ -617,8 +636,10 @@ public class seq extends AbstractMaxRubyObject {
 		}
 		else {
 			int idx = fixBounds(args[0].toInt());
-			seq.remove(idx);
-			insert(idx, Atom.removeFirst(args));
+			if (idx >= 0) {
+				seq.remove(idx);
+				insert(idx, Atom.removeFirst(args));
+			}
 		}
 	}
 
@@ -633,11 +654,15 @@ public class seq extends AbstractMaxRubyObject {
 			err("Invalid call to replacerange. Second argument (toIndex) was not a number: " + args[1]);
 		}
 		else {
-			int[] ft = fixBounds(args[0].toInt(), args[1].toInt());
-			int from = ft[0];
-			int to = ft[1];
-			deleterange(from, to);
-			insert(from, Atom.removeFirst(Atom.removeFirst(args)));
+			int[] lr = fixBounds(args[0].toInt(), args[1].toInt());
+			if (lr == null) {
+				return;
+			}
+			;
+			int left = lr[0];
+			int right = lr[1];
+			deleterange(left, right);
+			insert(left, Atom.removeFirst(Atom.removeFirst(args)));
 		}
 	}
 
@@ -653,7 +678,7 @@ public class seq extends AbstractMaxRubyObject {
 		}
 		int idx1 = fixBounds(args[0].toInt());
 		int idx2 = fixBounds(args[1].toInt());
-		if (idx1 != idx2) {
+		if (idx1 >= 0 && idx2 >= 0 && idx1 != idx2) {
 			Item tmp = seq.get(idx1);
 			seq.set(idx1, seq.get(idx2));
 			seq.set(idx2, tmp);
@@ -673,6 +698,9 @@ public class seq extends AbstractMaxRubyObject {
 			return;
 		}
 		int[] lr = fixBounds(idx1, idx2);
+		if (lr == null) {
+			return;
+		}
 		reverseVals(lr[0], lr[1]);
 		onSeqChange();
 		outputSeq();
@@ -700,6 +728,9 @@ public class seq extends AbstractMaxRubyObject {
 			return;
 		}
 		int[] lr = fixBounds(left, right);
+		if (lr == null) {
+			return;
+		}
 		left = lr[0];
 		right = lr[1];
 

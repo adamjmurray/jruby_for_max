@@ -1,5 +1,6 @@
 package ajm;
 
+import ajm.seq.OUTLET;
 import ajm.seqsupport.Item;
 
 import java.io.PrintStream;
@@ -45,6 +46,22 @@ public class rseqTest {
 		}
 
 		@Override
+		protected void output(OUTLET outlet, Item data) {
+			Object val = data.getValue();
+			if (val instanceof Atom) {
+				Atom atom = (Atom) val;
+				if (outlet == OUTLET.VALUE) {
+					valOuts.add(atom.getInt());
+					if (DEBUG) {
+						out.println(outlet + ": " + atom.getInt());
+					}
+				}
+				outputs.put(outlet, atom.getInt());
+			}
+			// else?
+		}
+
+		@Override
 		protected void output(OUTLET outlet, Atom[] data) {
 		}
 
@@ -54,11 +71,6 @@ public class rseqTest {
 			if (DEBUG) {
 				out.println(outlet + ": " + data);
 			}
-		}
-
-		@Override
-		protected void output(OUTLET outlet, Item data) {
-
 		}
 
 		@Override
@@ -221,13 +233,13 @@ public class rseqTest {
 
 		s.bang();
 		assertEquals(1, s.valueSinceBang());
-		assertEquals(2, s.indexSinceBang());
+		assertEquals(3, s.indexSinceBang());
 		assertEquals(s.getValueOutputs(), 1, 1, 0, 1);
 
 		s.index(2);
 		s.bang();
 		assertEquals(1, s.valueSinceBang());
-		assertEquals(2, s.indexSinceBang());
+		assertEquals(3, s.indexSinceBang());
 		assertEquals(s.getValueOutputs(), 1, 1, 0, 1, 0, 1);
 
 		if (DEBUG) {
@@ -325,7 +337,7 @@ public class rseqTest {
 		// out.println("***");
 
 		s.bang();
-		assertEquals(null, s.valueSinceBang());
+		assertNull(s.valueSinceBang());
 		// out.println("***");
 
 		s.bang();
@@ -333,7 +345,7 @@ public class rseqTest {
 		// out.println("***");
 
 		s.bang();
-		assertEquals(null, s.valueSinceBang());
+		assertNull(s.valueSinceBang());
 
 		s.bang();
 		assertEquals(2, s.valueSinceBang());
@@ -367,120 +379,4 @@ public class rseqTest {
 		}
 	}
 
-	/*
-	 * public void testRhythmlen() throws Exception { if (DEBUG) { out.println("\n*** START testRhythmlen ***"); } //
-	 * TODO: test with symbols in the list rhythmseqStub s = makeSeq(1, 2, 3); s.rhythmlen(7); assertEquals(makeSeq(1,
-	 * 2, 4), s); s.rhythmlen(4); assertEquals(makeSeq(1, 2, 1), s); s.rhythmlen(3); assertEquals(makeSeq(1, 2), s);
-	 * s.rhythmlen(2); assertEquals(makeSeq(1, 1), s); s.rhythmlen(4); assertEquals(makeSeq(1, 3), s); s.rhythmlen(1);
-	 * assertEquals(makeSeq(1), s); s.rhythmlen(4); assertEquals(makeSeq(4), s); s.rhythmlen(0);
-	 * assertEquals(emptySeq(), s); if (DEBUG) { out.println("*** END testRhythmlen ***\n"); } }
-	 */
-	@Test
-	public void testRlength() throws Exception {
-		if (DEBUG) {
-			out.println("\n*** START testMaxtick ***");
-		}
-		// TODO: test with symbols in the list
-
-		rStub s = makeSeq(1, 2, 3);
-		s.rlength(7);
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		assertEquals(3, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		s.bang();
-		assertEquals(null, s.valueSinceBang());
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-
-		s.index(0);
-		s.rlength(5);
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		assertEquals(3, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-
-		if (DEBUG) {
-			out.println("*** END testMaxtick ***\n");
-		}
-	}
-
-	@Test
-	public void testMaintainTickWhenListChangesSimple() throws Exception {
-		if (DEBUG) {
-			out.println("\n*** START testMaintainTickWhenListChangesSimple ***");
-		}
-		rStub s = makeSeq(2, 2, 1);
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.set(1, 1, 2, 1);
-		s.bang();
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-		if (DEBUG) {
-			out.println("*** END testMaintainTickWhenListChangesSimple ***\n");
-		}
-	}
-
-	@Test
-	public void testMaintainTickWhenListChangesComplex() throws Exception {
-		if (DEBUG) {
-			out.println("\n*** START testMaintainTickWhenListChangesComplex ***");
-		}
-		rStub s = makeSeq(3, 2, 1);
-		s.bang();
-		assertEquals(3, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.set(1, 1, 2, 2);
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-
-		if (DEBUG) {
-			out.println("*** END testMaintainTickWhenListChangesComplex ***\n");
-		}
-	}
-
-	@Test
-	public void testMaintainTickWhenListChangesComplex2() throws Exception {
-		if (DEBUG) {
-			out.println("\n*** START testMaintainTickWhenListChangesComplex2 ***");
-		}
-		// try again, but switch the seq in a different spot
-		rStub s = makeSeq(3, 2, 1);
-		s.bang();
-		assertEquals(3, s.valueSinceBang());
-		s.bang();
-		s.bang();
-		s.bang();
-		assertEquals(2, s.valueSinceBang());
-		s.bang();
-		s.set(1, 1, 2, 2);
-		s.bang();
-		s.bang();
-		assertEquals(1, s.valueSinceBang());
-
-		if (DEBUG) {
-			out.println("*** END testMaintainTickWhenListChangesComplex2 ***\n");
-		}
-	}
 }

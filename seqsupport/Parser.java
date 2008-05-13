@@ -80,8 +80,11 @@ public class Parser {
 	public List<Item> parse(String msg, Atom[] args) {
 		// construct a single String from the input (makes parsing easier)
 		StringBuilder input = new StringBuilder();
-		if (msg != null) {
-			if (msg.contains(" ")) {
+		if (msg != null && (msg.trim().length() > 0 || args.length > 0)) {
+			// the last 2 constraints above are to handle a whitespace only String
+			// like an empty string. This is to handle the " " value for empty ajm.seq
+
+			if (msg.contains(" ") && !msg.contains("[") && !msg.contains("{")) {
 				// this is a chord
 				input.append("[").append(msg).append("]");
 			}
@@ -95,9 +98,16 @@ public class Parser {
 				input.append(" ");
 			}
 			Atom arg = args[i];
-			if (arg.isString() && arg.toString().contains(" ")) {
-				// this is a chord
-				input.append("[").append(arg).append("]");
+
+			if (arg.isString()) {
+				String str = arg.toString();
+				if (str.contains(" ") && !str.contains("[") && !str.contains("{")) {
+					// this is a chord
+					input.append("[").append(arg).append("]");
+				}
+				else {
+					input.append(arg);
+				}
 			}
 			else {
 				input.append(arg);

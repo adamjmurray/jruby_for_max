@@ -80,7 +80,6 @@ public class rseq extends seq {
 					}
 				}
 			}
-			// Still need this check!
 			if (allZeros) {
 				seq.add(new Item(1)); // prevents infinite loops
 			}
@@ -100,10 +99,7 @@ public class rseq extends seq {
 				}
 			}
 
-			debug("HERE");
-
 			if (count == 0) {
-				debug("OUTPUTTING");
 				output();
 				if (step % seq.size() != 0) {
 					while (duration == 0) {
@@ -111,6 +107,9 @@ public class rseq extends seq {
 						index(index + step);
 						output();
 					}
+					// infinite loops are still possible (think step==2 and every other val is 0),
+					// so just record the start index when duration==0 and break
+					// loop if we ever hit that index again. then we don't need to mess with the seq when all 0s
 				}
 				// else we'd have an infinite loop
 			}

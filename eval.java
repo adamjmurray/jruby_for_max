@@ -29,12 +29,13 @@ package ajm;
 
 import java.util.List;
 
-import ajm.maxsupport.AbstractMaxObject;
+import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.seqsupport.Item;
 import ajm.seqsupport.Parser;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
 
 /**
  * The ajm.eval MaxObject
@@ -42,7 +43,7 @@ import com.cycling74.max.Atom;
  * @version 0.85
  * @author Adam Murray (adam@compusition.com)
  */
-public class eval extends AbstractMaxObject {
+public class eval extends AbstractMaxRubyObject {
 
 	Parser parser = new Parser();
 
@@ -53,20 +54,35 @@ public class eval extends AbstractMaxObject {
 		// TODO parsing options
 	}
 
+	@Override
+	protected Executable getInitializer() {
+		return new EvalInitializer();
+	}
+
+	protected class EvalInitializer extends DefaultRubyInitializer {
+		@Override
+		public void execute() {
+			super.execute();
+			parser.setRubyEvaluator(ruby);
+		}
+	}
+
 	public void list(Atom[] list) {
 		anything(null, list);
 	}
 
 	public void anything(String msg, Atom[] args) {
 		try {
-			List<Item> parsed = parser.parse(msg, args);
-			Atom[] atoms = new Atom[parsed.size()];
+			List<Item> items = parser.parse(msg, args);
+			Atom[] atoms = new Atom[items.size()];
 			for (int i = 0; i < atoms.length; i++) {
-				atoms[i] = parsed.get(i).getAtom();
+				Item item = items.get(i);
+				item.getValue(); // evaluate ruby, if needed
+				atoms[i] = item.toAtom();
 			}
 			outlet(0, atoms);
 		}
-		catch (IllegalStateException e) {
+		catch (Exception e) {
 			err("Could not evaluate: " + Utils.detokenize(msg, args) + "\n" + e.getMessage());
 		}
 	}

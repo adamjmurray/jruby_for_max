@@ -232,12 +232,13 @@ public class seq extends AbstractMaxRubyObject {
 			List<Item> newSeq = parser.parse(msg, args);
 			seq.clear();
 			seq.addAll(newSeq);
-			onSeqChange();
-			outputSeq();
 		}
 		catch (IllegalStateException e) {
 			err("Could not evaluate: " + Utils.detokenize(msg, args) + "\n" + e.getMessage());
+			return;
 		}
+		onSeqChange();
+		outputSeq();
 	}
 
 	public void rubyseq(Atom[] input) {
@@ -940,11 +941,10 @@ public class seq extends AbstractMaxRubyObject {
 	public void bang() {
 		if (!seq.isEmpty()) {
 			output();
-			Item currentItem = seq.get(this.index);
-			Object currentVal = currentItem.getValue();
 
-			if (currentVal instanceof Atom[] && chordmode == CHORDMODE.ARPEGGIATE) {
-				Atom[] atoms = (Atom[]) currentVal;
+			Item currentItem = seq.get(this.index);
+			if (currentItem.isAtomArray() && chordmode == CHORDMODE.ARPEGGIATE) {
+				Atom[] atoms = currentItem.getAtoms();
 				if (atoms.length == 0) {
 					// [], the empty chord noop
 					index += step;
@@ -1085,8 +1085,6 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	protected void onSeqChange() {
-		// maybe? index = defaultIndex;
-
 		// chordIndex = 0; // maybe this isn't really needed
 		// chordIndex needs to be reset whenever the current value changes, but
 		// is this overly aggressive? YES! Try

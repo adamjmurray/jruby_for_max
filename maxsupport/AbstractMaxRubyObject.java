@@ -40,12 +40,14 @@ import ajm.rubysupport.MaxRubyEvaluator;
 public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 
 	protected String context = null;
+	private boolean autoinit = false;
 
 	protected MaxRubyEvaluator ruby;
 
 	public AbstractMaxRubyObject() {
 		super();
 		declareAttribute("context", "getcontext", "context");
+		declareAttribute("autoinit");
 	}
 
 	@Override
@@ -58,6 +60,13 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		public void execute() {
 			super.execute();
 			contructRubyEvaluator();
+			if (autoinit) {
+				ruby.init();
+			}
+			/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
+			   Thus autoinit is false by default.
+			   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
+			   The hang delay got much shorter with JRuby 1.1. */
 		}
 	}
 

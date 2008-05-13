@@ -48,7 +48,6 @@ import com.cycling74.max.MaxSystem;
 public class ruby extends AbstractMaxRubyObject {
 
 	private int evaloutlet = 0;
-	private boolean autoinit = false;
 
 	private String scriptFilePath;
 	private File scriptFile;
@@ -64,7 +63,6 @@ public class ruby extends AbstractMaxRubyObject {
 		super();
 
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
-		declareAttribute("autoinit");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
 
 		int outlets = 1;
@@ -85,15 +83,8 @@ public class ruby extends AbstractMaxRubyObject {
 		public void execute() {
 			super.execute();
 			if (scriptFile != null) {
-				loadFile(); // this initializes ruby so we can ignore autoinit
+				loadFile();
 			}
-			else if (autoinit) {
-				ruby.init();
-			}
-			/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
-			   Thus autoinit is false by default.
-			   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-			   The hang delay got much shorter with JRuby 1.1. */
 		}
 	}
 

@@ -159,26 +159,12 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 
 	public void anything(String msg, Atom[] args) {
-		if (true) {
-			// actually, maybe this behavior is for the best
-			// MaxSystem.getMaxVersion() < 1200
-			// deal with Max 4's bugs with a hackish detokenizer routine:
-			StringBuilder input = new StringBuilder();
-			input.append(Utils.detokenize(msg));
-			for (Atom arg : args) {
-				input.append(" ").append(Utils.detokenize(arg.toString()));
-			}
-			eval(input.toString().trim());
+		StringBuilder input = new StringBuilder();
+		input.append(Utils.detokenize(msg));
+		for (Atom arg : args) {
+			input.append(" ").append(Utils.detokenize(arg.toString()));
 		}
-		else {
-			// Yay! Max 5 works much better.
-			StringBuilder input = new StringBuilder();
-			input.append(msg);
-			for (Atom arg : args) {
-				input.append(" ").append(arg.toString());
-			}
-			eval(input.toString());
-		}
+		eval(input.toString().trim());
 	}
 
 	public void text(String script) {

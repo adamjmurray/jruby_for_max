@@ -53,12 +53,11 @@ public class seq extends AbstractMaxRubyObject {
 
 	public seq(Atom[] args) {
 		declareAttribute("seq", "getseq", "seq");
-		declareAttribute("defaultseq", "getdefaultseq", "defaultseq");
 		declareAttribute("index", "getindex", "index");
 		declareAttribute("cmode", "getchordmode", "chordmode");
 		declareAttribute("iter", "getiter", "iter");
 		declareAttribute("step", "getstep", "step");
-		declareIO(2, 4);
+		declareIO(1, 4);
 		setInletAssist(new String[] { "list / bang / commands", "cold inlet" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
 	}
@@ -78,8 +77,8 @@ public class seq extends AbstractMaxRubyObject {
 			defaultIter = iter;
 			defaultStep = step;
 			defaultChordmode = chordmode;
-			if (seq.isEmpty()) {
-				seq.addAll(defaultSeq);
+			if (!seq.isEmpty()) {
+				defaultSeq.addAll(seq);
 			}
 			outputSeq();
 		}
@@ -141,21 +140,6 @@ public class seq extends AbstractMaxRubyObject {
 	@SuppressWarnings("all")
 	public void seq(Atom[] list) {
 		list(list);
-	}
-
-	public Atom[] getdefaultseq() {
-		return Utils.toAtoms(defaultSeq);
-	}
-
-	public void defaultseq(Atom[] list) {
-		try {
-			List<Item> newSeq = parser.parse(list);
-			defaultSeq.clear();
-			defaultSeq.addAll(newSeq);
-		}
-		catch (IllegalStateException e) {
-			err("Could not evaluate: " + Utils.detokenize(list) + "\n" + e.getMessage());
-		}
 	}
 
 	public int getindex() {
@@ -257,18 +241,20 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	public void rubyseq(Atom[] input) {
-		// TODO: it seems questionable that I do my ajm.eval logic on the Atom(s) returned by Ruby.
-		// Maybe it should use the raw results.
 		Atom[] atoms = null;
 		if (input.length > 0) {
-			String rubyCode;
-			if (input[0].isString() && "text".equals(input[0].getString())) {
-				rubyCode = input[1].getString();
+			if (ruby == null) {
+				err("ruby evaluator not initialized yet. If you are loadbanging a script, try using a deferlow.");
+				return;
 			}
-			else {
-				rubyCode = Utils.detokenize(input);
+			Object result = null;
+			try {
+				result = evalRuby(input, true);
 			}
-			Object result = evalRuby(rubyCode);
+			catch (Exception e) {
+				err("could not evaluate: " + input);
+				return;
+			}
 			if (result != null) {
 				if (result instanceof Atom[]) {
 					atoms = (Atom[]) result;
@@ -284,30 +270,34 @@ public class seq extends AbstractMaxRubyObject {
 			atoms = Atom.emptyArray;
 		}
 		list(atoms);
+
 	}
 
 	public void ruby(Atom[] input) {
-		// TODO: I've reused this logic in a few places now. Can I refactor it into MaxRubyEvaluator?
-		String rubyCode = "";
 		if (input.length > 0) {
-			if (input[0].isString() && "text".equals(input[0].getString())) {
-				rubyCode = input[1].getString();
+			if (ruby == null) {
+				err("ruby evaluator not initialized yet. If you are loadbanging a script, try using a deferlow.");
+				return;
 			}
-			else {
-				rubyCode = Utils.detokenize(input);
+			try {
+				evalRuby(input, false);
+			}
+			catch (Exception e) {
+				err("could not evaluate: " + input);
+				return;
 			}
 		}
-		evalRuby(rubyCode);
 	}
 
-	protected Object evalRuby(CharSequence input) {
-		try {
-			return ruby.eval(input);
+	protected Object evalRuby(Atom[] input, boolean returnResults) {
+		String rubyCode;
+		if (input[0].isString() && "text".equals(input[0].getString())) {
+			rubyCode = input[1].getString();
 		}
-		catch (Exception e) {
-			err("could not evaluate: " + input);
-			return null;
+		else {
+			rubyCode = Utils.detokenize(input);
 		}
+		return ruby.eval(rubyCode, returnResults);
 	}
 
 	/*------------------------------------------------
@@ -1045,7 +1035,7 @@ public class seq extends AbstractMaxRubyObject {
 				break;
 
 			case SYMBOL:
-				outlet(outlet.outletNumber, atoms);
+				outlet(outlet.outletNumber, data.toAtom());
 				break;
 			}
 		}
@@ -1071,7 +1061,7 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	public void resetindex() {
-		this.index = defaultIndex;
+		index(defaultIndex);
 		chordIndex = 0;
 	}
 

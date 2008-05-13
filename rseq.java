@@ -65,6 +65,7 @@ public class rseq extends seq {
 	protected int count = 0;
 	protected int duration = 0;
 
+	/*
 	@Override
 	protected void onSeqChange() {
 		super.onSeqChange();
@@ -85,6 +86,7 @@ public class rseq extends seq {
 			}
 		}
 	}
+	*/
 
 	@Override
 	public void bang() {
@@ -101,17 +103,15 @@ public class rseq extends seq {
 
 			if (count == 0) {
 				output();
-				if (step % seq.size() != 0) {
-					while (duration == 0) {
-						// a list of all 0s (which would cause infinite loops) is prevented when setting the seq
-						index(index + step);
-						output();
+				int startIndex = index;
+				while (duration == 0) {
+					index(index + step);
+					if (index == startIndex) {
+						// prevent infinite loop
+						break;
 					}
-					// infinite loops are still possible (think step==2 and every other val is 0),
-					// so just record the start index when duration==0 and break
-					// loop if we ever hit that index again. then we don't need to mess with the seq when all 0s
+					output();
 				}
-				// else we'd have an infinite loop
 			}
 			count++;
 		}
@@ -119,10 +119,10 @@ public class rseq extends seq {
 
 	@Override
 	public void index(int idx) {
-		if (seq.size() > 0) {
-			index = idx;
-			fixIndexBounds();
+		index = idx; // handle case where index is set before seq
 
+		if (seq.size() > 0) {
+			fixIndexBounds();
 			Object val = seq.get(index).getValue();
 			if (val instanceof Atom) {
 				Atom atom = (Atom) val;

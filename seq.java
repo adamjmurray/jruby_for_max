@@ -27,6 +27,7 @@ package ajm;
 
  */
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -239,6 +240,72 @@ public class seq extends AbstractMaxRubyObject {
 		}
 		onSeqChange();
 		outputSeq();
+	}
+
+	public void text(Atom[] args) {
+		if (args.length == 0) {
+			System.out.println("Handle empty input");
+			seq.clear();
+		}
+		else {
+			String input = args[0].toString().trim();
+			if (input.startsWith("!")) {
+				String command;
+				Atom[] commandArgs = null;
+				int firstSpace = input.indexOf(' ');
+				if (firstSpace >= 0) {
+					command = input.substring(1, firstSpace);
+					String[] strArgs = input.substring(firstSpace + 1).split("\\s+");
+					commandArgs = new Atom[strArgs.length];
+					for (int i = 0; i < commandArgs.length; i++) {
+						commandArgs[i] = Atom.newAtom(strArgs[i]);
+					}
+				}
+				else {
+					command = input.substring(1);
+
+				}
+
+				try {
+					Method method;
+					if (commandArgs == null) {
+						method = getClass().getMethod(command);
+						method.invoke(this);
+					}
+					else {
+						method = getClass().getMethod(command, Atom[].class);
+						method.invoke(this, (Object) commandArgs);
+					}
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				// TODO: error handling
+
+				/*
+				if ("ruby".equals(firstToken)) {
+					ruby(new Atom[] { Atom.newAtom("text"), Atom.newAtom(input.substring(firstSpace)) });
+					return;
+				}
+				else if ("rubyseq".equals(firstToken)) {
+					rubyseq(new Atom[] { Atom.newAtom("text"), Atom.newAtom(input.substring(firstSpace)) });
+					return;
+				}*/
+
+			}
+			else try {
+				List<Item> newSeq = parser.parse(input);
+				seq.clear();
+				seq.addAll(newSeq);
+				onSeqChange();
+				outputSeq();
+			}
+			catch (IllegalStateException e) {
+				err("Could not evaluate: " + input + "\n" + e.getMessage());
+				return;
+			}
+		}
+
 	}
 
 	public void rubyseq(Atom[] input) {

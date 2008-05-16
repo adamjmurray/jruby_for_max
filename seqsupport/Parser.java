@@ -117,7 +117,7 @@ public class Parser {
 		return parse(input);
 	}
 
-	protected List<Item> parse(CharSequence inputStr) {
+	public List<Item> parse(CharSequence inputStr) {
 		input = inputStr;
 		topScope.clear();
 		currentScope = topScope;

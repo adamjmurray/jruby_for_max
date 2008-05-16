@@ -63,7 +63,9 @@ public class rseq extends seq {
 	}
 
 	protected int count = 0;
-	protected int duration = 0;
+	protected int duration = INDEX_SET_BEFORE_SEQ;
+	protected static int INFINITY = -1;
+	protected static int INDEX_SET_BEFORE_SEQ = -2;
 
 	/*
 	@Override
@@ -91,20 +93,25 @@ public class rseq extends seq {
 	@Override
 	public void bang() {
 		if (!seq.isEmpty()) {
-			if (count >= duration) {
-				if (duration > 0) { // auto increment has issues with setIndex (rethink?)
-					index(index + step);
-				}
-				else {
-					// handle case where index is set before seq
+			// System.out.println("... count = " + count + " duration=" + duration);
+
+			if (count >= duration && duration != INFINITY) {
+				if (duration == INDEX_SET_BEFORE_SEQ) {
+					// handle case where @index is set before @seq
+					// by reseting the index without advancing, to get the current value
 					index(index);
 				}
+				else {
+					index(index + step);
+				}
 			}
+
+			// System.out.println("count = " + count + " duration=" + duration);
 
 			if (count == 0) {
 				output();
 				int startIndex = index;
-				while (duration == 0) {
+				while (duration == 0 && duration != INFINITY) {
 					index(index + step);
 					if (index == startIndex) {
 						// prevent infinite loop
@@ -113,26 +120,35 @@ public class rseq extends seq {
 					output();
 				}
 			}
-			count++;
 		}
+		count++;
 	}
 
 	@Override
 	public void index(int idx) {
-		index = idx; // handle case where index is set before seq
+		index = idx;
+		count = 0;
 
 		if (seq.size() > 0) {
 			fixIndexBounds();
-			Object val = seq.get(index).getValue();
+			Item item = seq.get(index);
+			if (item.isInfinite()) {
+				duration = INFINITY;
+				return;
+			}
+			Object val = item.getValue();
 			if (val instanceof Atom) {
 				Atom atom = (Atom) val;
 				// Strings will be coerced to 0, which is exactly what we want (output immediately and advance)
 				duration = Math.abs(atom.toInt());
 			}
 			else {
+				// TODO: support arpeggiation? Could make {ruby snippets} for mini-sequences of rhythm possible
 				duration = 0;
 			}
-			count = 0;
+		}
+		else {
+			duration = INDEX_SET_BEFORE_SEQ;
 		}
 	}
 

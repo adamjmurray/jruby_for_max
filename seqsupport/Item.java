@@ -40,11 +40,16 @@ import com.cycling74.max.Atom;
  */
 public class Item implements Comparable<Item>, Atomizer {
 
+	public static final String INFINITY = "INF";
+	public static final String NEG_INFINITY = "-INF";
+
 	private Atom atom;
 	private Atom[] atoms;
 
 	private String rubyCode;
 	private MaxRubyEvaluator ruby;
+
+	private boolean infinite = false;
 
 	private boolean reeval = true;
 
@@ -64,6 +69,10 @@ public class Item implements Comparable<Item>, Atomizer {
 	}
 
 	public Item(String s) {
+		infinite = INFINITY.equalsIgnoreCase(s) || NEG_INFINITY.equalsIgnoreCase(s);
+		if (infinite) {
+			s = s.toUpperCase();
+		}
 		this.atom = Atom.newAtom(s);
 	}
 
@@ -140,6 +149,10 @@ public class Item implements Comparable<Item>, Atomizer {
 		else {
 			return atom;
 		}
+	}
+
+	public boolean isInfinite() {
+		return infinite;
 	}
 
 	// these kinds of operation must return a new item. otherwise we overwrite the defaultSeq values

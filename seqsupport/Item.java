@@ -121,14 +121,16 @@ public class Item implements Comparable<Item>, Atomizer {
 		return atoms != null;
 	}
 
+	public void setReeval(boolean reeval) {
+		this.reeval = reeval;
+	}
+
 	/**
 	 * @return either Atom[] or Atom
 	 */
 	public Object getValue() {
 		if (rubyCode != null && ruby != null) {
-			// System.out.println("RUBY CODE");
 			if (reeval) {
-				// System.out.println("EVALUATING");
 				Object value = ruby.eval(rubyCode);
 				if (value instanceof Atom[]) {
 					atoms = (Atom[]) value;
@@ -138,8 +140,7 @@ public class Item implements Comparable<Item>, Atomizer {
 					atoms = null;
 					atom = (Atom) value;
 				}
-				// TODO: reeval = false;
-				// then need to explicitly set reeval true from the seq when appropriate
+				reeval = false;
 			}
 		}
 
@@ -183,7 +184,7 @@ public class Item implements Comparable<Item>, Atomizer {
 		}
 	}
 
-	private static Atom add(Atom a1, Atom a2) {
+	private Atom add(Atom a1, Atom a2) {
 		if (a1.isFloat() || a2.isFloat()) {
 			return Atom.newAtom(a1.toFloat() + a2.toFloat());
 		}
@@ -217,7 +218,7 @@ public class Item implements Comparable<Item>, Atomizer {
 		}
 	}
 
-	private static Atom multiply(Atom a1, Atom a2) {
+	private Atom multiply(Atom a1, Atom a2) {
 		if (a1.isFloat() || a2.isFloat()) {
 			return Atom.newAtom(a1.toFloat() * a2.toFloat());
 		}

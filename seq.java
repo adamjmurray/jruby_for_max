@@ -147,9 +147,12 @@ public class seq extends AbstractMaxRubyObject {
 		return this.index;
 	}
 
-	public void index(int index) {
-		this.index = index;
+	public void index(int idx) {
+		index = idx;
 		fixIndexBounds();
+		if (!seq.isEmpty()) {
+			seq.get(index).setReeval(true);
+		}
 		chordIndex = 0;
 	}
 
@@ -157,9 +160,9 @@ public class seq extends AbstractMaxRubyObject {
 		return iter;
 	}
 
-	public void iter(int count) {
+	public void iter(int iter) {
 		fixIndexBounds(); // otherwise we might change iter on next bang
-		iter = count;
+		this.iter = iter;
 		iterChanged = true;
 	}
 
@@ -716,7 +719,6 @@ public class seq extends AbstractMaxRubyObject {
 			if (lr == null) {
 				return;
 			}
-			;
 			int left = lr[0];
 			int right = lr[1];
 			deleterange(left, right);
@@ -1009,7 +1011,7 @@ public class seq extends AbstractMaxRubyObject {
 		if (!seq.isEmpty()) {
 			output();
 			if (!arpeggiating()) {
-				index += step;
+				index(index + step);
 			}
 		}
 	}

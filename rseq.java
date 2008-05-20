@@ -130,8 +130,7 @@ public class rseq extends seq {
 
 	@Override
 	public void index(int idx) {
-		index = idx;
-		chordIndex = 0;
+		super.index(idx);
 		setDuration();
 	}
 

@@ -28,11 +28,8 @@ package ajm;
  */
 
 import java.util.Arrays;
-import java.util.List;
 
 import ajm.seqsupport.Item;
-import ajm.util.MappedList;
-import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
@@ -93,29 +90,36 @@ public class rseq extends seq {
 	@Override
 	public void bang() {
 		if (!seq.isEmpty()) {
-			// System.out.println("... count = " + count + " duration=" + duration);
-
 			if (count >= duration && duration != INFINITY) {
 				if (duration == INDEX_SET_BEFORE_SEQ) {
 					// handle case where @index is set before @seq
 					// by reseting the index without advancing, to get the current value
 					index(index);
 				}
-				else {
+				else if (!arpeggiating()) {
 					index(index + step);
 				}
+				else {
+					setDuration();
+				}
 			}
-
-			// System.out.println("count = " + count + " duration=" + duration);
 
 			if (count == 0) {
 				output();
 				int startIndex = index;
 				while (duration == 0 && duration != INFINITY) {
-					index(index + step);
-					if (index == startIndex) {
-						// prevent infinite loop
-						break;
+					if (!arpeggiating()) {
+						index(index + step);
+						if (index == startIndex) {
+							// prevent infinite loop
+							// we already advanced to the next value we want to output,
+							// so prevent advancing on the next bang:
+							duration = INDEX_SET_BEFORE_SEQ;
+							break;
+						}
+					}
+					else {
+						setDuration();
 					}
 					output();
 				}
@@ -127,28 +131,35 @@ public class rseq extends seq {
 	@Override
 	public void index(int idx) {
 		index = idx;
-		count = 0;
+		chordIndex = 0;
+		setDuration();
+	}
 
-		if (seq.size() > 0) {
+	private void setDuration() {
+		count = 0;
+		if (seq.isEmpty()) {
+			duration = INDEX_SET_BEFORE_SEQ;
+		}
+		else {
 			fixIndexBounds();
 			Item item = seq.get(index);
 			if (item.isInfinite()) {
 				duration = INFINITY;
 				return;
 			}
+
 			Object val = item.getValue();
 			if (val instanceof Atom) {
 				Atom atom = (Atom) val;
 				// Strings will be coerced to 0, which is exactly what we want (output immediately and advance)
 				duration = Math.abs(atom.toInt());
 			}
+			else if (chordmode == CHORDMODE.ARPEGGIATE) {
+				duration = Math.abs(((Atom[]) val)[chordIndex].toInt());
+			}
 			else {
-				// TODO: support arpeggiation? Could make {ruby snippets} for mini-sequences of rhythm possible
 				duration = 0;
 			}
-		}
-		else {
-			duration = INDEX_SET_BEFORE_SEQ;
 		}
 	}
 

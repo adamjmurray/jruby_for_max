@@ -1008,26 +1008,24 @@ public class seq extends AbstractMaxRubyObject {
 	public void bang() {
 		if (!seq.isEmpty()) {
 			output();
-
-			Item currentItem = seq.get(this.index);
-			if (currentItem.isAtomArray() && chordmode == CHORDMODE.ARPEGGIATE) {
-				Atom[] atoms = currentItem.getAtoms();
-				if (atoms.length == 0) {
-					// [], the empty chord noop
-					index += step;
-				}
-				else {
-					chordIndex = (chordIndex + 1) % atoms.length;
-					if (chordIndex == 0) {
-						// we wrapped around
-						index += step;
-					}
-				}
-			}
-			else {
+			if (!arpeggiating()) {
 				index += step;
 			}
 		}
+	}
+
+	protected boolean arpeggiating() {
+		Item currentItem = seq.get(this.index);
+		if (currentItem.isAtomArray() && chordmode == CHORDMODE.ARPEGGIATE) {
+			Atom[] atoms = currentItem.getAtoms();
+			if (atoms.length > 0) {
+				chordIndex = (chordIndex + 1) % atoms.length;
+				return chordIndex > 0;
+				// if chordIndex == 0, we wrapped around and are done arpeggiating
+			}
+			// else this is [], the empty chord "noop", and we need to advance
+		}
+		return false;
 	}
 
 	protected void fixIndexBounds() {

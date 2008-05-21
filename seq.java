@@ -542,7 +542,7 @@ public class seq extends AbstractMaxRubyObject {
 
 	protected int fixBounds(int idx) {
 		int size = seq.size();
-		if (idx < -size || idx > size) {
+		if (idx < -size || idx >= size) {
 			info("index (" + idx + ") must be >= -size and < size (current size=" + size + ")");
 			return -1;
 		}

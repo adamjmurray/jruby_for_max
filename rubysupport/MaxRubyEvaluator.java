@@ -44,7 +44,7 @@ import com.cycling74.max.MaxSystem;
 /**
  * The bridge between Max and Ruby.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class MaxRubyEvaluator {

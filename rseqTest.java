@@ -1,6 +1,5 @@
 package ajm;
 
-import ajm.seq.OUTLET;
 import ajm.seqsupport.Item;
 
 import java.io.PrintStream;

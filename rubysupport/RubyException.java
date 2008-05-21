@@ -3,7 +3,7 @@ package ajm.rubysupport;
 /**
  * Wrapper for any Ruby exceptions. Helps encapsulate the underlying Ruby implementation.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")

@@ -38,7 +38,7 @@ import com.cycling74.max.Atom;
 /**
  * Preemptive rseq, sends positive values out one bang early.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class preemptrseq extends rseq {

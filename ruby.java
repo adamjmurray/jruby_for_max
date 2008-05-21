@@ -37,12 +37,11 @@ import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
-import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class ruby extends AbstractMaxRubyObject {

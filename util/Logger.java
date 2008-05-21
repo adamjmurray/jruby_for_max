@@ -3,7 +3,7 @@ package ajm.util;
 /**
  * Simple logging interface.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public interface Logger {

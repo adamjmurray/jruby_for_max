@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Factory for Ruby evaluators that manages shared contexts.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class RubyEvaluatorFactory {

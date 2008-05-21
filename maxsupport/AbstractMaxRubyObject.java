@@ -34,7 +34,7 @@ import ajm.rubysupport.MaxRubyEvaluator;
 /**
  * Superclass for objects that support Ruby scripting.
  * 
- * @version 0.85
+ * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public abstract class AbstractMaxRubyObject extends AbstractMaxObject {

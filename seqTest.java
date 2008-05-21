@@ -166,7 +166,7 @@ public class seqTest {
 		s.delete(-1);
 		assertEquals(makeSeq("B", "C", "D"), s);
 		s.delete(5);
-		assertEquals(makeSeq("B", "C", "D", "E"), s);
+		assertEquals(makeSeq("B", "C", "D"), s);
 		s.delete(new int[] { 1, 3 });
 		assertEquals(makeSeq("B", "D"), s);
 		s.delete(new int[] { 0, 1, 2, -1 });
@@ -183,24 +183,28 @@ public class seqTest {
 		assertEquals(makeSeq("A", "E"), s);
 
 		s = makeSeq();
-		s.deleterange(3, 1);
+		s.deleterange(3, 1); // do I still want to support this?
 		assertEquals(makeSeq("A", "E"), s);
 
 		s = makeSeq();
-		s.deleterange(10, 1);
-		assertEquals(makeSeq("A"), s);
+		s.deleterange(3, -1);
+		assertEquals(makeSeq("A", "B", "C"), s);
 
 		s = makeSeq();
-		s.deleterange(-1, 3);
-		assertEquals(makeSeq("E"), s);
+		s.deleterange(0, 4);
+		assertEquals(emptySeq(), s);
 
 		s = makeSeq();
-		s.deleterange(-1, -5);
+		s.deleterange(-5, -1);
+		assertEquals(emptySeq(), s);
+
+		s = makeSeq();
+		s.deleterange(1, 10); // bounds out of range, so noop
 		assertEquals(makeSeq(), s);
 
 		s = makeSeq();
-		s.deleterange(10, -5);
-		assertEquals(emptySeq(), s);
+		s.deleterange(-6, -1); // bounds out of range, so noop
+		assertEquals(makeSeq(), s);
 
 		s = emptySeq();
 		s.deleterange(0, 1);
@@ -304,19 +308,19 @@ public class seqTest {
 		assertEquals(makeSeq(-1, 0, 1), s);
 
 		s.add(2, 1, 2);
-		assertEquals(makeSeq(-1, 2, 3), s);
+		assertEquals(makeSeq(1, 1, 3), s);
 		s.add(2, 1, 1);
-		assertEquals(makeSeq(-1, 4, 3), s);
+		assertEquals(makeSeq(3, 2, 4), s);
 
 		s.add(2.5f);
-		assertEquals(makeFloatSeq(-1 + 2.5f, 4 + 2.5f, 3 + 2.5f), s);
+		assertEquals(makeFloatSeq(5.5f, 4.5f, 6.5f), s);
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
 		s.add(2);
-		assertEquals(Atom.newAtom(3), s.seq.get(0));
-		assertEquals(Atom.newAtom("a"), s.seq.get(1));
-		assertEquals(Atom.newAtom(2.5 + 2), s.seq.get(2));
-		assertEquals(Atom.newAtom("b"), s.seq.get(3));
+		assertEquals(Atom.newAtom(3), s.seq.get(0).toAtom());
+		assertEquals(Atom.newAtom("a"), s.seq.get(1).toAtom());
+		assertEquals(Atom.newAtom(2.5 + 2), s.seq.get(2).toAtom());
+		assertEquals(Atom.newAtom("b"), s.seq.get(3).toAtom());
 	}
 
 	@Test
@@ -329,9 +333,9 @@ public class seqTest {
 		s.multiply(-1);
 		assertEquals(makeSeq(-2, -4, -6), s);
 
-		s.multiply(2, 1, 2);
+		s.multiply(1, 2, 2);
 		assertEquals(makeSeq(-2, -8, -12), s);
-		s.multiply(0, 1, 1);
+		s.multiply(1, 0, 1);
 		assertEquals(makeSeq(-2, 0, -12), s);
 
 		s.multiply(2.5f);
@@ -339,14 +343,12 @@ public class seqTest {
 
 		s.set(new Atom[] { Atom.newAtom(1), Atom.newAtom("a"), Atom.newAtom(2.5), Atom.newAtom("b") });
 		s.multiply(2);
-		assertEquals(Atom.newAtom(2), s.seq.get(0));
-		assertEquals(Atom.newAtom("a"), s.seq.get(1));
-		assertEquals(Atom.newAtom(2.5 * 2), s.seq.get(2));
-		assertEquals(Atom.newAtom("b"), s.seq.get(3));
+		assertEquals(Atom.newAtom(2), s.seq.get(0).toAtom());
+		assertEquals(Atom.newAtom("a"), s.seq.get(1).toAtom());
+		assertEquals(Atom.newAtom(2.5 * 2), s.seq.get(2).toAtom());
+		assertEquals(Atom.newAtom("b"), s.seq.get(3).toAtom());
 	}
-
 	/*
-	 * public void testInsertNumberAndMaintainIndex() { // TODO! // what is the correct behavior in different
-	 * situations? }
+	 * public void testInsertNumberAndMaintainIndex() { // TODO }
 	 */
 }

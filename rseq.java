@@ -90,19 +90,26 @@ public class rseq extends seq {
 	@Override
 	public void bang() {
 		if (!seq.isEmpty()) {
-			if (count >= duration && duration != INFINITY) {
+
+			// debug("!! count=" + count + ", duration=" + duration);
+
+			if (count >= duration) {
 				if (duration == INDEX_SET_BEFORE_SEQ) {
 					// handle case where @index is set before @seq
 					// by reseting the index without advancing, to get the current value
 					index(index);
 				}
-				else if (!arpeggiating()) {
-					index(index + step);
-				}
-				else {
-					setDuration();
+				else if (duration > 0) {
+					if (!arpeggiating()) {
+						index(index + step);
+					}
+					else {
+						setDuration();
+					}
 				}
 			}
+
+			// debug("count=" + count + ", duration=" + duration);
 
 			if (count == 0) {
 				output();

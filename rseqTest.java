@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 import static org.junit.Assert.*;
 
@@ -19,8 +18,13 @@ import com.cycling74.max.Executable;
 
 public class rseqTest {
 
-	private boolean DEBUG = true;
-	private final PrintStream out = new PrintStream(System.out);
+	private boolean DEBUG = false;
+	private static PrintStream out;
+
+	@BeforeClass
+	public static void initOut() {
+		out = new PrintStream(System.out);
+	}
 
 	protected class rStub extends rseq {
 
@@ -239,6 +243,7 @@ public class rseqTest {
 		s.bang();
 		assertEquals(1, s.valueSinceBang());
 		assertEquals(3, s.indexSinceBang());
+
 		assertEquals(s.getValueOutputs(), 1, 1, 0, 1, 0, 1);
 
 		if (DEBUG) {
@@ -362,20 +367,22 @@ public class rseqTest {
 		}
 
 		rStub s = makeSeq(0, 0, 0);
-		Assert.assertEquals(makeSeq(0, 0, 0, 1), s);
+		Assert.assertEquals(makeSeq(0, 0, 0), s);
 		assertNull(s.valueSinceBang());
 
 		s.bang();
-		assertEquals(1, s.valueSinceBang());
-		assertEquals(s.getValueOutputs(), 0, 0, 0, 1);
+		assertEquals(0, s.valueSinceBang());
+		assertEquals(s.getValueOutputs(), 0, 0, 0);
 
 		s.bang();
-		assertEquals(1, s.valueSinceBang());
-		assertEquals(s.getValueOutputs(), 0, 0, 0, 1, 0, 0, 0, 1);
+		assertEquals(0, s.valueSinceBang());
+		assertEquals(s.getValueOutputs(), 0, 0, 0, 0, 0, 0);
 
 		if (DEBUG) {
 			out.println("*** END testPreventInfiniteLoop ***\n");
 		}
 	}
+
+	// TODO: test arpeggiated chords
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ajm.seqsupport.Item;
@@ -16,7 +17,12 @@ import com.cycling74.max.Executable;
 public class seqTest {
 
 	private boolean DEBUG = false;
-	private PrintStream out = System.out;
+	private static PrintStream out;
+
+	@BeforeClass
+	public static void initOut() {
+		out = new PrintStream(System.out);
+	}
 
 	protected class seqStub extends seq {
 		public seqStub(Atom[] args) {

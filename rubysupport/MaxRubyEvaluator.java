@@ -444,7 +444,7 @@ public class MaxRubyEvaluator {
 				}
 			}
 			else {
-				System.out.println(atom.toString());
+				MaxSystem.error(atom.toString());
 			}
 		}
 

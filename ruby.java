@@ -120,15 +120,12 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 
 	private synchronized void loadFile() {
-		String script = Utils.getFileAsString(scriptFile);
-		if (script != null) {
-			info("loading script '" + scriptFile + "' on " + new Date());
-			try {
-				ruby.init(script);
-			}
-			catch (RubyException e) {
-				err("Error evaluating script file: " + scriptFilePath);
-			}
+		info("loading script '" + scriptFile + "' on " + new Date());
+		try {
+			ruby.init(scriptFile);
+		}
+		catch (RubyException e) {
+			err("Error evaluating script file: " + scriptFilePath);
 		}
 	}
 

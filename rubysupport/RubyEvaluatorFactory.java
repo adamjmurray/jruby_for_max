@@ -59,15 +59,24 @@ public class RubyEvaluatorFactory {
 		return evaluator;
 	}
 
-	public static void removeRubyEvaluator(String context) {
+	/**
+	 * Unregisters a RubyEvaluator.
+	 * 
+	 * @param context
+	 *            the evaluator's shared context name
+	 * @return true if the entire context was removed
+	 */
+	public static boolean removeRubyEvaluator(String context) {
 		int count = contextCounter.get(context);
 		count--;
 		if (count > 0) {
 			contextCounter.put(context, count++);
+			return false;
 		}
 		else {
 			contextCounter.remove(context);
 			contexts.remove(context); // lets the garbage collector do its job
+			return true;
 		}
 	}
 }

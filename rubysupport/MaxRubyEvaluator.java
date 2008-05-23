@@ -65,10 +65,6 @@ public class MaxRubyEvaluator {
 
 	private String context;
 
-	private final static String CONTEXT_DESTROYED_CALLBACK = "context_destroyed";
-
-	// private boolean initialized = false;
-
 	private String OMIT_PATHS = ".*/\\.svn/.*";
 
 	public MaxRubyEvaluator(MaxObject maxObj) {
@@ -106,9 +102,7 @@ public class MaxRubyEvaluator {
 
 	public void setContext(String context) {
 		if (!Utils.equals(this.context, context)) {
-			if (RubyEvaluatorFactory.removeRubyEvaluator(this.context)) {
-				destroyContext();
-			}
+			RubyEvaluatorFactory.removeRubyEvaluator(this.context);
 			ruby.undeclareGlobal(maxObjVar);
 			ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
 			ruby.declarePersistentGlobal(maxObjVar, maxObj);
@@ -117,13 +111,7 @@ public class MaxRubyEvaluator {
 	}
 
 	public void notifyDeleted() {
-		if (RubyEvaluatorFactory.removeRubyEvaluator(this.context)) {
-			destroyContext();
-		}
-	}
-
-	public void destroyContext() {
-		eval(CONTEXT_DESTROYED_CALLBACK, false);
+		RubyEvaluatorFactory.removeRubyEvaluator(this.context);
 	}
 
 	/**
@@ -174,7 +162,7 @@ public class MaxRubyEvaluator {
 
 	public void init(File scriptFile) {
 		if (ruby.isInitialized()) {
-			destroyContext();
+			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
 		ruby.resetContext();
 
@@ -261,10 +249,6 @@ public class MaxRubyEvaluator {
 
 			code.line("def list(array)");
 			code.line("  array");
-			code.line("end");
-
-			// the "finalize" method
-			code.line("def " + CONTEXT_DESTROYED_CALLBACK);
 			code.line("end");
 
 			// for use with shared contexts:
@@ -494,6 +478,10 @@ public class MaxRubyEvaluator {
 					maxObj.outlet(outletIdx, (Atom) atoms);
 				}
 			}
+		}
+
+		public void on_context_destroyed(String callback) {
+			RubyEvaluatorFactory.registerContextDestroyedListener(context, callback);
 		}
 	}
 }

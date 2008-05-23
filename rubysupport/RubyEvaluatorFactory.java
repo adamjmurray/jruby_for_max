@@ -40,6 +40,7 @@ public class RubyEvaluatorFactory {
 
 	private static Map<String, RubyEvaluator> contexts = new HashMap<String, RubyEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
+	private static Map<String, String> contextDestroyedListeners = new HashMap<String, String>();
 
 	private RubyEvaluatorFactory() {
 	}
@@ -66,17 +67,34 @@ public class RubyEvaluatorFactory {
 	 *            the evaluator's shared context name
 	 * @return true if the entire context was removed
 	 */
-	public static boolean removeRubyEvaluator(String context) {
+	public static void removeRubyEvaluator(String context) {
 		int count = contextCounter.get(context);
 		count--;
 		if (count > 0) {
 			contextCounter.put(context, count++);
-			return false;
 		}
 		else {
 			contextCounter.remove(context);
-			contexts.remove(context); // lets the garbage collector do its job
-			return true;
+			RubyEvaluator ruby = contexts.remove(context); // lets the garbage collector do its job
+			String callbackMethod = contextDestroyedListeners.remove(context);
+			if (ruby != null && callbackMethod != null) {
+				System.out.println("EVALING CALLBACK: " + callbackMethod);
+				ruby.eval(callbackMethod);
+			}
+		}
+	}
+
+	public static void registerContextDestroyedListener(String context, String callbackMethod) {
+		System.out.println(context + " registering callback: " + callbackMethod);
+		contextDestroyedListeners.put(context, callbackMethod);
+	}
+
+	public static void notifyContextDestroyedListener(String context) {
+		RubyEvaluator ruby = contexts.get(context); // lets the garbage collector do its job
+		String callbackMethod = contextDestroyedListeners.get(context);
+		if (ruby != null && callbackMethod != null) {
+			System.out.println("EVALING CALLBACK (forced): " + callbackMethod);
+			ruby.eval(callbackMethod);
 		}
 	}
 }

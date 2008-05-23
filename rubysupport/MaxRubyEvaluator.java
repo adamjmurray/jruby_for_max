@@ -319,20 +319,28 @@ public class MaxRubyEvaluator {
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
-
 		else if (obj instanceof Atom || obj instanceof Atom[]) {
 			return obj;
 		}
 		else if (obj instanceof Atomizer) {
 			return ((Atomizer) obj).toAtom();
 		}
-
 		else if (obj instanceof Double || obj instanceof Float) {
+			// Not sure if there's a situation where we should coerce to a String instead
+			// (Max can only handle floats, JRuby seems to always output Doubles).
+			// Floating point accuracy is very different the Long wrap-around problem,
+			// so letting it downcast seems ok:
 			return Atom.newAtom(((Number) obj).doubleValue());
 		}
-
-		else if (obj instanceof Long || obj instanceof Integer) {
-			return Atom.newAtom(((Number) obj).longValue());
+		else if (obj instanceof Long || obj instanceof Integer || obj instanceof Short) {
+			long val = ((Number) obj).longValue();
+			if (val > Integer.MAX_VALUE || val < Integer.MIN_VALUE) {
+				if (logger != null) {
+					logger.info("Ruby: coerced type " + obj.getClass().getName() + " to String");
+				}
+				return Atom.newAtom(obj.toString());
+			}
+			else return Atom.newAtom(val);
 		}
 
 		else if (obj instanceof CharSequence) {

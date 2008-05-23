@@ -27,8 +27,8 @@ package ajm.util;
 
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -38,19 +38,19 @@ import java.util.TreeMap;
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")
-public class MappedList<T> extends TreeMap<Integer, List<T>> {
+public class MappedSet<K, T> extends TreeMap<K, Set<T>> {
 
-	public void addValue(int pos, T value) {
-		List<T> values = get(pos);
+	public void addValue(K key, T value) {
+		Set<T> values = get(key);
 		if (values == null) {
-			values = new ArrayList<T>();
-			put(pos, values);
+			values = new HashSet<T>();
+			put(key, values);
 		}
 		values.add(value);
 	}
 
-	@SuppressWarnings(value = "unchecked")
-	public MappedList<T> clone() {
-		return (MappedList<T>) super.clone();
+	@SuppressWarnings("unchecked")
+	public MappedSet<K, T> clone() {
+		return (MappedSet<K, T>) super.clone();
 	}
 }

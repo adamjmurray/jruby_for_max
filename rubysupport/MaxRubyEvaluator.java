@@ -181,24 +181,6 @@ public class MaxRubyEvaluator {
 		}
 
 		if (code.isEmpty()) {
-			/* This chunk of code used to add the current patches folders and immediate subfolders to the ruby path,
-			 * but it is inconsistent with the scriptfile and ajm.scriptfilewatch behaviors, so I disabled it:
-			String patcherPath = maxObj.getParentPatcher().getPath();
-			if (patcherPath != null) {
-				// Add the patch's folder and subfolders
-				addPath(patcherPath);
-				File ppath = new File(patcherPath);
-				for (File file : ppath.listFiles()) {
-					if (file.isDirectory()) {
-						String path = file.getAbsolutePath();
-						if (!OMIT_PATHS.matcher(path).matches()) {
-							addPath(path);
-						}
-					}
-				}
-			}
-			 */
-
 			// Setup the path:
 			for (String path : MaxSystem.getSearchPath()) {
 				if (!path.matches(OMIT_PATHS)) {
@@ -241,6 +223,10 @@ public class MaxRubyEvaluator {
 				code.line("  $Utils.outlet(" + i + ", *params)");
 				code.line("end");
 			}
+
+			code.line("def on_context_destroyed(callback)");
+			code.line("  $Utils.on_context_destroyed(callback.to_s)");
+			code.line("end");
 
 			// Placeholders for Max hooks:
 			code.line("def bang");
@@ -416,6 +402,7 @@ public class MaxRubyEvaluator {
 
 	private class RubyUtils {
 		// JRuby has problems calling some Max Java methods, so I go back into Java-land to do it
+		// not sure if all of these are necessary anymore, but it works!
 
 		public Object atom(Object o) {
 			return toAtoms(o);

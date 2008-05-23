@@ -27,8 +27,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import ajm.util.MappedSet;
 
 /**
  * Factory for Ruby evaluators that manages shared contexts.
@@ -40,7 +43,7 @@ public class RubyEvaluatorFactory {
 
 	private static Map<String, RubyEvaluator> contexts = new HashMap<String, RubyEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
-	private static Map<String, String> contextDestroyedListeners = new HashMap<String, String>();
+	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
 
 	private RubyEvaluatorFactory() {
 	}
@@ -74,27 +77,31 @@ public class RubyEvaluatorFactory {
 			contextCounter.put(context, count++);
 		}
 		else {
+			notifyContextDestroyedListener(context);
+			contextDestroyedListeners.remove(context);
 			contextCounter.remove(context);
-			RubyEvaluator ruby = contexts.remove(context); // lets the garbage collector do its job
-			String callbackMethod = contextDestroyedListeners.remove(context);
-			if (ruby != null && callbackMethod != null) {
-				System.out.println("EVALING CALLBACK: " + callbackMethod);
-				ruby.eval(callbackMethod);
-			}
+			contexts.remove(context);
 		}
 	}
 
 	public static void registerContextDestroyedListener(String context, String callbackMethod) {
-		System.out.println(context + " registering callback: " + callbackMethod);
-		contextDestroyedListeners.put(context, callbackMethod);
+		contextDestroyedListeners.addValue(context, callbackMethod);
 	}
 
 	public static void notifyContextDestroyedListener(String context) {
 		RubyEvaluator ruby = contexts.get(context); // lets the garbage collector do its job
-		String callbackMethod = contextDestroyedListeners.get(context);
-		if (ruby != null && callbackMethod != null) {
-			System.out.println("EVALING CALLBACK (forced): " + callbackMethod);
-			ruby.eval(callbackMethod);
+		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
+		if (ruby != null && callbackMethods != null) {
+			for (String callbackMethod : callbackMethods) {
+				try {
+					ruby.eval(callbackMethod);
+				}
+				catch (Exception e) {
+					System.err.println("on_context_destroyed method '" + callbackMethod + "' failed:\n"
+							+ e.getMessage());
+				}
+			}
+
 		}
 	}
 }

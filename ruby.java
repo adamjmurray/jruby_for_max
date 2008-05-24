@@ -33,6 +33,7 @@ import java.util.Date;
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.maxsupport.TextBlock;
 import ajm.rubysupport.RubyException;
+import ajm.util.FileWatcher;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
@@ -52,6 +53,9 @@ public class ruby extends AbstractMaxRubyObject {
 	private File scriptFile;
 	private Atom[] scriptFileArgs;
 
+	private boolean autowatch = false;
+	private FileWatcher fileWatcher;
+
 	/**
 	 * The Constructor
 	 * 
@@ -64,6 +68,7 @@ public class ruby extends AbstractMaxRubyObject {
 
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
+		declareAttribute("autowatch", "getautowatch", "autowatch");
 
 		int outlets = 1;
 		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
@@ -83,9 +88,15 @@ public class ruby extends AbstractMaxRubyObject {
 		public void execute() {
 			super.execute();
 			if (scriptFile != null) {
-				loadFile();
+				initFile();
 			}
 		}
+	}
+
+	@Override
+	public void notifyDeleted() {
+		stopFileWatcher();
+		super.notifyDeleted();
 	}
 
 	public int getevaloutlet() {
@@ -112,11 +123,53 @@ public class ruby extends AbstractMaxRubyObject {
 			if (scriptFile != null) {
 				scriptFileArgs = Atom.removeFirst(args);
 				if (initialized) {
-					loadFile();
+					initFile();
 				}
 				// else it'll be handled by the Initializer
 			}
 		}
+	}
+
+	public boolean getautowatch() {
+		return autowatch;
+	}
+
+	public void autowatch(boolean autowatch) {
+		this.autowatch = autowatch;
+		if (initialized) {
+			if (autowatch) {
+				startFileWatcher();
+			}
+			else {
+				stopFileWatcher();
+			}
+		}
+	}
+
+	private void startFileWatcher() {
+		if (fileWatcher == null && scriptFile != null && autowatch) {
+			fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
+			fileWatcher.start();
+		}
+	}
+
+	private void stopFileWatcher() {
+		if (fileWatcher != null) {
+			fileWatcher.stopWatching();
+			fileWatcher = null; // this lets me ensure only one watcher thread exists at a time
+		}
+	}
+
+	private Executable fileWatcherCallback = new Executable() {
+		public void execute() {
+			loadFile();
+		}
+	};
+
+	private void initFile() {
+		stopFileWatcher();
+		loadFile();
+		startFileWatcher();
 	}
 
 	private synchronized void loadFile() {

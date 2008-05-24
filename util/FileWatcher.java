@@ -54,8 +54,8 @@ public class FileWatcher extends Thread {
 
 	public FileWatcher(File file, Executable callback, long watchPeriod) {
 		setFile(file);
-		setWatchPeriod(watchPeriod);
 		setCallback(callback);
+		setWatchPeriod(watchPeriod);
 	}
 
 	public void setFile(File file) {
@@ -93,7 +93,7 @@ public class FileWatcher extends Thread {
 		while (keepWatching) {
 			if (file != null) {
 				long currLastMod = file.lastModified();
-				System.out.println("Last modified = " + currLastMod);
+				// System.out.println("Last modified = " + currLastMod);
 				if (currLastMod > prevLastModified) {
 					try {
 						callback.execute();
@@ -107,8 +107,8 @@ public class FileWatcher extends Thread {
 					Thread.sleep(watchPeriod);
 				}
 				catch (InterruptedException e) {
-					System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
-					e.printStackTrace();
+					// System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
+					// e.printStackTrace();
 				}
 			}
 		}

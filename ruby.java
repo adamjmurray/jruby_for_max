@@ -53,6 +53,7 @@ public class ruby extends AbstractMaxRubyObject {
 	private File scriptFile;
 	private Atom[] scriptFileArgs;
 
+	private boolean listproc = true;
 	private boolean autowatch = false;
 	private FileWatcher fileWatcher;
 
@@ -68,6 +69,7 @@ public class ruby extends AbstractMaxRubyObject {
 
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
+		declareAttribute("listproc");
 		declareAttribute("autowatch", "getautowatch", "autowatch");
 
 		int outlets = 1;
@@ -187,20 +189,27 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 
 	public void list(Atom[] args) {
-		StringBuilder s = new StringBuilder("list([");
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0) {
-				s.append(",");
+		if (listproc) {
+			StringBuilder s = new StringBuilder("list([");
+			for (int i = 0; i < args.length; i++) {
+				if (i > 0) {
+					s.append(",");
+				}
+				s.append(args[i]);
 			}
-			s.append(args[i]);
+			s.append("])");
+			eval(s);
 		}
-		s.append("])");
-		eval(s);
+		else {
+			anything(null, args);
+		}
 	}
 
 	public void anything(String msg, Atom[] args) {
 		StringBuilder input = new StringBuilder();
-		input.append(Utils.detokenize(msg));
+		if (msg != null) {
+			input.append(Utils.detokenize(msg));
+		}
 		for (Atom arg : args) {
 			input.append(" ").append(Utils.detokenize(arg.toString()));
 		}

@@ -199,7 +199,6 @@ public class MaxRubyEvaluator {
 			String script = Utils.getFileAsString(scriptFile);
 			scriptFileInit.clear();
 			scriptFileInit.line("$0 = %q{" + scriptFile + "}");
-			scriptFileInit.line("ARGV = []");
 			for (Atom arg : args) {
 				scriptFileInit.line("ARGV << " + Utils.detokenize(arg));
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));

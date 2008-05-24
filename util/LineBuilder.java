@@ -26,6 +26,10 @@ public class LineBuilder implements CharSequence {
 		return lines.length();
 	}
 
+	public void clear() {
+		lines.setLength(0);
+	}
+
 	public char charAt(int index) {
 		return lines.charAt(index);
 	}
@@ -33,4 +37,5 @@ public class LineBuilder implements CharSequence {
 	public CharSequence subSequence(int start, int end) {
 		return lines.subSequence(start, end);
 	}
+
 }

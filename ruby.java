@@ -50,6 +50,7 @@ public class ruby extends AbstractMaxRubyObject {
 
 	private String scriptFilePath;
 	private File scriptFile;
+	private Atom[] scriptFileArgs;
 
 	/**
 	 * The Constructor
@@ -104,28 +105,27 @@ public class ruby extends AbstractMaxRubyObject {
 		return scriptFilePath;
 	}
 
-	public void scriptfile(String path) {
-		scriptFilePath = path;
-		scriptFile = Utils.getFile(path);
-		if (scriptFile != null) {
-			if (path == null) {
-				// then the user was prompted to select a file:
-				scriptFilePath = scriptFile.getPath();
+	public void scriptfile(Atom[] args) {
+		if (args != null && args.length > 0) {
+			String path = args[0].toString();
+			scriptFile = Utils.getFile(path);
+			if (scriptFile != null) {
+				scriptFileArgs = Atom.removeFirst(args);
+				if (initialized) {
+					loadFile();
+				}
+				// else it'll be handled by the Initializer
 			}
-			if (initialized) {
-				loadFile();
-			}
-			// else it'll be handled by the Initializer
 		}
 	}
 
 	private synchronized void loadFile() {
 		info("loading script '" + scriptFile + "' on " + new Date());
 		try {
-			ruby.init(scriptFile);
+			ruby.init(scriptFile, scriptFileArgs);
 		}
 		catch (RubyException e) {
-			err("Error evaluating script file: " + scriptFilePath);
+			err("Error evaluating script file: " + scriptFile.getPath());
 		}
 	}
 

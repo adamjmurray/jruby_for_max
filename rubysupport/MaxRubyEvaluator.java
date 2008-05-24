@@ -57,6 +57,8 @@ public class MaxRubyEvaluator {
 
 	private LineBuilder code = new LineBuilder();
 
+	private LineBuilder scriptFileInit = new LineBuilder();
+
 	private final MaxObject maxObj;
 
 	private final String maxObjVar;
@@ -127,7 +129,8 @@ public class MaxRubyEvaluator {
 		}
 		Object result;
 		synchronized (ruby) {
-			// set the $MaxObject global correctly, this indirection is needed when using shared contexts
+			// Set the $MaxObject global correctly.
+			// This eval() needed when using shared contexts:
 			ruby.eval("$MaxObject = $" + maxObjVar);
 			result = ruby.eval(rubyCode);
 		}
@@ -161,6 +164,10 @@ public class MaxRubyEvaluator {
 	}
 
 	public void init(File scriptFile) {
+		init(scriptFile, Atom.emptyArray);
+	}
+
+	public void init(File scriptFile, Atom[] args) {
 		if (ruby.isInitialized()) {
 			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
@@ -181,91 +188,100 @@ public class MaxRubyEvaluator {
 		}
 
 		if (code.isEmpty()) {
-			// Setup the path:
-			for (String path : MaxSystem.getSearchPath()) {
-				if (!path.matches(OMIT_PATHS)) {
-					// if (!OMIT_PATHS.matcher(path).matches()) {
-					addPath(path);
-				}
-			}
-
-			// Setup the default functions:
-			code.line("def puts(*params)");
-			code.line("  $Utils.puts(*params)");
-			code.line("end");
-
-			code.line("def print(*params)");
-			code.line("  $Utils.print(*params)");
-			code.line("end");
-
-			code.line("def flush");
-			code.line("  $Utils.flush");
-			code.line("end");
-
-			code.line("def atom(obj)");
-			code.line("  if obj");
-			code.line("    $Utils.atom(obj)");
-			code.line("  else");
-			code.line("    $Utils.emptyAtomArray");
-			code.line("  end");
-			code.line("end");
-
-			code.line("def error(*params)");
-			code.line("  $Utils.error(*params)");
-			code.line("end");
-
-			code.line("def outlet(n, *params)");
-			code.line("  $Utils.outlet(n, *params)");
-			code.line("end");
-
-			for (int i = 0; i < 10; i++) {
-				code.line("def out" + i + "(*params)");
-				code.line("  $Utils.outlet(" + i + ", *params)");
-				code.line("end");
-			}
-
-			code.line("def on_context_destroyed(callback)");
-			code.line("  $Utils.on_context_destroyed(callback.to_s)");
-			code.line("end");
-
-			// Placeholders for Max hooks:
-			code.line("def bang");
-			code.line("  'bang'");
-			code.line("end");
-
-			code.line("def list(array)");
-			code.line("  array");
-			code.line("end");
-
-			// for use with shared contexts:
-			code.line("$LocalStorage = {}");
-			code.line("def setLocal(name,obj)");
-			code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
-			code.line("  if(!storage)");
-			code.line("    storage = {}");
-			code.line("    $LocalStorage[$MaxObject.hashCode] = storage");
-			code.line("  end");
-			code.line("  storage[name] = obj");
-			code.line("end");
-			code.line("def getLocal(name)");
-			code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
-			code.line("  storage[name] if storage");
-			code.line("end");
+			buildInitializationCode();
 		}
 
 		ruby.declareGlobal("Utils", new RubyUtils());
 		ruby.setInitialized(true);
-
 		eval(code);
 
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
-			eval("$0 = %q{" + scriptFile + "}");
+			scriptFileInit.clear();
+			scriptFileInit.line("$0 = %q{" + scriptFile + "}");
+			scriptFileInit.line("ARGV = []");
+			for (Atom arg : args) {
+				scriptFileInit.line("ARGV << " + Utils.detokenize(arg));
+				scriptFileInit.line("$* << " + Utils.detokenize(arg));
+			}
+			eval(scriptFileInit);
 			if (script != null) {
 				eval(script);
 			}
 		}
+	}
 
+	private void buildInitializationCode() {
+		// Setup the path:
+		for (String path : MaxSystem.getSearchPath()) {
+			if (!path.matches(OMIT_PATHS)) {
+				// if (!OMIT_PATHS.matcher(path).matches()) {
+				addPath(path);
+			}
+		}
+
+		// Setup the default functions:
+		code.line("def puts(*params)");
+		code.line("  $Utils.puts(*params)");
+		code.line("end");
+
+		code.line("def print(*params)");
+		code.line("  $Utils.print(*params)");
+		code.line("end");
+
+		code.line("def flush");
+		code.line("  $Utils.flush");
+		code.line("end");
+
+		code.line("def atom(obj)");
+		code.line("  if obj");
+		code.line("    $Utils.atom(obj)");
+		code.line("  else");
+		code.line("    $Utils.emptyAtomArray");
+		code.line("  end");
+		code.line("end");
+
+		code.line("def error(*params)");
+		code.line("  $Utils.error(*params)");
+		code.line("end");
+
+		code.line("def outlet(n, *params)");
+		code.line("  $Utils.outlet(n, *params)");
+		code.line("end");
+
+		for (int i = 0; i < 10; i++) {
+			code.line("def out" + i + "(*params)");
+			code.line("  $Utils.outlet(" + i + ", *params)");
+			code.line("end");
+		}
+
+		code.line("def on_context_destroyed(callback)");
+		code.line("  $Utils.on_context_destroyed(callback.to_s)");
+		code.line("end");
+
+		// Placeholders for Max hooks:
+		code.line("def bang");
+		code.line("  'bang'");
+		code.line("end");
+
+		code.line("def list(array)");
+		code.line("  array");
+		code.line("end");
+
+		// for use with shared contexts:
+		code.line("$LocalStorage = {}");
+		code.line("def setLocal(name,obj)");
+		code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
+		code.line("  if(!storage)");
+		code.line("    storage = {}");
+		code.line("    $LocalStorage[$MaxObject.hashCode] = storage");
+		code.line("  end");
+		code.line("  storage[name] = obj");
+		code.line("end");
+		code.line("def getLocal(name)");
+		code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
+		code.line("  storage[name] if storage");
+		code.line("end");
 	}
 
 	/**

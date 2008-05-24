@@ -90,6 +90,7 @@ public class rseq extends seq {
 	@Override
 	public void bang() {
 		if (!seq.isEmpty()) {
+			fixIndexBounds();
 
 			// debug("!! count=" + count + ", duration=" + duration);
 

@@ -1009,6 +1009,7 @@ public class seq extends AbstractMaxRubyObject {
 
 	public void bang() {
 		if (!seq.isEmpty()) {
+			fixIndexBounds();
 			output();
 			if (!arpeggiating()) {
 				index(index + step);

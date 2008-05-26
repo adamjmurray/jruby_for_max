@@ -321,7 +321,7 @@ public class MaxRubyEvaluator {
 			long val = ((Number) obj).longValue();
 			if (val > Integer.MAX_VALUE || val < Integer.MIN_VALUE) {
 				if (logger != null) {
-					logger.info("Ruby: coerced type " + obj.getClass().getName() + " to String");
+					logger.info("coerced type " + obj.getClass().getName() + " to String");
 				}
 				return Atom.newAtom(obj.toString());
 			}
@@ -358,7 +358,7 @@ public class MaxRubyEvaluator {
 			}
 			else {
 				if (logger != null) {
-					logger.info("Ruby: coerced a nested Array to String");
+					logger.info("coerced a nested Array to String");
 				}
 				return Atom.newAtom(toArrayString(atomsArray));
 			}
@@ -366,7 +366,7 @@ public class MaxRubyEvaluator {
 
 		else if (obj instanceof RubyHash) {
 			if (logger != null) {
-				logger.info("Ruby: coerced a Hash to String");
+				logger.info("coerced a Hash to String");
 			}
 			RubyHash hash = (RubyHash) obj;
 			StringBuilder s = new StringBuilder();
@@ -385,7 +385,7 @@ public class MaxRubyEvaluator {
 
 		else {
 			if (logger != null) {
-				logger.info("Ruby: coerced type " + obj.getClass().getName() + " to String");
+				logger.info("coerced type " + obj.getClass().getName() + " to String");
 			}
 			return Atom.newAtom(obj.toString());
 		}

@@ -120,16 +120,17 @@ public class ruby extends AbstractMaxRubyObject {
 
 	public void scriptfile(Atom[] args) {
 		if (args != null && args.length > 0) {
-			String path = args[0].toString();
-			scriptFile = Utils.getFile(path);
-			if (scriptFile != null) {
-				scriptFileArgs = Atom.removeFirst(args);
-				if (initialized) {
-					initFile();
-				}
-				// else it'll be handled by the Initializer
-			}
+			scriptFile = Utils.getFile(args[0].toString());
+			scriptFileArgs = Atom.removeFirst(args);
 		}
+		else {
+			scriptFile = Utils.getFile(null);
+			scriptFileArgs = Atom.emptyArray;
+		}
+
+		if (scriptFile != null && initialized) {
+			initFile();
+		} // if not initialized initFile() will be called by the Initializer
 	}
 
 	public boolean getautowatch() {

@@ -1091,9 +1091,8 @@ public class seq extends AbstractMaxRubyObject {
 				break;
 
 			case ARPEGGIATE:
-				// probably we should ensure the chordIndex range here, but
-				// it is best it is always correct by the time we reach here!
 				if (atoms.length > 0) {
+					chordIndex %= atoms.length;
 					outlet(outlet.outletNumber, atoms[chordIndex]);
 				}
 				break;

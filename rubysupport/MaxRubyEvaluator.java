@@ -156,7 +156,7 @@ public class MaxRubyEvaluator {
 	}
 
 	private void addPath(String path) {
-		code.line("$: << '" + path.replace("'", "\\'") + "'");
+		code.line("$: << '" + path.replace("\\", "\\\\").replace("'", "\\'") + "'");
 	}
 
 	public void init() {

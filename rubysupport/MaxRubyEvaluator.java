@@ -219,17 +219,35 @@ public class MaxRubyEvaluator {
 		}
 
 		// Setup the default functions:
-		code.line("def puts(*params)");
-		code.line("  $Utils.puts(*params)");
-		code.line("end");
-
-		code.line("def print(*params)");
-		code.line("  $Utils.print(*params)");
-		code.line("end");
+		for (String command : new String[] { "puts", "print", "error" }) {
+			code.line("def " + command + "(arg1, *rest)");
+			code.line("  if rest.size > 0");
+			code.line("    rest.insert(0,arg1)");
+			code.line("    $Utils." + command + "(rest)");
+			code.line("  else");
+			code.line("    $Utils." + command + "(arg1)");
+			code.line("  end");
+			code.line("end");
+		}
 
 		code.line("def flush");
 		code.line("  $Utils.flush");
 		code.line("end");
+
+		code.line("def outlet(n, arg1, *rest)");
+		code.line("  if rest.size > 0");
+		code.line("    rest.insert(0,arg1)");
+		code.line("    $Utils.outlet(n,rest)");
+		code.line("  else");
+		code.line("    $Utils.outlet(n,arg1)");
+		code.line("  end");
+		code.line("end");
+
+		for (int i = 0; i < 10; i++) {
+			code.line("def out" + i + "(*params)");
+			code.line("  outlet(" + i + ", *params)");
+			code.line("end");
+		}
 
 		code.line("def atom(obj)");
 		code.line("  if obj");
@@ -238,20 +256,6 @@ public class MaxRubyEvaluator {
 		code.line("    $Utils.emptyAtomArray");
 		code.line("  end");
 		code.line("end");
-
-		code.line("def error(*params)");
-		code.line("  $Utils.error(*params)");
-		code.line("end");
-
-		code.line("def outlet(n, *params)");
-		code.line("  $Utils.outlet(n, *params)");
-		code.line("end");
-
-		for (int i = 0; i < 10; i++) {
-			code.line("def out" + i + "(*params)");
-			code.line("  $Utils.outlet(" + i + ", *params)");
-			code.line("end");
-		}
 
 		code.line("def on_context_destroyed(callback)");
 		code.line("  $Utils.on_context_destroyed(callback.to_s)");

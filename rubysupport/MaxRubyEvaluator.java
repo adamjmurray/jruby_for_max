@@ -160,14 +160,10 @@ public class MaxRubyEvaluator {
 	}
 
 	public void init() {
-		init(null);
+		init(null, Atom.emptyArray, true);
 	}
 
-	public void init(File scriptFile) {
-		init(scriptFile, Atom.emptyArray);
-	}
-
-	public void init(File scriptFile, Atom[] args) {
+	public void init(File scriptFile, Atom[] args, boolean returnResults) {
 		if (ruby.isInitialized()) {
 			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
@@ -193,7 +189,7 @@ public class MaxRubyEvaluator {
 
 		ruby.declareGlobal("Utils", new RubyUtils());
 		ruby.setInitialized(true);
-		eval(code);
+		eval(code, false);
 
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
@@ -202,9 +198,9 @@ public class MaxRubyEvaluator {
 			for (Atom arg : args) {
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));
 			}
-			eval(scriptFileInit);
+			eval(scriptFileInit, false);
 			if (script != null) {
-				eval(script);
+				eval(script, returnResults);
 			}
 		}
 	}

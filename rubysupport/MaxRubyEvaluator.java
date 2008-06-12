@@ -215,33 +215,29 @@ public class MaxRubyEvaluator {
 		}
 
 		// Setup the default functions:
-		for (String command : new String[] { "puts", "print", "error" }) {
-			code.line("def " + command + "(arg1, *rest)");
-			code.line("  if rest.size > 0");
-			code.line("    rest.insert(0,arg1)");
-			code.line("    $Utils." + command + "(rest)");
-			code.line("  else");
-			code.line("    $Utils." + command + "(arg1)");
-			code.line("  end");
-			code.line("end");
-		}
+		code.line("def puts(*params)");
+		code.line("  $Utils.puts(params)");
+		code.line("end");
+
+		code.line("def print(*params)");
+		code.line("  $Utils.print(params)");
+		code.line("end");
+
+		code.line("def error(*params)");
+		code.line("  $Utils.error(params)");
+		code.line("end");
 
 		code.line("def flush");
 		code.line("  $Utils.flush");
 		code.line("end");
 
-		code.line("def outlet(n, arg1, *rest)");
-		code.line("  if rest.size > 0");
-		code.line("    rest.insert(0,arg1)");
-		code.line("    $Utils.outlet(n,rest)");
-		code.line("  else");
-		code.line("    $Utils.outlet(n,arg1)");
-		code.line("  end");
+		code.line("def outlet(n, *params)");
+		code.line("  $Utils.outlet(n, params)");
 		code.line("end");
 
 		for (int i = 0; i < 10; i++) {
 			code.line("def out" + i + "(*params)");
-			code.line("  outlet(" + i + ", *params)");
+			code.line("  $Utils.outlet(" + i + ", params)");
 			code.line("end");
 		}
 
@@ -426,39 +422,45 @@ public class MaxRubyEvaluator {
 			return Atom.emptyArray;
 		}
 
-		public void puts(Object o) {
-			Object atom = toAtoms(o);
-			if (atom instanceof Atom[]) {
-				for (Atom a : (Atom[]) atom) {
-					System.out.println(a);
+		public void puts(RubyArray args) {
+			for (Object o : args.toArray()) {
+				Object atom = toAtoms(o);
+				if (atom instanceof Atom[]) {
+					for (Atom a : (Atom[]) atom) {
+						System.out.println(a);
+					}
 				}
-			}
-			else {
-				System.out.println(atom);
+				else {
+					System.out.println(atom);
+				}
 			}
 		}
 
-		public void print(Object o) {
-			Object atom = toAtoms(o);
-			if (atom instanceof Atom[]) {
-				for (Atom a : (Atom[]) atom) {
-					System.out.print(a);
+		public void print(RubyArray args) {
+			for (Object o : args.toArray()) {
+				Object atom = toAtoms(o);
+				if (atom instanceof Atom[]) {
+					for (Atom a : (Atom[]) atom) {
+						System.out.print(a);
+					}
 				}
-			}
-			else {
-				System.out.print(atom);
+				else {
+					System.out.print(atom);
+				}
 			}
 		}
 
-		public void error(Object o) {
-			Object atom = toAtoms(o);
-			if (atom instanceof Atom[]) {
-				for (Atom a : (Atom[]) atom) {
-					MaxSystem.error(a.toString());
+		public void error(RubyArray args) {
+			for (Object o : args.toArray()) {
+				Object atom = toAtoms(o);
+				if (atom instanceof Atom[]) {
+					for (Atom a : (Atom[]) atom) {
+						System.err.println(a);
+					}
 				}
-			}
-			else {
-				MaxSystem.error(atom.toString());
+				else {
+					System.err.println(atom);
+				}
 			}
 		}
 
@@ -466,12 +468,20 @@ public class MaxRubyEvaluator {
 			System.out.println();
 		}
 
-		public void outlet(int outletIdx, Object output) {
+		public void outlet(int outletIdx, RubyArray args) {
 			if (outletIdx >= maxObj.getNumOutlets()) {
 				MaxSystem.error("Invalid outlet index " + outletIdx);
 			}
 			else {
-				Object atoms = toAtoms(output);
+				Object atoms;
+				if (args.size() == 1) {
+					// avoid unnecessary nested arrays for things like "outlet 0, [1,2]"
+					atoms = toAtoms(args.get(0));
+				}
+				else {
+					atoms = toAtoms(args);
+				}
+
 				if (atoms instanceof Atom[]) {
 					maxObj.outlet(outletIdx, (Atom[]) atoms);
 				}

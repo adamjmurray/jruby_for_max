@@ -1,5 +1,6 @@
 package ajm;
 
+import ajm.seq.OUTLET;
 import ajm.seqsupport.Item;
 
 import java.io.PrintStream;
@@ -74,6 +75,10 @@ public class rseqTest {
 			if (DEBUG) {
 				out.println(outlet + ": " + data);
 			}
+		}
+
+		@Override
+		protected void outputInfo(Atom... data) {
 		}
 
 		@Override

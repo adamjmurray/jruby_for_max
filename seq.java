@@ -39,6 +39,7 @@ import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.MaxRubyEvaluator;
 import ajm.seqsupport.Item;
 import ajm.seqsupport.Parser;
+import ajm.seqsupport.Token;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
@@ -59,7 +60,7 @@ public class seq extends AbstractMaxRubyObject {
 		declareAttribute("iter", "getiter", "iter");
 		declareAttribute("step", "getstep", "step");
 		declareIO(1, 4);
-		setInletAssist(new String[] { "list / bang / commands", "cold inlet" });
+		setInletAssist(new String[] { "list / bang / commands" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
 	}
 
@@ -86,7 +87,7 @@ public class seq extends AbstractMaxRubyObject {
 	}
 
 	protected enum OUTLET {
-		VALUE(0), INDEX(1), ITER(2), SEQ(3), VALINDEX(4);
+		VALUE(0), INDEX(1), ITER(2), SEQ(3), VALINDEX(4), INFO(-1);
 		// VALINDEX outlet is just for the rseq subclass because Java enums
 		// don't support inheritance :(
 
@@ -96,6 +97,8 @@ public class seq extends AbstractMaxRubyObject {
 			this.outletNumber = outletNumber;
 		}
 	}
+
+	protected static int INFO_OUTLET = 4;
 
 	protected enum CHORDMODE {
 		CHORD, ARPEGGIATE, SYMBOL, LIST;
@@ -976,6 +979,180 @@ public class seq extends AbstractMaxRubyObject {
 		outputSeq();
 	}
 
+	public void invert(Atom[] args) {
+		Atom doubleCenter;
+		if (args.length >= 1) {
+			Atom center = args[0];
+			if (center.isString()) {
+				// try parsing as a note
+				center = new Token(Token.TYPE.TEXT, center.toString()).getValue();
+			}
+
+			if (center.isFloat()) {
+				doubleCenter = Atom.newAtom(2.0 * center.toFloat());
+			}
+			else if (center.isInt()) {
+				doubleCenter = Atom.newAtom(2 * center.toInt());
+			}
+			else {
+				err("argument to invert must be a number");
+				return;
+			}
+		}
+		else {
+			Number min = getMin();
+			Number max = getMax();
+			if (min == null || max == null) {
+				return;
+			}
+			else if (min instanceof Float || max instanceof Float) {
+				doubleCenter = Atom.newAtom(min.floatValue() + max.floatValue());
+			}
+			else {
+				doubleCenter = Atom.newAtom(min.intValue() + max.intValue());
+			}
+		}
+		subtractfrom(doubleCenter);
+	}
+
+	public void subtractfrom(Atom... args) {
+		if (args.length == 0) {
+			err("subtractFrom needs at least one argument");
+			return;
+		}
+		for (Atom atom : args) {
+			if (!atom.isFloat() && !atom.isInt()) {
+				err("arguments to add must be numbers");
+				return;
+			}
+		}
+		for (int i = 0; i < seq.size(); i++) {
+			seq.set(i, seq.get(i).subtractFrom(args[i % args.length]));
+		}
+		onSeqChange();
+		outputSeq();
+	}
+
+	protected static Atom ATOM_MAX = Atom.newAtom("max");
+
+	protected static Atom ATOM_MIN = Atom.newAtom("min");
+
+	public void max() {
+		Number max = getMax();
+		if (max == null) {
+			outputInfo(ATOM_MAX);
+		}
+		else if (max instanceof Float) {
+			outputInfo(ATOM_MAX, Atom.newAtom(max.floatValue()));
+		}
+		else {
+			outputInfo(ATOM_MAX, Atom.newAtom(max.intValue()));
+		}
+	}
+
+	public Number getMax() {
+		Number max = null;
+		for (Item item : seq) {
+			if (item.isAtomArray()) {
+				for (Atom atom : item.getAtoms()) {
+					max = max(atom, max);
+				}
+			}
+			else {
+				max = max(item.getAtom(), max);
+			}
+		}
+		return max;
+	}
+
+	private Number max(Atom atom, Number n) {
+		if (atom.isInt()) {
+			int val = atom.toInt();
+			if (n == null) {
+				return val;
+			}
+			else if (n instanceof Float) {
+				return val >= n.floatValue() ? val : n;
+			}
+			else {
+				return val >= n.intValue() ? val : n;
+			}
+		}
+		else if (atom.isFloat()) {
+			float val = atom.toFloat();
+			if (n == null) {
+				return val;
+			}
+			else if (n instanceof Float) {
+				return val >= n.floatValue() ? val : n;
+			}
+			else {
+				return val >= n.intValue() ? val : n;
+			}
+		}
+		else {
+			return n;
+		}
+	}
+
+	public void min() {
+		Number min = getMin();
+		if (min == null) {
+			outputInfo(ATOM_MIN);
+		}
+		else if (min instanceof Float) {
+			outputInfo(ATOM_MIN, Atom.newAtom(min.floatValue()));
+		}
+		else {
+			outputInfo(ATOM_MIN, Atom.newAtom(min.intValue()));
+		}
+	}
+
+	public Number getMin() {
+		Number min = null;
+		for (Item item : seq) {
+			if (item.isAtomArray()) {
+				for (Atom atom : item.getAtoms()) {
+					min = min(atom, min);
+				}
+			}
+			else {
+				min = min(item.getAtom(), min);
+			}
+		}
+		return min;
+	}
+
+	private Number min(Atom atom, Number n) {
+		if (atom.isInt()) {
+			int val = atom.toInt();
+			if (n == null) {
+				return val;
+			}
+			else if (n instanceof Float) {
+				return val <= n.floatValue() ? val : n;
+			}
+			else {
+				return val <= n.intValue() ? val : n;
+			}
+		}
+		else if (atom.isFloat()) {
+			float val = atom.toFloat();
+			if (n == null) {
+				return val;
+			}
+			else if (n instanceof Float) {
+				return val <= n.floatValue() ? val : n;
+			}
+			else {
+				return val <= n.intValue() ? val : n;
+			}
+		}
+		else {
+			return n;
+		}
+	}
+
 	public void direction() {
 		step(step * -1);
 	}
@@ -1117,6 +1294,10 @@ public class seq extends AbstractMaxRubyObject {
 
 	protected void output(OUTLET outlet, Atom[] data) {
 		outlet(outlet.outletNumber, data);
+	}
+
+	protected void outputInfo(Atom... data) {
+		outlet(INFO_OUTLET, data);
 	}
 
 	public void reset() {

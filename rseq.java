@@ -59,6 +59,8 @@ public class rseq extends seq {
 		}
 	}
 
+	protected static int INFO_OUTLET = 5;
+
 	protected int count = 0;
 	protected int duration = INDEX_SET_BEFORE_SEQ;
 	protected static int INFINITY = -1;

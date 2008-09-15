@@ -193,6 +193,40 @@ public class Item implements Comparable<Item>, Atomizer {
 		}
 	}
 
+	public Item subtractFrom(Atom operand) {
+		if (isAtomArray()) {
+			Atom[] sumAtoms = new Atom[atoms.length];
+			for (int i = 0; i < atoms.length; i++) {
+				Atom atom = atoms[i];
+				if (atom.isFloat() || atom.isInt()) {
+					sumAtoms[i] = subtract(operand, atom);
+				}
+				else {
+					sumAtoms[i] = atom;
+				}
+			}
+			return new Item(sumAtoms);
+
+		}
+		else {
+			if (atom.isFloat() || atom.isInt()) {
+				return new Item(subtract(operand, atom));
+			}
+			else {
+				return this;
+			}
+		}
+	}
+
+	private Atom subtract(Atom a1, Atom a2) {
+		if (a1.isFloat() || a2.isFloat()) {
+			return Atom.newAtom(a1.toFloat() - a2.toFloat());
+		}
+		else {
+			return Atom.newAtom(a1.toInt() - a2.toInt());
+		}
+	}
+
 	public Item multiply(Atom multiplier) {
 		if (isAtomArray()) {
 			Atom[] sumAtoms = new Atom[atoms.length];

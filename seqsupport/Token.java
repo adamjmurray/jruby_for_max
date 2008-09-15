@@ -37,7 +37,7 @@ import com.cycling74.max.Atom;
  */
 public class Token {
 
-	enum TYPE {
+	public enum TYPE {
 		REPEAT_BEGIN, REPEAT_END, REPEAT_STAR, CHORD_BEGIN, CHORD_END, NEXT, PREV, RUBY_BEGIN, RUBY_END, TEXT;
 	}
 

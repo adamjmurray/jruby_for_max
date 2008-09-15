@@ -53,6 +53,11 @@ public class seqTest {
 			outputData.put(outlet, data);
 		}
 
+		@Override
+		protected void outputInfo(Atom... data) {
+			outputData.put(OUTLET.INFO, data);
+		}
+
 		public Map<OUTLET, Object> outputData = new HashMap<OUTLET, Object>();
 
 		public String getLastStringValue() {

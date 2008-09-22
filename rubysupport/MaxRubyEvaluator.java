@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
+import java.util.Collection;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -67,6 +68,7 @@ public class MaxRubyEvaluator {
 
 	private String context;
 
+	// TODO: put in a config file
 	private String OMIT_PATHS = ".*/\\.svn/.*";
 
 	public MaxRubyEvaluator(MaxObject maxObj) {
@@ -83,11 +85,10 @@ public class MaxRubyEvaluator {
 			this.logger = (Logger) maxObj;
 		}
 		this.context = context;
-		ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
-
-		// System.out.println("Got ruby evaluator " + ruby);
+		ruby = RubyEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
 
 		ruby.declarePersistentGlobal(maxObjVar, maxObj);
+		declareMaxObjects();
 	}
 
 	public Logger getLogger() {
@@ -104,16 +105,22 @@ public class MaxRubyEvaluator {
 
 	public void setContext(String context) {
 		if (!Utils.equals(this.context, context)) {
-			RubyEvaluatorFactory.removeRubyEvaluator(this.context);
+			// cleanup old context
+			RubyEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
 			ruby.undeclareGlobal(maxObjVar);
-			ruby = RubyEvaluatorFactory.getRubyEvaluator(context);
+			declareMaxObjects();
+
+			// init new context
+			ruby = RubyEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
 			ruby.declarePersistentGlobal(maxObjVar, maxObj);
 			this.context = context;
+			declareMaxObjects();
 		}
 	}
 
 	public void notifyDeleted() {
-		RubyEvaluatorFactory.removeRubyEvaluator(this.context);
+		RubyEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
+		declareMaxObjects();
 	}
 
 	/**
@@ -142,21 +149,36 @@ public class MaxRubyEvaluator {
 		}
 	}
 
-	/**
-	 * Less efficient version of eval will always return an Atom[]
-	 */
-	public Atom[] evalToAtoms(CharSequence rubyCode) {
-		Object o = eval(rubyCode);
-		if (o instanceof Atom[]) {
-			return (Atom[]) o;
-		}
-		else {
-			return new Atom[] { (Atom) o };
+	private void declareMaxObjects() {
+		// It works! But it is not very efficient. I wonder if we should be declaring globals with the RubyEvaluator
+		// If nothing else, check all the places I'm calling this and make sure it is reasonable
+		// Need to test with deleting and adding new objects
+		StringBuilder decl = new StringBuilder();
+		Collection<String> vars = RubyEvaluatorFactory.getMaxObjectVariables(context);
+		if (vars != null) {
+			for (String var : RubyEvaluatorFactory.getMaxObjectVariables(context)) {
+				if (decl.length() == 0) {
+					decl.append("$MaxObjects = [");
+				}
+				else {
+					decl.append(", ");
+				}
+				decl.append("$").append(var);
+			}
+			decl.append("]");
+			ruby.eval(decl);
 		}
 	}
 
 	private void addPath(String path) {
-		code.line("$: << '" + path.replace("\\", "\\\\").replace("'", "\\'") + "'");
+		code.line("$: << " + quote(path));
+	}
+
+	private String quote(Object o) {
+		if (o == null) return NIL;
+		String s = o.toString();
+		if (s == null) return NIL;
+		return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'";
 	}
 
 	public void init() {
@@ -168,6 +190,7 @@ public class MaxRubyEvaluator {
 			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
 		ruby.resetContext();
+		declareMaxObjects();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -194,7 +217,7 @@ public class MaxRubyEvaluator {
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
 			scriptFileInit.clear();
-			scriptFileInit.line("$0 = %q{" + scriptFile + "}");
+			scriptFileInit.line("$0 = " + quote(scriptFile));
 			for (Atom arg : args) {
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));
 			}
@@ -208,12 +231,10 @@ public class MaxRubyEvaluator {
 	private void buildInitializationCode() {
 		// Setup the path:
 		for (String path : MaxSystem.getSearchPath()) {
-			if (!path.matches(OMIT_PATHS)) {
-				// if (!OMIT_PATHS.matcher(path).matches()) {
-				addPath(path);
-			}
+			if (!path.matches(OMIT_PATHS)) addPath(path);
 		}
 
+		// TODO: move this to an external file:
 		// Setup the default functions:
 		code.line("def puts(*params)");
 		code.line("  $Utils.puts(params)");
@@ -240,6 +261,8 @@ public class MaxRubyEvaluator {
 			code.line("  $Utils.outlet(" + i + ", params)");
 			code.line("end");
 		}
+		// TODO: define methods that will output to all object in the current context
+		// TODO: will need to maintain a mapping to handle that
 
 		code.line("def atom(obj)");
 		code.line("  if obj");
@@ -290,12 +313,6 @@ public class MaxRubyEvaluator {
 	}
 
 	private Object toAtoms(Object obj, boolean nested) {
-
-		/*
-		if (obj != null) {
-			System.out.println("Class: " + obj.getClass().getName());
-		}*/
-
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
@@ -306,9 +323,9 @@ public class MaxRubyEvaluator {
 			return ((Atomizer) obj).toAtom();
 		}
 		else if (obj instanceof Double || obj instanceof Float) {
-			// Not sure if there's a situation where we should coerce to a String instead
-			// (Max can only handle floats, JRuby seems to always output Doubles).
-			// Floating point accuracy is very different the Long wrap-around problem,
+			// Not sure if there's a situation where we should coerce to a String,
+			// because Max can only handle floats and JRuby always outputs Doubles.
+			// Floating point accuracy is very different from the Long wrap-around problem,
 			// so letting it downcast seems ok:
 			return Atom.newAtom(((Number) obj).doubleValue());
 		}

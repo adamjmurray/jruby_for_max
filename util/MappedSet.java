@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * A Map where all the values are Lists.
+ * A Map where all the values are a Set.
  * 
  * @version 0.8
  * @author Adam Murray (adam@compusition.com)

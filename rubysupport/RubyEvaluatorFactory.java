@@ -44,11 +44,12 @@ public class RubyEvaluatorFactory {
 	private static Map<String, RubyEvaluator> contexts = new HashMap<String, RubyEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
 	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
+	private static MappedSet<String, String> contextMaxObjectMapping = new MappedSet<String, String>();
 
 	private RubyEvaluatorFactory() {
 	}
 
-	public static RubyEvaluator getRubyEvaluator(String context) {
+	public static RubyEvaluator getRubyEvaluator(String context, String maxObjVar) {
 		RubyEvaluator evaluator = contexts.get(context);
 		if (evaluator == null) {
 			evaluator = new RubyEvaluator();
@@ -60,6 +61,7 @@ public class RubyEvaluatorFactory {
 			count++;
 			contextCounter.put(context, count);
 		}
+		contextMaxObjectMapping.addValue(context, maxObjVar);
 		return evaluator;
 	}
 
@@ -70,18 +72,24 @@ public class RubyEvaluatorFactory {
 	 *            the evaluator's shared context name
 	 * @return true if the entire context was removed
 	 */
-	public static void removeRubyEvaluator(String context) {
+	public static void removeRubyEvaluator(String context, String maxObjVar) {
 		int count = contextCounter.get(context);
 		count--;
 		if (count > 0) {
 			contextCounter.put(context, count++);
+			contextMaxObjectMapping.get(context).remove(maxObjVar);
 		}
 		else {
 			notifyContextDestroyedListener(context);
 			contextDestroyedListeners.remove(context);
+			contextMaxObjectMapping.remove(context);
 			contextCounter.remove(context);
 			contexts.remove(context);
 		}
+	}
+
+	public static Collection<String> getMaxObjectVariables(String context) {
+		return contextMaxObjectMapping.get(context);
 	}
 
 	public static void registerContextDestroyedListener(String context, String callbackMethod) {
@@ -89,8 +97,10 @@ public class RubyEvaluatorFactory {
 	}
 
 	public static void notifyContextDestroyedListener(String context) {
-		RubyEvaluator ruby = contexts.get(context); // lets the garbage collector do its job
+		RubyEvaluator ruby = contexts.get(context);
 		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
+		// remove() lets the garbage collector do its job
+
 		if (ruby != null && callbackMethods != null) {
 			for (String callbackMethod : callbackMethods) {
 				try {

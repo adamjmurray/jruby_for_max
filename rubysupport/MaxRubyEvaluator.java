@@ -150,6 +150,9 @@ public class MaxRubyEvaluator {
 	}
 
 	private void declareMaxObjects() {
+		// TODO: should be setting this as a persistant global
+		// and similarly with MaxObject (singular)
+
 		// It works! But it is not very efficient. I wonder if we should be declaring globals with the RubyEvaluator
 		// If nothing else, check all the places I'm calling this and make sure it is reasonable
 		// Need to test with deleting and adding new objects
@@ -190,7 +193,6 @@ public class MaxRubyEvaluator {
 			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
 		ruby.resetContext();
-		declareMaxObjects();
 
 		if (System.getProperty(PROP_JRUBY_HOME) == null) {
 			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
@@ -213,6 +215,7 @@ public class MaxRubyEvaluator {
 		ruby.declareGlobal("Utils", new RubyUtils());
 		ruby.setInitialized(true);
 		eval(code, false);
+		declareMaxObjects();
 
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);

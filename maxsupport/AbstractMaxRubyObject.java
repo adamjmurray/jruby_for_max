@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.cycling74.max.Executable;
 
-import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyAdapter;
 
 /**
  * Superclass for objects that support Ruby scripting.
@@ -42,7 +42,7 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 	protected String context = null;
 	private boolean autoinit = false;
 
-	protected MaxRubyEvaluator ruby;
+	protected MaxRubyAdapter ruby;
 
 	public AbstractMaxRubyObject() {
 		super();
@@ -71,7 +71,7 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 	}
 
 	protected void contructRubyEvaluator() {
-		ruby = new MaxRubyEvaluator(this, context);
+		ruby = new MaxRubyAdapter(this, context);
 	}
 
 	public String getcontext() {

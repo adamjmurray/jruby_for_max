@@ -40,13 +40,14 @@ import java.util.TreeMap;
 @SuppressWarnings("serial")
 public class MappedSet<K, T> extends TreeMap<K, Set<T>> {
 
-	public void addValue(K key, T value) {
+	public Set<T> addValue(K key, T value) {
 		Set<T> values = get(key);
 		if (values == null) {
 			values = new HashSet<T>();
 			put(key, values);
 		}
 		values.add(value);
+		return values;
 	}
 
 	@SuppressWarnings("unchecked")

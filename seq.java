@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
-import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyAdapter;
 import ajm.seqsupport.Item;
 import ajm.seqsupport.Parser;
 import ajm.seqsupport.Token;
@@ -340,7 +340,7 @@ public class seq extends AbstractMaxRubyObject {
 		}
 
 		if (atoms == null || atoms.length == 0
-				|| (atoms.length == 1 && MaxRubyEvaluator.NIL.equals(atoms[0].toString()))) {
+				|| (atoms.length == 1 && MaxRubyAdapter.NIL.equals(atoms[0].toString()))) {
 			atoms = Atom.emptyArray;
 		}
 		list(atoms);

@@ -48,13 +48,11 @@ import com.cycling74.max.MaxSystem;
  * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
-public class MaxRubyEvaluator {
+public class MaxRubyAdapter {
 
 	public static final String NIL = "nil";
 
-	public static final String PROP_JRUBY_HOME = "jruby.home";
-
-	private RubyEvaluator ruby;
+	private ScriptEvaluator ruby;
 
 	private LineBuilder code = new LineBuilder();
 
@@ -68,14 +66,13 @@ public class MaxRubyEvaluator {
 
 	private String context;
 
-	// TODO: put in a config file
-	private String OMIT_PATHS = ".*/\\.svn/.*";
+	private static String IGNORED_PATHS = RubyProperties.getIgnoredPaths();
 
-	public MaxRubyEvaluator(MaxObject maxObj) {
+	public MaxRubyAdapter(MaxObject maxObj) {
 		this(maxObj, null);
 	}
 
-	public MaxRubyEvaluator(MaxObject maxObj, String context) {
+	public MaxRubyAdapter(MaxObject maxObj, String context) {
 		if (context == null) {
 			context = "__" + Integer.toHexString(maxObj.hashCode());
 		}
@@ -85,9 +82,11 @@ public class MaxRubyEvaluator {
 			this.logger = (Logger) maxObj;
 		}
 		this.context = context;
-		ruby = RubyEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
+		ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
 
 		ruby.declarePersistentGlobal(maxObjVar, maxObj);
+		// TODO: can check to see if this was already created in current context
+		ruby.declarePersistentGlobal("Utils", new RubyUtils());
 		declareMaxObjects();
 	}
 
@@ -106,12 +105,12 @@ public class MaxRubyEvaluator {
 	public void setContext(String context) {
 		if (!Utils.equals(this.context, context)) {
 			// cleanup old context
-			RubyEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
+			ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
 			ruby.undeclareGlobal(maxObjVar);
 			declareMaxObjects();
 
 			// init new context
-			ruby = RubyEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
+			ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
 			ruby.declarePersistentGlobal(maxObjVar, maxObj);
 			this.context = context;
 			declareMaxObjects();
@@ -119,7 +118,7 @@ public class MaxRubyEvaluator {
 	}
 
 	public void notifyDeleted() {
-		RubyEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
+		ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
 		declareMaxObjects();
 	}
 
@@ -157,9 +156,9 @@ public class MaxRubyEvaluator {
 		// If nothing else, check all the places I'm calling this and make sure it is reasonable
 		// Need to test with deleting and adding new objects
 		StringBuilder decl = new StringBuilder();
-		Collection<String> vars = RubyEvaluatorFactory.getMaxObjectVariables(context);
+		Collection<String> vars = ScriptEvaluatorFactory.getMaxObjectVariables(context);
 		if (vars != null) {
-			for (String var : RubyEvaluatorFactory.getMaxObjectVariables(context)) {
+			for (String var : ScriptEvaluatorFactory.getMaxObjectVariables(context)) {
 				if (decl.length() == 0) {
 					decl.append("$MaxObjects = [");
 				}
@@ -190,29 +189,14 @@ public class MaxRubyEvaluator {
 
 	public void init(File scriptFile, Atom[] args, boolean returnResults) {
 		if (ruby.isInitialized()) {
-			RubyEvaluatorFactory.notifyContextDestroyedListener(context);
+			ScriptEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
 		ruby.resetContext();
-
-		if (System.getProperty(PROP_JRUBY_HOME) == null) {
-			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
-			if (pathToJRuby != null) {
-				File jRubyLibDir = new File(pathToJRuby).getParentFile();
-				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
-				System.setProperty(PROP_JRUBY_HOME, jRubyLibDir.getParent());
-				System.setProperty("jruby.lib", jRubyLibDir.getPath());
-				System.setProperty("jruby.script", "jruby"); // seems pointless but gems won't work without it
-			}
-			else {
-				MaxSystem.error("jruby.jar not found! Maybe it was not installed correctly?");
-			}
-		}
 
 		if (code.isEmpty()) {
 			buildInitializationCode();
 		}
 
-		ruby.declareGlobal("Utils", new RubyUtils());
 		ruby.setInitialized(true);
 		eval(code, false);
 		declareMaxObjects();
@@ -234,8 +218,11 @@ public class MaxRubyEvaluator {
 	private void buildInitializationCode() {
 		// Setup the path:
 		for (String path : MaxSystem.getSearchPath()) {
-			if (!path.matches(OMIT_PATHS)) addPath(path);
+			if (!path.matches(IGNORED_PATHS)) addPath(path);
 		}
+
+		// TODO: this was moved to ajm_ruby_initialize.rb
+		// find it on the path and eval that!
 
 		// TODO: move this to an external file:
 		// Setup the default functions:
@@ -512,7 +499,7 @@ public class MaxRubyEvaluator {
 		}
 
 		public void on_context_destroyed(String callback) {
-			RubyEvaluatorFactory.registerContextDestroyedListener(context, callback);
+			ScriptEvaluatorFactory.registerContextDestroyedListener(context, callback);
 		}
 	}
 }

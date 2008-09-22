@@ -28,7 +28,7 @@ package ajm.seqsupport;
  */
 
 import ajm.maxsupport.Atomizer;
-import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyAdapter;
 
 import com.cycling74.max.Atom;
 
@@ -47,7 +47,7 @@ public class Item implements Comparable<Item>, Atomizer {
 	private Atom[] atoms;
 
 	private String rubyCode;
-	private MaxRubyEvaluator ruby;
+	private MaxRubyAdapter ruby;
 
 	private boolean infinite = false;
 
@@ -76,7 +76,7 @@ public class Item implements Comparable<Item>, Atomizer {
 		this.atom = Atom.newAtom(s);
 	}
 
-	public Item(String rubyCode, MaxRubyEvaluator ruby) {
+	public Item(String rubyCode, MaxRubyAdapter ruby) {
 		// System.out.println("SET new ruby code: " + rubyCode + ruby);
 		this.rubyCode = rubyCode;
 		this.atom = Atom.newAtom("{" + rubyCode + "}");

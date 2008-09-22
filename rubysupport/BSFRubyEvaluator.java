@@ -39,13 +39,13 @@ import org.apache.bsf.BSFManager;
  * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
-public class RubyEvaluator {
+public class BSFRubyEvaluator implements ScriptEvaluator {
 
 	private BSFManager manager;
 	private boolean initialized = false;
 	private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
-	public RubyEvaluator() {
+	public BSFRubyEvaluator() {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
 		manager = new BSFManager();
 	}

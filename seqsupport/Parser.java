@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyAdapter;
 
 import com.cycling74.max.Atom;
 
@@ -53,9 +53,9 @@ public class Parser {
 		evalNotes = true;
 	}
 
-	private MaxRubyEvaluator ruby;
+	private MaxRubyAdapter ruby;
 
-	public void setRubyEvaluator(MaxRubyEvaluator ruby) {
+	public void setRubyEvaluator(MaxRubyAdapter ruby) {
 		this.ruby = ruby;
 	}
 

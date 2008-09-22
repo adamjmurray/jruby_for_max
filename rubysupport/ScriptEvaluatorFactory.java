@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,22 +42,55 @@ import ajm.util.MappedSet;
  * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
-public class RubyEvaluatorFactory {
+public class ScriptEvaluatorFactory {
 
-	private static Map<String, RubyEvaluator> contexts = new HashMap<String, RubyEvaluator>();
+	private static Map<String, ScriptEvaluator> contexts = new HashMap<String, ScriptEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
 	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
 	private static MappedSet<String, String> contextMaxObjectMapping = new MappedSet<String, String>();
 
-	private RubyEvaluatorFactory() {
+	private static Constructor<ScriptEvaluator> evaluatorConstructor;
+
+	private static ScriptEvaluator newRubyEvaluatorInstance() {
+		if (evaluatorConstructor == null) {
+			String evaluatorClassName = RubyProperties.getRubyEngine();
+			try {
+				@SuppressWarnings("unchecked")
+				Class<ScriptEvaluator> evaluatorClass = (Class<ScriptEvaluator>) Class.forName(evaluatorClassName);
+				evaluatorConstructor = evaluatorClass.getConstructor();
+			}
+			catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+			catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		try {
+			return evaluatorConstructor.newInstance();
+		}
+		catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+		catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static RubyEvaluator getRubyEvaluator(String context, String maxObjVar) {
-		RubyEvaluator evaluator = contexts.get(context);
+	private ScriptEvaluatorFactory() {
+
+	}
+
+	public static ScriptEvaluator getRubyEvaluator(String context, String maxObjVar) {
+		ScriptEvaluator evaluator = contexts.get(context);
 		if (evaluator == null) {
-			evaluator = new RubyEvaluator();
+			evaluator = newRubyEvaluatorInstance();
 			contexts.put(context, evaluator);
 			contextCounter.put(context, 1);
+			// evaluator.declarePersistentGlobal("MaxObjects", obj)
 		}
 		else {
 			int count = contextCounter.get(context);
@@ -97,7 +133,7 @@ public class RubyEvaluatorFactory {
 	}
 
 	public static void notifyContextDestroyedListener(String context) {
-		RubyEvaluator ruby = contexts.get(context);
+		ScriptEvaluator ruby = contexts.get(context);
 		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
 		// remove() lets the garbage collector do its job
 
@@ -111,7 +147,6 @@ public class RubyEvaluatorFactory {
 							+ e.getMessage());
 				}
 			}
-
 		}
 	}
 }

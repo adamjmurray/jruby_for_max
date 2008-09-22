@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import ajm.rubysupport.MaxRubyEvaluator;
+import ajm.rubysupport.MaxRubyAdapter;
 import ajm.util.DummyMaxObject;
 
 import com.cycling74.max.Atom;
@@ -17,7 +17,7 @@ public class ParserTest {
 
 	static PrintStream out = System.out;
 
-	static MaxRubyEvaluator ruby = new MaxRubyEvaluator(new DummyMaxObject(), null);
+	static MaxRubyAdapter ruby = new MaxRubyAdapter(new DummyMaxObject(), null);
 
 	static Parser p = new Parser();
 

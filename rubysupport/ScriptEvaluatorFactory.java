@@ -46,7 +46,7 @@ public class ScriptEvaluatorFactory {
 	private static Map<String, ScriptEvaluator> contexts = new HashMap<String, ScriptEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
 	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
-	private static MappedSet<String, String> javaObjectsUsingContext = new MappedSet<String, String>();
+	private static MappedSet<String, Object> javaObjectsUsingContext = new MappedSet<String, Object>();
 	private static Constructor<ScriptEvaluator> evaluatorConstructor;
 
 	// This is a singleton, so no instances allowed.
@@ -71,14 +71,14 @@ public class ScriptEvaluatorFactory {
 			evaluator = newRubyEvaluatorInstance();
 			contexts.put(context, evaluator);
 			contextCounter.put(context, 1);
-			Set<String> javaObjs = javaObjectsUsingContext.addValue(context, ownerVarName);
+			Set<Object> javaObjs = javaObjectsUsingContext.addValue(context, owner);
 			evaluator.declareGlobal(ownersInContextVarName, javaObjs);
 		}
 		else {
 			int count = contextCounter.get(context);
 			count++;
 			contextCounter.put(context, count);
-			javaObjectsUsingContext.addValue(context, ownerVarName);
+			javaObjectsUsingContext.addValue(context, owner);
 		}
 		evaluator.declareGlobal(ownerVarName, owner);
 		return evaluator;
@@ -92,22 +92,26 @@ public class ScriptEvaluatorFactory {
 	 * @return true if the entire context was removed
 	 */
 	public static void removeRubyEvaluator(String context, String ownerVarName) {
-		int count = contextCounter.get(context);
-		count--;
-		if (count > 0) {
-			contextCounter.put(context, count++);
-			javaObjectsUsingContext.get(context).remove(ownerVarName);
-		}
-		else {
-			notifyContextDestroyedListener(context);
-			contextDestroyedListeners.remove(context);
-			javaObjectsUsingContext.remove(context);
-			contextCounter.remove(context);
-			contexts.remove(context);
+		ScriptEvaluator evaluator = contexts.get(context);
+		if (evaluator != null) {
+			int count = contextCounter.get(context);
+			count--;
+			if (count > 0) {
+				contextCounter.put(context, count++);
+				javaObjectsUsingContext.get(context).remove(ownerVarName);
+			}
+			else {
+				notifyContextDestroyedListener(context);
+				contextDestroyedListeners.remove(context);
+				javaObjectsUsingContext.remove(context);
+				contextCounter.remove(context);
+				contexts.remove(context);
+			}
+			evaluator.undeclareGlobal(ownerVarName);
 		}
 	}
 
-	public static Collection<String> getJavaObjectVariables(String context) {
+	public static Collection<Object> getJavaObjectVariables(String context) {
 		return javaObjectsUsingContext.get(context);
 	}
 

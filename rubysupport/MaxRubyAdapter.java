@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
-import java.util.Collection;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -87,7 +86,6 @@ public class MaxRubyAdapter {
 		// ruby.declarePersistentGlobal(maxObjVar, maxObj);
 		// TODO: can check to see if this was already created in current context
 		ruby.declareGlobal("Utils", new RubyUtils());
-		declareMaxObjects();
 	}
 
 	public Logger getLogger() {
@@ -106,20 +104,15 @@ public class MaxRubyAdapter {
 		if (!Utils.equals(this.context, context)) {
 			// cleanup old context
 			ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
-			ruby.undeclareGlobal(maxObjVar);
-			declareMaxObjects();
 
 			// init new context
 			ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
-			ruby.declareGlobal(maxObjVar, maxObj);
 			this.context = context;
-			declareMaxObjects();
 		}
 	}
 
 	public void notifyDeleted() {
 		ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
-		declareMaxObjects();
 	}
 
 	public void eval(CharSequence rubyCode) {
@@ -148,41 +141,6 @@ public class MaxRubyAdapter {
 		}
 	}
 
-	private void declareMaxObjects() {
-		// TODO: should be setting this as a persistant global
-		// and similarly with MaxObject (singular)
-
-		// It works! But it is not very efficient. I wonder if we should be declaring globals with the RubyEvaluator
-		// If nothing else, check all the places I'm calling this and make sure it is reasonable
-		// Need to test with deleting and adding new objects
-		StringBuilder decl = new StringBuilder();
-		Collection<String> vars = ScriptEvaluatorFactory.getJavaObjectVariables(context);
-		if (vars != null) {
-			for (String var : ScriptEvaluatorFactory.getJavaObjectVariables(context)) {
-				if (decl.length() == 0) {
-					decl.append("$MaxObjects = [");
-				}
-				else {
-					decl.append(", ");
-				}
-				decl.append("$").append(var);
-			}
-			decl.append("]");
-			ruby.eval(decl);
-		}
-	}
-
-	private void addPath(String path) {
-		code.line("$: << " + quote(path));
-	}
-
-	private String quote(Object o) {
-		if (o == null) return NIL;
-		String s = o.toString();
-		if (s == null) return NIL;
-		return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'";
-	}
-
 	public void init() {
 		init(null, Atom.emptyArray);
 	}
@@ -196,25 +154,14 @@ public class MaxRubyAdapter {
 		}
 		ruby.resetContext();
 
-		/*
-		if (code.isEmpty()) {
-			buildInitializationCode();
-		}
-		*/
-
-		ruby.setInitialized(true);
 		if (code.isEmpty()) {
 			for (String path : MaxSystem.getSearchPath()) {
 				if (!path.matches(IGNORED_PATHS)) addPath(path);
 			}
 			code.line(Utils.getFileAsString("ajm_ruby_initialize.rb"));
 		}
+		ruby.setInitialized(true);
 		eval(code);
-
-		// System.out.println("INIT CODE!!!\n" + initCode);
-		// eval(initCode, false);
-
-		declareMaxObjects();
 
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
@@ -225,9 +172,20 @@ public class MaxRubyAdapter {
 			}
 			eval(scriptFileInit, false);
 			if (script != null) {
-				eval(script, false);
+				eval(script);
 			}
 		}
+	}
+
+	private void addPath(String path) {
+		code.line("$: << " + quote(path));
+	}
+
+	private String quote(Object o) {
+		if (o == null) return NIL;
+		String s = o.toString();
+		if (s == null) return NIL;
+		return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'";
 	}
 
 	/**

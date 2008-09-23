@@ -27,14 +27,14 @@ package ajm.util;
 
  */
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * A Map where all the values are a Set.
+ * A Map where all the values are a Set. The Set maintains insertion order of its entires.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")
@@ -43,7 +43,8 @@ public class MappedSet<K, T> extends TreeMap<K, Set<T>> {
 	public Set<T> addValue(K key, T value) {
 		Set<T> values = get(key);
 		if (values == null) {
-			values = new HashSet<T>();
+			// LinkedHashSet maintains insertion order
+			values = new LinkedHashSet<T>();
 			put(key, values);
 		}
 		values.add(value);

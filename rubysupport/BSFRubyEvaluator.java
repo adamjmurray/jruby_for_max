@@ -27,68 +27,34 @@ package ajm.rubysupport;
 
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 
 /**
- * JRuby/BSF wrapper.
+ * Bridge to Apache BSF project's Ruby evaluator engine.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
-public class BSFRubyEvaluator implements ScriptEvaluator {
+public class BSFRubyEvaluator extends AbstractScriptEvaluator {
 
 	private BSFManager manager;
-	private boolean initialized = false;
-	private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
 	public BSFRubyEvaluator() {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
+		resetEngineContext();
+	}
+
+	protected void resetEngineContext() {
 		manager = new BSFManager();
 	}
 
-	public void resetContext() {
-		manager = new BSFManager();
-		for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
-			declareGlobal(global.getKey(), global.getValue());
-		}
+	protected void declareGlobalInternal(String variableName, Object obj) throws BSFException {
+		manager.declareBean(variableName, obj, obj.getClass());
 	}
 
-	public boolean isInitialized() {
-		return initialized;
-	}
-
-	public void setInitialized(boolean initialized) {
-		this.initialized = initialized;
-	}
-
-	public void declareGlobal(String variableName, Object obj) {
-		try {
-			manager.declareBean(variableName, obj, obj.getClass());
-		}
-		catch (BSFException e) {
-			// convert to unchecked and hide the details of the BSF implementation
-			throw new RubyException(e);
-		}
-	}
-
-	public void declarePersistentGlobal(String variableName, Object obj) {
-		declareGlobal(variableName, obj);
-		persitentGlobals.put(variableName, obj);
-	}
-
-	public void undeclareGlobal(String variableName) {
-		try {
-			manager.undeclareBean(variableName);
-			persitentGlobals.remove(variableName);
-		}
-		catch (BSFException e) {
-			// convert to unchecked and hide the details of the BSF implementation
-			throw new RubyException(e);
-		}
+	protected void undeclareGlobalInternal(String variableName) throws BSFException {
+		manager.undeclareBean(variableName);
 	}
 
 	public Object eval(CharSequence rubyCode) {
@@ -96,7 +62,6 @@ public class BSFRubyEvaluator implements ScriptEvaluator {
 			return manager.eval("ruby", getClass().getName(), 1, 1, rubyCode);
 		}
 		catch (BSFException e) {
-			// convert to unchecked and hide the details of the BSF implementation
 			throw new RubyException(e);
 		}
 	}

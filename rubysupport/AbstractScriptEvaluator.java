@@ -27,23 +27,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Interface for all script evaluator engines.
+ * Superclass for script evaluator implementations.
  * 
  * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
-public interface ScriptEvaluator {
+public abstract class AbstractScriptEvaluator implements ScriptEvaluator {
 
-	void resetContext();
+	private boolean initialized = false;
+	private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
-	boolean isInitialized();
+	protected abstract void resetEngineContext();
 
-	void setInitialized(boolean initialized);
+	protected abstract void declareGlobalInternal(String variableName, Object obj) throws Exception;
 
-	void declareGlobal(String variableName, Object obj);
+	protected abstract void undeclareGlobalInternal(String variableName) throws Exception;
 
-	void undeclareGlobal(String variableName);
+	public void resetContext() {
+		resetEngineContext();
+		try {
+			for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
+				declareGlobalInternal(global.getKey(), global.getValue());
+			}
+		}
+		catch (Exception e) {
+			throw new RubyException(e);
+		}
+	}
 
-	Object eval(CharSequence rubyCode);
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
+	public void declareGlobal(String variableName, Object obj) {
+		try {
+			declareGlobalInternal(variableName, obj);
+		}
+		catch (Exception e) {
+			throw new RubyException(e);
+		}
+		persitentGlobals.put(variableName, obj);
+	}
+
+	public void undeclareGlobal(String variableName) {
+		try {
+			undeclareGlobalInternal(variableName);
+		}
+		catch (Exception e) {
+			throw new RubyException(e);
+		}
+		persitentGlobals.remove(variableName);
+	}
 }

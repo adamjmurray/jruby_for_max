@@ -82,11 +82,11 @@ public class MaxRubyAdapter {
 			this.logger = (Logger) maxObj;
 		}
 		this.context = context;
-		ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
+		ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
 
-		ruby.declarePersistentGlobal(maxObjVar, maxObj);
+		// ruby.declarePersistentGlobal(maxObjVar, maxObj);
 		// TODO: can check to see if this was already created in current context
-		ruby.declarePersistentGlobal("Utils", new RubyUtils());
+		ruby.declareGlobal("Utils", new RubyUtils());
 		declareMaxObjects();
 	}
 
@@ -110,8 +110,8 @@ public class MaxRubyAdapter {
 			declareMaxObjects();
 
 			// init new context
-			ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar);
-			ruby.declarePersistentGlobal(maxObjVar, maxObj);
+			ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
+			ruby.declareGlobal(maxObjVar, maxObj);
 			this.context = context;
 			declareMaxObjects();
 		}
@@ -156,9 +156,9 @@ public class MaxRubyAdapter {
 		// If nothing else, check all the places I'm calling this and make sure it is reasonable
 		// Need to test with deleting and adding new objects
 		StringBuilder decl = new StringBuilder();
-		Collection<String> vars = ScriptEvaluatorFactory.getMaxObjectVariables(context);
+		Collection<String> vars = ScriptEvaluatorFactory.getJavaObjectVariables(context);
 		if (vars != null) {
-			for (String var : ScriptEvaluatorFactory.getMaxObjectVariables(context)) {
+			for (String var : ScriptEvaluatorFactory.getJavaObjectVariables(context)) {
 				if (decl.length() == 0) {
 					decl.append("$MaxObjects = [");
 				}

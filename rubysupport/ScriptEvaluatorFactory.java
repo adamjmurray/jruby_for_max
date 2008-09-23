@@ -29,17 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Set;
 import ajm.util.MappedSet;
 
 /**
  * Factory for Ruby evaluators that manages shared contexts.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class ScriptEvaluatorFactory {
@@ -47,9 +46,92 @@ public class ScriptEvaluatorFactory {
 	private static Map<String, ScriptEvaluator> contexts = new HashMap<String, ScriptEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
 	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
-	private static MappedSet<String, String> contextMaxObjectMapping = new MappedSet<String, String>();
-
+	private static MappedSet<String, String> javaObjectsUsingContext = new MappedSet<String, String>();
 	private static Constructor<ScriptEvaluator> evaluatorConstructor;
+
+	// This is a singleton, so no instances allowed.
+	private ScriptEvaluatorFactory() {
+	}
+
+	/**
+	 * Get a Ruby evaluator for the specified context.
+	 * 
+	 * @param context
+	 * @param ownerVarName -
+	 *            the ruby variable that will reference the Java object that uses this evaluator
+	 * @param owner -
+	 *            the Java object that will be using this evalutor.
+	 * @parem ownersInContextVarName - a variable containing all Java objects that use this evalutor context
+	 * @return
+	 */
+	public static ScriptEvaluator getRubyEvaluator(String context, String ownerVarName, Object owner,
+			String ownersInContextVarName) {
+		ScriptEvaluator evaluator = contexts.get(context);
+		if (evaluator == null) {
+			evaluator = newRubyEvaluatorInstance();
+			contexts.put(context, evaluator);
+			contextCounter.put(context, 1);
+			Set<String> javaObjs = javaObjectsUsingContext.addValue(context, ownerVarName);
+			evaluator.declareGlobal(ownersInContextVarName, javaObjs);
+		}
+		else {
+			int count = contextCounter.get(context);
+			count++;
+			contextCounter.put(context, count);
+			javaObjectsUsingContext.addValue(context, ownerVarName);
+		}
+		evaluator.declareGlobal(ownerVarName, owner);
+		return evaluator;
+	}
+
+	/**
+	 * Unregisters a RubyEvaluator.
+	 * 
+	 * @param context
+	 *            the evaluator's shared context name
+	 * @return true if the entire context was removed
+	 */
+	public static void removeRubyEvaluator(String context, String ownerVarName) {
+		int count = contextCounter.get(context);
+		count--;
+		if (count > 0) {
+			contextCounter.put(context, count++);
+			javaObjectsUsingContext.get(context).remove(ownerVarName);
+		}
+		else {
+			notifyContextDestroyedListener(context);
+			contextDestroyedListeners.remove(context);
+			javaObjectsUsingContext.remove(context);
+			contextCounter.remove(context);
+			contexts.remove(context);
+		}
+	}
+
+	public static Collection<String> getJavaObjectVariables(String context) {
+		return javaObjectsUsingContext.get(context);
+	}
+
+	public static void registerContextDestroyedListener(String context, String callbackMethod) {
+		contextDestroyedListeners.addValue(context, callbackMethod);
+	}
+
+	public static void notifyContextDestroyedListener(String context) {
+		ScriptEvaluator ruby = contexts.get(context);
+		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
+		// remove() lets the garbage collector do its job
+
+		if (ruby != null && callbackMethods != null) {
+			for (String callbackMethod : callbackMethods) {
+				try {
+					ruby.eval(callbackMethod);
+				}
+				catch (Exception e) {
+					System.err.println("on_context_destroyed method '" + callbackMethod + "' failed:\n"
+							+ e.getMessage());
+				}
+			}
+		}
+	}
 
 	private static ScriptEvaluator newRubyEvaluatorInstance() {
 		if (evaluatorConstructor == null) {
@@ -77,76 +159,6 @@ public class ScriptEvaluatorFactory {
 		}
 		catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	private ScriptEvaluatorFactory() {
-
-	}
-
-	public static ScriptEvaluator getRubyEvaluator(String context, String maxObjVar) {
-		ScriptEvaluator evaluator = contexts.get(context);
-		if (evaluator == null) {
-			evaluator = newRubyEvaluatorInstance();
-			contexts.put(context, evaluator);
-			contextCounter.put(context, 1);
-			// evaluator.declarePersistentGlobal("MaxObjects", obj)
-		}
-		else {
-			int count = contextCounter.get(context);
-			count++;
-			contextCounter.put(context, count);
-		}
-		contextMaxObjectMapping.addValue(context, maxObjVar);
-		return evaluator;
-	}
-
-	/**
-	 * Unregisters a RubyEvaluator.
-	 * 
-	 * @param context
-	 *            the evaluator's shared context name
-	 * @return true if the entire context was removed
-	 */
-	public static void removeRubyEvaluator(String context, String maxObjVar) {
-		int count = contextCounter.get(context);
-		count--;
-		if (count > 0) {
-			contextCounter.put(context, count++);
-			contextMaxObjectMapping.get(context).remove(maxObjVar);
-		}
-		else {
-			notifyContextDestroyedListener(context);
-			contextDestroyedListeners.remove(context);
-			contextMaxObjectMapping.remove(context);
-			contextCounter.remove(context);
-			contexts.remove(context);
-		}
-	}
-
-	public static Collection<String> getMaxObjectVariables(String context) {
-		return contextMaxObjectMapping.get(context);
-	}
-
-	public static void registerContextDestroyedListener(String context, String callbackMethod) {
-		contextDestroyedListeners.addValue(context, callbackMethod);
-	}
-
-	public static void notifyContextDestroyedListener(String context) {
-		ScriptEvaluator ruby = contexts.get(context);
-		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
-		// remove() lets the garbage collector do its job
-
-		if (ruby != null && callbackMethods != null) {
-			for (String callbackMethod : callbackMethods) {
-				try {
-					ruby.eval(callbackMethod);
-				}
-				catch (Exception e) {
-					System.err.println("on_context_destroyed method '" + callbackMethod + "' failed:\n"
-							+ e.getMessage());
-				}
-			}
 		}
 	}
 }

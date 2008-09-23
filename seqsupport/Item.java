@@ -131,7 +131,7 @@ public class Item implements Comparable<Item>, Atomizer {
 	public Object getValue() {
 		if (rubyCode != null && ruby != null) {
 			if (reeval) {
-				Object value = ruby.eval(rubyCode);
+				Object value = ruby.eval(rubyCode, true);
 				if (value instanceof Atom[]) {
 					atoms = (Atom[]) value;
 					setAtomFromAtoms();

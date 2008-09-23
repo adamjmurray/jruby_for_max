@@ -178,7 +178,7 @@ public class ruby extends AbstractMaxRubyObject {
 	private synchronized void loadFile() {
 		info("loading script '" + scriptFile + "' on " + new Date());
 		try {
-			ruby.init(scriptFile, scriptFileArgs, evaloutlet >= 0);
+			ruby.init(scriptFile, scriptFileArgs);
 		}
 		catch (RubyException e) {
 			err("Error evaluating script file: " + scriptFile.getPath());

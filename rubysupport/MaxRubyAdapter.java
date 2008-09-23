@@ -45,7 +45,7 @@ import com.cycling74.max.MaxSystem;
 /**
  * The bridge between Max and Ruby.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class MaxRubyAdapter {
@@ -122,13 +122,13 @@ public class MaxRubyAdapter {
 		declareMaxObjects();
 	}
 
+	public void eval(CharSequence rubyCode) {
+		eval(rubyCode, false);
+	}
+
 	/**
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
-	public Object eval(CharSequence rubyCode) {
-		return eval(rubyCode, true);
-	}
-
 	public Object eval(CharSequence rubyCode, boolean returnResult) {
 		if (!ruby.isInitialized()) {
 			init();
@@ -184,21 +184,36 @@ public class MaxRubyAdapter {
 	}
 
 	public void init() {
-		init(null, Atom.emptyArray, true);
+		init(null, Atom.emptyArray);
 	}
 
-	public void init(File scriptFile, Atom[] args, boolean returnResults) {
+	public void init(File scriptFile, Atom[] args) {
 		if (ruby.isInitialized()) {
 			ScriptEvaluatorFactory.notifyContextDestroyedListener(context);
 		}
+		else {
+
+		}
 		ruby.resetContext();
 
+		/*
 		if (code.isEmpty()) {
 			buildInitializationCode();
 		}
+		*/
 
 		ruby.setInitialized(true);
-		eval(code, false);
+		if (code.isEmpty()) {
+			for (String path : MaxSystem.getSearchPath()) {
+				if (!path.matches(IGNORED_PATHS)) addPath(path);
+			}
+			code.line(Utils.getFileAsString("ajm_ruby_initialize.rb"));
+		}
+		eval(code);
+
+		// System.out.println("INIT CODE!!!\n" + initCode);
+		// eval(initCode, false);
+
 		declareMaxObjects();
 
 		if (scriptFile != null) {
@@ -210,85 +225,9 @@ public class MaxRubyAdapter {
 			}
 			eval(scriptFileInit, false);
 			if (script != null) {
-				eval(script, returnResults);
+				eval(script, false);
 			}
 		}
-	}
-
-	private void buildInitializationCode() {
-		// Setup the path:
-		for (String path : MaxSystem.getSearchPath()) {
-			if (!path.matches(IGNORED_PATHS)) addPath(path);
-		}
-
-		// TODO: this was moved to ajm_ruby_initialize.rb
-		// find it on the path and eval that!
-
-		// TODO: move this to an external file:
-		// Setup the default functions:
-		code.line("def puts(*params)");
-		code.line("  $Utils.puts(params)");
-		code.line("end");
-
-		code.line("def print(*params)");
-		code.line("  $Utils.print(params)");
-		code.line("end");
-
-		code.line("def error(*params)");
-		code.line("  $Utils.error(params)");
-		code.line("end");
-
-		code.line("def flush");
-		code.line("  $Utils.flush");
-		code.line("end");
-
-		code.line("def outlet(n, *params)");
-		code.line("  $Utils.outlet(n, params)");
-		code.line("end");
-
-		for (int i = 0; i < 10; i++) {
-			code.line("def out" + i + "(*params)");
-			code.line("  $Utils.outlet(" + i + ", params)");
-			code.line("end");
-		}
-		// TODO: define methods that will output to all object in the current context
-		// TODO: will need to maintain a mapping to handle that
-
-		code.line("def atom(obj)");
-		code.line("  if obj");
-		code.line("    $Utils.atom(obj)");
-		code.line("  else");
-		code.line("    $Utils.emptyAtomArray");
-		code.line("  end");
-		code.line("end");
-
-		code.line("def on_context_destroyed(callback)");
-		code.line("  $Utils.on_context_destroyed(callback.to_s)");
-		code.line("end");
-
-		// Placeholders for Max hooks:
-		code.line("def bang");
-		code.line("  'bang'");
-		code.line("end");
-
-		code.line("def list(array)");
-		code.line("  array");
-		code.line("end");
-
-		// for use with shared contexts:
-		code.line("$LocalStorage = {}");
-		code.line("def setLocal(name,obj)");
-		code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
-		code.line("  if(!storage)");
-		code.line("    storage = {}");
-		code.line("    $LocalStorage[$MaxObject.hashCode] = storage");
-		code.line("  end");
-		code.line("  storage[name] = obj");
-		code.line("end");
-		code.line("def getLocal(name)");
-		code.line("  storage = $LocalStorage[$MaxObject.hashCode]");
-		code.line("  storage[name] if storage");
-		code.line("end");
 	}
 
 	/**

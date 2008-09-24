@@ -31,6 +31,7 @@ import java.io.File;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
 
 import ajm.maxsupport.Atomizer;
 import ajm.util.LineBuilder;
@@ -82,10 +83,7 @@ public class MaxRubyAdapter {
 		}
 		this.context = context;
 		ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
-
-		// ruby.declarePersistentGlobal(maxObjVar, maxObj);
-		// TODO: can check to see if this was already created in current context
-		ruby.declareGlobal("Utils", new RubyUtils());
+		ruby.declareGlobal("MaxRubyAdapter", this);
 	}
 
 	public Logger getLogger() {
@@ -115,8 +113,12 @@ public class MaxRubyAdapter {
 		ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
 	}
 
-	public void eval(CharSequence rubyCode) {
+	public void exec(CharSequence rubyCode) {
 		eval(rubyCode, false);
+	}
+
+	public void eval(CharSequence rubyCode) {
+		eval(rubyCode, true);
 	}
 
 	/**
@@ -128,13 +130,12 @@ public class MaxRubyAdapter {
 		}
 		Object result;
 		synchronized (ruby) {
-			// Set the $MaxObject global correctly.
-			// This eval() needed when using shared contexts:
-			ruby.eval("$MaxObject = $" + maxObjVar);
+			// Set the $MaxObject global correctly in shared contexts:
+			ruby.declareGlobal("MaxObject", maxObj);
 			result = ruby.eval(rubyCode);
 		}
 		if (returnResult) {
-			return toAtoms(result);
+			return toAtoms(result, true);
 		}
 		else {
 			return null;
@@ -146,22 +147,23 @@ public class MaxRubyAdapter {
 	}
 
 	public void init(File scriptFile, Atom[] args) {
-		if (ruby.isInitialized()) {
-			ScriptEvaluatorFactory.notifyContextDestroyedListener(context);
-		}
-		else {
-
-		}
-		ruby.resetContext();
-
 		if (code.isEmpty()) {
 			for (String path : MaxSystem.getSearchPath()) {
-				if (!path.matches(IGNORED_PATHS)) addPath(path);
+				if (!path.matches(IGNORED_PATHS)) {
+					// Add the path to Ruby's search path:
+					code.line("$: << " + quote(path));
+				}
 			}
-			code.line(Utils.getFileAsString("ajm_ruby_initialize.rb"));
+			String initializationCode = Utils.getFileAsString("ajm_ruby_initialize.rb");
+			code.append(initializationCode);
+		}
+
+		if (ruby.isInitialized()) {
+			ScriptEvaluatorFactory.notifyContextDestroyedListener(context);
+			ruby.resetContext();
 		}
 		ruby.setInitialized(true);
-		eval(code);
+		exec(code);
 
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
@@ -170,15 +172,11 @@ public class MaxRubyAdapter {
 			for (Atom arg : args) {
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));
 			}
-			eval(scriptFileInit, false);
+			exec(scriptFileInit);
 			if (script != null) {
-				eval(script);
+				exec(script);
 			}
 		}
-	}
-
-	private void addPath(String path) {
-		code.line("$: << " + quote(path));
 	}
 
 	private String quote(Object o) {
@@ -196,10 +194,14 @@ public class MaxRubyAdapter {
 	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
 	public Object toAtoms(Object obj) {
-		return toAtoms(obj, false);
+		return toAtoms(obj, null, false);
 	}
 
-	private Object toAtoms(Object obj, boolean nested) {
+	public Object toAtoms(Object obj, boolean logCoercions) {
+		return toAtoms(obj, (logCoercions ? logger : null), false);
+	}
+
+	private Object toAtoms(Object obj, Logger logger, boolean nested) {
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
@@ -227,7 +229,7 @@ public class MaxRubyAdapter {
 			else return Atom.newAtom(val);
 		}
 
-		else if (obj instanceof CharSequence) {
+		else if (obj instanceof CharSequence || obj instanceof RubySymbol) {
 			return Atom.newAtom(obj.toString());
 		}
 
@@ -241,14 +243,14 @@ public class MaxRubyAdapter {
 			Object[] atomsArray = new Object[array.size()];
 			boolean isFlatArray = true;
 			for (int i = 0; i < array.size(); i++) {
-				Object val = toAtoms(array.get(i), true);
+				Object val = toAtoms(array.get(i), logger, true);
 				if (!(val instanceof Atom)) {
 					isFlatArray = false;
 				}
 				atomsArray[i] = val;
 			}
 
-			if (nested == true || isFlatArray) {
+			if (isFlatArray) {
 				Atom[] atoms = new Atom[array.size()];
 				for (int i = 0; i < atomsArray.length; i++) {
 					atoms[i] = (Atom) atomsArray[i];
@@ -314,89 +316,7 @@ public class MaxRubyAdapter {
 		}
 	}
 
-	private class RubyUtils {
-		// JRuby has problems calling some Max Java methods, so I go back into Java-land to do it
-		// not sure if all of these are necessary anymore, but it works!
-
-		public Object atom(Object o) {
-			return toAtoms(o);
-		}
-
-		public Atom[] emptyAtomArray() {
-			return Atom.emptyArray;
-		}
-
-		public void puts(RubyArray args) {
-			for (Object o : args.toArray()) {
-				Object atom = toAtoms(o);
-				if (atom instanceof Atom[]) {
-					for (Atom a : (Atom[]) atom) {
-						System.out.println(a);
-					}
-				}
-				else {
-					System.out.println(atom);
-				}
-			}
-		}
-
-		public void print(RubyArray args) {
-			for (Object o : args.toArray()) {
-				Object atom = toAtoms(o);
-				if (atom instanceof Atom[]) {
-					for (Atom a : (Atom[]) atom) {
-						System.out.print(a);
-					}
-				}
-				else {
-					System.out.print(atom);
-				}
-			}
-		}
-
-		public void error(RubyArray args) {
-			for (Object o : args.toArray()) {
-				Object atom = toAtoms(o);
-				if (atom instanceof Atom[]) {
-					for (Atom a : (Atom[]) atom) {
-						System.err.println(a);
-					}
-				}
-				else {
-					System.err.println(atom);
-				}
-			}
-		}
-
-		public void flush() {
-			System.out.println();
-		}
-
-		public void outlet(int outletIdx, RubyArray args) {
-			if (outletIdx >= maxObj.getNumOutlets()) {
-				MaxSystem.error("Invalid outlet index " + outletIdx);
-			}
-			else {
-				Object atoms;
-				if (args.size() == 1) {
-					// avoid unnecessary nested arrays for things like "outlet 0, [1,2]"
-					atoms = toAtoms(args.get(0));
-				}
-				else {
-					atoms = toAtoms(args);
-				}
-
-				if (atoms instanceof Atom[]) {
-					maxObj.outlet(outletIdx, (Atom[]) atoms);
-				}
-				else {
-					maxObj.outlet(outletIdx, (Atom) atoms);
-				}
-			}
-		}
-
-		public void on_context_destroyed(String callback) {
-			ScriptEvaluatorFactory.registerContextDestroyedListener(context, callback);
-		}
+	public void on_context_destroyed(String context, Object callback) {
+		ScriptEvaluatorFactory.registerContextDestroyedListener(context, callback.toString());
 	}
 }

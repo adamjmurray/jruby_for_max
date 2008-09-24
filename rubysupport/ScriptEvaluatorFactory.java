@@ -73,6 +73,7 @@ public class ScriptEvaluatorFactory {
 			contextCounter.put(context, 1);
 			Set<Object> javaObjs = javaObjectsUsingContext.addValue(context, owner);
 			evaluator.declareGlobal(ownersInContextVarName, javaObjs);
+			evaluator.declareGlobal("MaxContext", context);
 		}
 		else {
 			int count = contextCounter.get(context);

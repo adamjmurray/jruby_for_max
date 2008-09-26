@@ -38,7 +38,7 @@ import com.cycling74.max.MaxQelem;
 /**
  * Common behavior for ajm objects.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public abstract class AbstractMaxObject extends MaxObject implements Logger {
@@ -132,4 +132,7 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 		error(this.getClass().getName() + ": " + message);
 	}
 
+	public String toString() {
+		return getClass().getName() + "#<" + Integer.toHexString(hashCode()) + ">";
+	}
 }

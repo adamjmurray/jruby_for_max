@@ -42,7 +42,7 @@ import com.cycling74.max.Executable;
 /**
  * The ajm.ruby MaxObject
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class ruby extends AbstractMaxRubyObject {
@@ -62,7 +62,6 @@ public class ruby extends AbstractMaxRubyObject {
 	 * 
 	 * @param args
 	 *            1 optional integer arg specifies the number of outlets
-	 * 
 	 */
 	public ruby(Atom[] args) {
 		super();

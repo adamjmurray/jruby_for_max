@@ -34,19 +34,23 @@ import ajm.rubysupport.MaxRubyAdapter;
 /**
  * Superclass for objects that support Ruby scripting.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 
 	protected String context = null;
+	protected String id = null;
 	private boolean autoinit = false;
 
 	protected MaxRubyAdapter ruby;
 
+	protected AbstractMaxRubyObject self = this;
+
 	public AbstractMaxRubyObject() {
 		super();
 		declareAttribute("context", "getcontext", "context");
+		declareAttribute("id", "getid", "id");
 		declareAttribute("autoinit");
 	}
 
@@ -59,22 +63,27 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		@Override
 		public void execute() {
 			super.execute();
-			contructRubyEvaluator();
+			ruby = new MaxRubyAdapter(self, context, id);
 			if (autoinit) {
 				ruby.init();
+				/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
+				   Thus autoinit is false by default.
+				   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
+				   The hang delay got much shorter with JRuby 1.1. */
 			}
-			/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
-			   Thus autoinit is false by default.
-			   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-			   The hang delay got much shorter with JRuby 1.1. */
 		}
 	}
 
 	protected void contructRubyEvaluator() {
-		ruby = new MaxRubyAdapter(this, context);
+
 	}
 
 	public String getcontext() {
+		return context;
+	}
+
+	// So ruby can access with . notation
+	public String context() {
 		return context;
 	}
 
@@ -82,6 +91,22 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		this.context = context;
 		if (ruby != null) {
 			ruby.setContext(context);
+		} // else we're still initializing and the initalizer should handle this
+	}
+
+	public String getid() {
+		return id;
+	}
+
+	// So ruby can access with . notation
+	public String id() {
+		return id;
+	}
+
+	public void id(String id) {
+		this.id = id;
+		if (ruby != null) {
+			ruby.setId(id);
 		} // else we're still initializing and the initalizer should handle this
 	}
 

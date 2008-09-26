@@ -60,11 +60,13 @@ public class MaxRubyAdapter {
 
 	private final MaxObject maxObj;
 
-	private final String maxObjVar;
+	// private final String maxObjVar;
 
 	private Logger logger;
 
 	private String context;
+
+	private String id;
 
 	private static String IGNORED_PATHS = RubyProperties.getIgnoredPaths();
 
@@ -73,16 +75,29 @@ public class MaxRubyAdapter {
 	}
 
 	public MaxRubyAdapter(MaxObject maxObj, String context) {
+		this(maxObj, context, null);
+	}
+
+	public MaxRubyAdapter(MaxObject maxObj, String context, String id) {
+		if (id == null) {
+			id = Integer.toHexString(maxObj.hashCode());
+		}
 		if (context == null) {
-			context = "__" + Integer.toHexString(maxObj.hashCode());
+			context = "__" + id;
 		}
 		this.maxObj = maxObj;
-		this.maxObjVar = "MaxObject_" + maxObj.hashCode();
+		// this.maxObjVar = "MaxObject_" + id;
 		if (maxObj instanceof Logger) {
 			this.logger = (Logger) maxObj;
 		}
 		this.context = context;
-		ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
+		this.id = id;
+		getEvaluator();
+	}
+
+	private void getEvaluator() {
+		ruby = ScriptEvaluatorManager.getRubyEvaluator(context, id, maxObj);
+		// ruby.declareGlobal(maxObjVar, maxObj);
 		ruby.declareGlobal("MaxRubyAdapter", this);
 	}
 
@@ -101,16 +116,27 @@ public class MaxRubyAdapter {
 	public void setContext(String context) {
 		if (!Utils.equals(this.context, context)) {
 			// cleanup old context
-			ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
+			ScriptEvaluatorManager.removeRubyEvaluator(maxObj);
 
 			// init new context
-			ruby = ScriptEvaluatorFactory.getRubyEvaluator(context, maxObjVar, maxObj, "MaxObjects");
 			this.context = context;
+			getEvaluator();
+		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		if (!Utils.equals(this.id, id)) {
+			ScriptEvaluatorManager.updateId(maxObj, id);
+			this.id = id;
 		}
 	}
 
 	public void notifyDeleted() {
-		ScriptEvaluatorFactory.removeRubyEvaluator(this.context, maxObjVar);
+		ScriptEvaluatorManager.removeRubyEvaluator(maxObj);
 	}
 
 	public void exec(CharSequence rubyCode) {
@@ -130,8 +156,9 @@ public class MaxRubyAdapter {
 		}
 		Object result;
 		synchronized (ruby) {
-			// Set the $MaxObject global correctly in shared contexts:
-			ruby.declareGlobal("MaxObject", maxObj);
+			// Set the $MaxObject/ID globals correctly in shared contexts:
+			ruby.declareGlobal("MaxObject", maxObj); // for backward compatibility
+			ruby.declareGlobal("max_object", maxObj); // the new preferred ruby-ish variable name
 			result = ruby.eval(rubyCode);
 		}
 		if (returnResult) {
@@ -159,7 +186,7 @@ public class MaxRubyAdapter {
 		}
 
 		if (ruby.isInitialized()) {
-			ScriptEvaluatorFactory.notifyContextDestroyedListener(context);
+			ScriptEvaluatorManager.notifyContextDestroyedListener(context);
 			ruby.resetContext();
 		}
 		ruby.setInitialized(true);
@@ -194,14 +221,14 @@ public class MaxRubyAdapter {
 	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
 	public Object toAtoms(Object obj) {
-		return toAtoms(obj, null, false);
+		return toAtoms(obj, null);
 	}
 
 	public Object toAtoms(Object obj, boolean logCoercions) {
-		return toAtoms(obj, (logCoercions ? logger : null), false);
+		return toAtoms(obj, (logCoercions ? logger : null));
 	}
 
-	private Object toAtoms(Object obj, Logger logger, boolean nested) {
+	private Object toAtoms(Object obj, Logger logger) {
 		if (obj == null) {
 			return Atom.newAtom("nil");
 		}
@@ -243,7 +270,7 @@ public class MaxRubyAdapter {
 			Object[] atomsArray = new Object[array.size()];
 			boolean isFlatArray = true;
 			for (int i = 0; i < array.size(); i++) {
-				Object val = toAtoms(array.get(i), logger, true);
+				Object val = toAtoms(array.get(i), logger);
 				if (!(val instanceof Atom)) {
 					isFlatArray = false;
 				}
@@ -316,7 +343,7 @@ public class MaxRubyAdapter {
 		}
 	}
 
-	public void on_context_destroyed(String context, Object callback) {
-		ScriptEvaluatorFactory.registerContextDestroyedListener(context, callback.toString());
+	public void on_context_destroyed(Object callback) {
+		ScriptEvaluatorManager.registerContextDestroyedListener(maxObj, callback.toString());
 	}
 }

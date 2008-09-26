@@ -3,7 +3,7 @@ package ajm.util;
 /**
  * Builds text one line at a time.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class LineBuilder implements CharSequence {
@@ -12,6 +12,10 @@ public class LineBuilder implements CharSequence {
 
 	public void line(String s) {
 		lines.append(s).append("\n");
+	}
+
+	public void append(String s) {
+		lines.append(s);
 	}
 
 	public String toString() {

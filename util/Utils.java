@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Miscellaneous utility methods.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class Utils {
@@ -56,6 +56,17 @@ public class Utils {
 		else {
 			return o1.equals(o2);
 		}
+	}
+
+	/**
+	 * A safe toString() method that avoids NullPointerExceptions.
+	 * 
+	 * @param obj
+	 *            the object to convert to a String
+	 * @return the String representation of the object
+	 */
+	public static String toString(Object obj) {
+		return (obj == null ? null : obj.toString());
 	}
 
 	public static Atom[] toAtoms(Collection<? extends Atomizer> objs) {

@@ -41,90 +41,119 @@ import ajm.util.MappedSet;
  * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
-public class ScriptEvaluatorFactory {
+public class ScriptEvaluatorManager {
 
 	private static Map<String, ScriptEvaluator> contexts = new HashMap<String, ScriptEvaluator>();
 	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
 	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
 	private static MappedSet<String, Object> javaObjectsUsingContext = new MappedSet<String, Object>();
+	private static Map<String, Map<String, Object>> objectMap = new HashMap<String, Map<String, Object>>();
 	private static Constructor<ScriptEvaluator> evaluatorConstructor;
 
+	/**
+	 * Stores a mapping from max objects to their context and id
+	 */
+	private static Map<Object, String[]> objectMetadata = new HashMap<Object, String[]>();
+
 	// This is a singleton, so no instances allowed.
-	private ScriptEvaluatorFactory() {
+	private ScriptEvaluatorManager() {
 	}
 
 	/**
 	 * Get a Ruby evaluator for the specified context.
 	 * 
-	 * @param context
-	 * @param ownerVarName -
-	 *            the ruby variable that will reference the Java object that uses this evaluator
-	 * @param owner -
-	 *            the Java object that will be using this evalutor.
-	 * @parem ownersInContextVarName - a variable containing all Java objects that use this evalutor context
 	 * @return
 	 */
-	public static ScriptEvaluator getRubyEvaluator(String context, String ownerVarName, Object owner,
-			String ownersInContextVarName) {
+	public static ScriptEvaluator getRubyEvaluator(String context, String id, Object maxObject) {
+		context = getContext(context, maxObject);
+		id = getId(id, maxObject);
+		objectMetadata.put(maxObject, new String[] { context, id });
+
 		ScriptEvaluator evaluator = contexts.get(context);
 		if (evaluator == null) {
 			evaluator = newRubyEvaluatorInstance();
 			contexts.put(context, evaluator);
 			contextCounter.put(context, 1);
-			Set<Object> javaObjs = javaObjectsUsingContext.addValue(context, owner);
-			evaluator.declareGlobal(ownersInContextVarName, javaObjs);
-			evaluator.declareGlobal("MaxContext", context);
+			Set<Object> javaObjs = javaObjectsUsingContext.addValue(context, maxObject);
+			evaluator.declareGlobal("max_objects", javaObjs);
+
+			Map<String, Object> idMap = new HashMap<String, Object>();
+			objectMap.put(context, idMap);
+			evaluator.declareGlobal("max_object_map", objectMap);
 		}
 		else {
 			int count = contextCounter.get(context);
 			count++;
 			contextCounter.put(context, count);
-			javaObjectsUsingContext.addValue(context, owner);
+			javaObjectsUsingContext.addValue(context, maxObject);
 		}
-		evaluator.declareGlobal(ownerVarName, owner);
+		objectMap.get(context).put(id, maxObject);
 		return evaluator;
 	}
 
 	/**
-	 * Unregisters a RubyEvaluator.
 	 * 
-	 * @param context
-	 *            the evaluator's shared context name
 	 * @return true if the entire context was removed
 	 */
-	public static void removeRubyEvaluator(String context, String ownerVarName) {
-		ScriptEvaluator evaluator = contexts.get(context);
-		if (evaluator != null) {
+	public static void removeRubyEvaluator(Object maxObject) {
+		String[] contextAndId = objectMetadata.remove(maxObject);
+		if (contextAndId != null) {
+			String context = contextAndId[0];
+			String id = contextAndId[1];
 			int count = contextCounter.get(context);
 			count--;
 			if (count > 0) {
 				contextCounter.put(context, count++);
-				javaObjectsUsingContext.get(context).remove(ownerVarName);
+				javaObjectsUsingContext.get(context).remove(maxObject);
+				objectMap.get(context).remove(id);
 			}
 			else {
 				notifyContextDestroyedListener(context);
-				contextDestroyedListeners.remove(context);
 				javaObjectsUsingContext.remove(context);
 				contextCounter.remove(context);
 				contexts.remove(context);
+				objectMap.remove(context);
 			}
-			evaluator.undeclareGlobal(ownerVarName);
 		}
 	}
 
-	public static Collection<Object> getJavaObjectVariables(String context) {
-		return javaObjectsUsingContext.get(context);
+	public static void updateId(Object maxObject, String id) {
+		String[] contextAndId = objectMetadata.get(maxObject);
+		if (contextAndId != null) {
+			String context = contextAndId[0];
+			String oldId = contextAndId[1];
+			contextAndId[1] = id;
+			Map<String, Object> idMap = objectMap.get(context);
+			idMap.remove(oldId);
+			idMap.put(id, maxObject);
+		}
 	}
 
-	public static void registerContextDestroyedListener(String context, String callbackMethod) {
-		contextDestroyedListeners.addValue(context, callbackMethod);
+	private static String getContext(String context, Object maxObject) {
+		if (context == null) {
+			context = "__" + Integer.toHexString(maxObject.hashCode());
+		}
+		return context;
+	}
+
+	private static String getId(String id, Object maxObject) {
+		if (id == null) {
+			id = Integer.toHexString(maxObject.hashCode());
+		}
+		return id;
+	}
+
+	public static void registerContextDestroyedListener(Object maxObject, String callbackMethod) {
+		String[] contextAndId = objectMetadata.get(maxObject);
+		if (contextAndId != null) {
+			String context = contextAndId[0];
+			contextDestroyedListeners.addValue(context, callbackMethod);
+		}
 	}
 
 	public static void notifyContextDestroyedListener(String context) {
 		ScriptEvaluator ruby = contexts.get(context);
 		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
-		// remove() lets the garbage collector do its job
-
 		if (ruby != null && callbackMethods != null) {
 			for (String callbackMethod : callbackMethods) {
 				try {

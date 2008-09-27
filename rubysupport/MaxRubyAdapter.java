@@ -58,13 +58,13 @@ public class MaxRubyAdapter {
 
 	private LineBuilder scriptFileInit = new LineBuilder();
 
-	private final MaxObject maxObj;
+	private final MaxObject maxObject;
 
 	// private final String maxObjVar;
 
 	private Logger logger;
 
-	private String context;
+	private String maxContext;
 
 	private String id;
 
@@ -79,24 +79,24 @@ public class MaxRubyAdapter {
 	}
 
 	public MaxRubyAdapter(MaxObject maxObj, String context, String id) {
-		if (id == null) {
-			id = Integer.toHexString(maxObj.hashCode());
-		}
-		if (context == null) {
-			context = "__" + id;
-		}
-		this.maxObj = maxObj;
+		// if (id == null) {
+		// id = Integer.toHexString(maxObj.hashCode());
+		// }
+		// if (context == null) {
+		// context = "__" + id;
+		// }
+		this.maxObject = maxObj;
 		// this.maxObjVar = "MaxObject_" + id;
 		if (maxObj instanceof Logger) {
 			this.logger = (Logger) maxObj;
 		}
-		this.context = context;
+		this.maxContext = context;
 		this.id = id;
 		getEvaluator();
 	}
 
 	private void getEvaluator() {
-		ruby = ScriptEvaluatorManager.getRubyEvaluator(context, id, maxObj);
+		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject);
 		// ruby.declareGlobal(maxObjVar, maxObj);
 		ruby.declareGlobal("MaxRubyAdapter", this);
 	}
@@ -110,16 +110,16 @@ public class MaxRubyAdapter {
 	}
 
 	public String getContext() {
-		return context;
+		return maxContext;
 	}
 
 	public void setContext(String context) {
-		if (!Utils.equals(this.context, context)) {
+		if (!Utils.equals(this.maxContext, context)) {
 			// cleanup old context
-			ScriptEvaluatorManager.removeRubyEvaluator(maxObj);
+			ScriptEvaluatorManager.removeRubyEvaluator(maxObject);
 
 			// init new context
-			this.context = context;
+			this.maxContext = context;
 			getEvaluator();
 		}
 	}
@@ -130,13 +130,13 @@ public class MaxRubyAdapter {
 
 	public void setId(String id) {
 		if (!Utils.equals(this.id, id)) {
-			ScriptEvaluatorManager.updateId(maxObj, id);
+			ScriptEvaluatorManager.updateId(maxObject, id);
 			this.id = id;
 		}
 	}
 
 	public void notifyDeleted() {
-		ScriptEvaluatorManager.removeRubyEvaluator(maxObj);
+		ScriptEvaluatorManager.removeRubyEvaluator(maxObject);
 	}
 
 	public void exec(CharSequence rubyCode) {
@@ -157,8 +157,8 @@ public class MaxRubyAdapter {
 		Object result;
 		synchronized (ruby) {
 			// Set the $MaxObject/ID globals correctly in shared contexts:
-			ruby.declareGlobal("MaxObject", maxObj); // for backward compatibility
-			ruby.declareGlobal("max_object", maxObj); // the new preferred ruby-ish variable name
+			ruby.declareGlobal("MaxObject", maxObject); // for backward compatibility
+			ruby.declareGlobal("max_object", maxObject); // the new preferred ruby-ish variable name
 			result = ruby.eval(rubyCode);
 		}
 		if (returnResult) {
@@ -186,7 +186,7 @@ public class MaxRubyAdapter {
 		}
 
 		if (ruby.isInitialized()) {
-			ScriptEvaluatorManager.notifyContextDestroyedListener(context);
+			ScriptEvaluatorManager.notifyContextDestroyedListener(maxContext, maxObject);
 			ruby.resetContext();
 		}
 		ruby.setInitialized(true);
@@ -344,6 +344,6 @@ public class MaxRubyAdapter {
 	}
 
 	public void on_context_destroyed(Object callback) {
-		ScriptEvaluatorManager.registerContextDestroyedListener(maxObj, callback.toString());
+		ScriptEvaluatorManager.registerContextDestroyedListener(maxObject, callback.toString());
 	}
 }

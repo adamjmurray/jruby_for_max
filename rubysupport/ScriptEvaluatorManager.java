@@ -43,11 +43,11 @@ import ajm.util.MappedSet;
  */
 public class ScriptEvaluatorManager {
 
-	private static Map<String, ScriptEvaluator> contexts = new HashMap<String, ScriptEvaluator>();
-	private static Map<String, Integer> contextCounter = new HashMap<String, Integer>();
-	private static MappedSet<String, String> contextDestroyedListeners = new MappedSet<String, String>();
-	private static MappedSet<String, Object> javaObjectsUsingContext = new MappedSet<String, Object>();
-	private static Map<String, Map<String, Object>> objectMap = new HashMap<String, Map<String, Object>>();
+	private static Map<String, ScriptEvaluator> evaluatorContexts = new HashMap<String, ScriptEvaluator>();
+	private static Map<String, Integer> evaluatorContextCounter = new HashMap<String, Integer>();
+	private static MappedSet<String, String> evaluatorContextDestroyedListeners = new MappedSet<String, String>();
+	private static MappedSet<String, Object> objectsUsingEvaluator = new MappedSet<String, Object>();
+	private static Map<String, Map<String, Object>> maxObjectMap = new HashMap<String, Map<String, Object>>();
 	private static Constructor<ScriptEvaluator> evaluatorConstructor;
 
 	/**
@@ -64,30 +64,37 @@ public class ScriptEvaluatorManager {
 	 * 
 	 * @return
 	 */
-	public static ScriptEvaluator getRubyEvaluator(String context, String id, Object maxObject) {
-		context = getContext(context, maxObject);
-		id = getId(id, maxObject);
-		objectMetadata.put(maxObject, new String[] { context, id });
+	public static ScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject) {
 
-		ScriptEvaluator evaluator = contexts.get(context);
+		// TODO: issue a warning when the id is already in use, and force the MaxObject to change it's id to id[n]
+
+		// if maxContext is null, the evaluatorContext will be some semi-random unique context
+		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
+		objectMetadata.put(maxObject, new String[] { maxContext, id });
+
+		ScriptEvaluator evaluator = evaluatorContexts.get(evaluatorContext);
 		if (evaluator == null) {
 			evaluator = newRubyEvaluatorInstance();
-			contexts.put(context, evaluator);
-			contextCounter.put(context, 1);
-			Set<Object> javaObjs = javaObjectsUsingContext.addValue(context, maxObject);
+			evaluatorContexts.put(evaluatorContext, evaluator);
+			evaluatorContextCounter.put(evaluatorContext, 1);
+			Set<Object> javaObjs = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
 			evaluator.declareGlobal("max_objects", javaObjs);
 
-			Map<String, Object> idMap = new HashMap<String, Object>();
-			objectMap.put(context, idMap);
-			evaluator.declareGlobal("max_object_map", objectMap);
+			// We have to check if the maxContext already exists, even though this evaluatorContext is new,
+			// because we may already have entries for the null maxContext
+
+			if (!maxObjectMap.containsKey(maxContext)) {
+				maxObjectMap.put(maxContext, new HashMap<String, Object>());
+			}
+			evaluator.declareGlobal("max_object_map", maxObjectMap);
 		}
 		else {
-			int count = contextCounter.get(context);
+			int count = evaluatorContextCounter.get(evaluatorContext);
 			count++;
-			contextCounter.put(context, count);
-			javaObjectsUsingContext.addValue(context, maxObject);
+			evaluatorContextCounter.put(evaluatorContext, count);
+			objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
 		}
-		objectMap.get(context).put(id, maxObject);
+		maxObjectMap.get(maxContext).put(id, maxObject);
 		return evaluator;
 	}
 
@@ -98,21 +105,29 @@ public class ScriptEvaluatorManager {
 	public static void removeRubyEvaluator(Object maxObject) {
 		String[] contextAndId = objectMetadata.remove(maxObject);
 		if (contextAndId != null) {
-			String context = contextAndId[0];
+			String maxContext = contextAndId[0];
+			String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
 			String id = contextAndId[1];
-			int count = contextCounter.get(context);
+			int count = evaluatorContextCounter.get(evaluatorContext);
 			count--;
 			if (count > 0) {
-				contextCounter.put(context, count++);
-				javaObjectsUsingContext.get(context).remove(maxObject);
-				objectMap.get(context).remove(id);
+				evaluatorContextCounter.put(evaluatorContext, count++);
+				objectsUsingEvaluator.get(evaluatorContext).remove(maxObject);
 			}
 			else {
-				notifyContextDestroyedListener(context);
-				javaObjectsUsingContext.remove(context);
-				contextCounter.remove(context);
-				contexts.remove(context);
-				objectMap.remove(context);
+				notifyContextDestroyedListener(maxContext, maxObject);
+				objectsUsingEvaluator.remove(evaluatorContext);
+				evaluatorContextCounter.remove(evaluatorContext);
+				evaluatorContexts.remove(evaluatorContext);
+			}
+
+			// We have to manage the map this way instead of relying on the count, because
+			// the null maxContext means a different evaluatorContext for each object,
+			// so the counts don't accurately reflect what's in this map
+			Map<String, Object> idMap = maxObjectMap.get(maxContext);
+			idMap.remove(id);
+			if (idMap.isEmpty()) {
+				maxObjectMap.remove(maxContext);
 			}
 		}
 	}
@@ -120,40 +135,37 @@ public class ScriptEvaluatorManager {
 	public static void updateId(Object maxObject, String id) {
 		String[] contextAndId = objectMetadata.get(maxObject);
 		if (contextAndId != null) {
-			String context = contextAndId[0];
+			String maxContext = contextAndId[0];
 			String oldId = contextAndId[1];
 			contextAndId[1] = id;
-			Map<String, Object> idMap = objectMap.get(context);
+			Map<String, Object> idMap = maxObjectMap.get(maxContext);
 			idMap.remove(oldId);
 			idMap.put(id, maxObject);
 		}
 	}
 
-	private static String getContext(String context, Object maxObject) {
-		if (context == null) {
-			context = "__" + Integer.toHexString(maxObject.hashCode());
+	private static String getEvaluatorContext(String maxContext, Object maxObject) {
+		if (maxContext == null) {
+			return "__" + Integer.toHexString(maxObject.hashCode());
 		}
-		return context;
-	}
-
-	private static String getId(String id, Object maxObject) {
-		if (id == null) {
-			id = Integer.toHexString(maxObject.hashCode());
+		else {
+			return maxContext;
 		}
-		return id;
 	}
 
 	public static void registerContextDestroyedListener(Object maxObject, String callbackMethod) {
 		String[] contextAndId = objectMetadata.get(maxObject);
 		if (contextAndId != null) {
-			String context = contextAndId[0];
-			contextDestroyedListeners.addValue(context, callbackMethod);
+			String maxContext = contextAndId[0];
+			String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
+			evaluatorContextDestroyedListeners.addValue(evaluatorContext, callbackMethod);
 		}
 	}
 
-	public static void notifyContextDestroyedListener(String context) {
-		ScriptEvaluator ruby = contexts.get(context);
-		Collection<String> callbackMethods = contextDestroyedListeners.remove(context);
+	public static void notifyContextDestroyedListener(String maxContext, Object maxObject) {
+		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
+		ScriptEvaluator ruby = evaluatorContexts.get(evaluatorContext);
+		Collection<String> callbackMethods = evaluatorContextDestroyedListeners.remove(evaluatorContext);
 		if (ruby != null && callbackMethods != null) {
 			for (String callbackMethod : callbackMethods) {
 				try {

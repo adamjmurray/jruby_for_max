@@ -40,7 +40,7 @@ import ajm.rubysupport.MaxRubyAdapter;
 public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 
 	protected String context = null;
-	protected String id = null;
+	protected String id = defaultId();
 	private boolean autoinit = false;
 
 	protected MaxRubyAdapter ruby;
@@ -104,10 +104,17 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 	}
 
 	public void id(String id) {
+		if (id == null || "".equals(id)) {
+			id = defaultId();
+		}
 		this.id = id;
 		if (ruby != null) {
 			ruby.setId(id);
 		} // else we're still initializing and the initalizer should handle this
+	}
+
+	private String defaultId() {
+		return Integer.toHexString(hashCode());
 	}
 
 	@Override

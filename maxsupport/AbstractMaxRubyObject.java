@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.cycling74.max.Executable;
 
+import ajm.rubysupport.IdInUseException;
 import ajm.rubysupport.MaxRubyAdapter;
 
 /**
@@ -63,7 +64,15 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		@Override
 		public void execute() {
 			super.execute();
-			ruby = new MaxRubyAdapter(self, context, id);
+			try {
+				ruby = new MaxRubyAdapter(self, context, id);
+			}
+			catch (IdInUseException e) {
+				String availableId = e.getMessage();
+				error("id " + id + " not available. Using: " + availableId);
+				id = availableId;
+				ruby = new MaxRubyAdapter(self, context, id);
+			}
 			if (autoinit) {
 				ruby.init();
 				/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
@@ -109,7 +118,15 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		}
 		this.id = id;
 		if (ruby != null) {
-			ruby.setId(id);
+			try {
+				ruby.setId(id);
+			}
+			catch (IdInUseException e) {
+				String availableId = e.getMessage();
+				error("id " + id + " not available. Using: " + availableId);
+				id = availableId;
+				ruby.setId(id);
+			}
 		} // else we're still initializing and the initalizer should handle this
 	}
 

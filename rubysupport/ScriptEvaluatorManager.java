@@ -66,27 +66,27 @@ public class ScriptEvaluatorManager {
 	 */
 	public static ScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject) {
 
-		// TODO: issue a warning when the id is already in use, and force the MaxObject to change it's id to id[n]
+		Map<String, Object> idMap = maxObjectMap.get(maxContext);
+		if (idMap == null) {
+			idMap = new HashMap<String, Object>();
+			maxObjectMap.put(maxContext, idMap);
+		}
+		else {
+			ensureIdAvailable(idMap, maxObject, id);
+		}
+		idMap.put(id, maxObject);
+		objectMetadata.put(maxObject, new String[] { maxContext, id });
 
 		// if maxContext is null, the evaluatorContext will be some semi-random unique context
 		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
-		objectMetadata.put(maxObject, new String[] { maxContext, id });
 
 		ScriptEvaluator evaluator = evaluatorContexts.get(evaluatorContext);
 		if (evaluator == null) {
 			evaluator = newRubyEvaluatorInstance();
 			evaluatorContexts.put(evaluatorContext, evaluator);
 			evaluatorContextCounter.put(evaluatorContext, 1);
-			Set<Object> javaObjs = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
-			// This is confusing, because this Set uses the evaluatorContext. But I think it could be useful!
-			evaluator.declareGlobal("max_objects", javaObjs);
-
-			// We have to check if the maxContext already exists, even though this evaluatorContext is new,
-			// because we may already have entries for the null maxContext
-
-			if (!maxObjectMap.containsKey(maxContext)) {
-				maxObjectMap.put(maxContext, new HashMap<String, Object>());
-			}
+			Set<Object> maxObjects = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
+			evaluator.declareGlobal("max_objects", maxObjects);
 			evaluator.declareGlobal("max_object_map", maxObjectMap);
 		}
 		else {
@@ -95,7 +95,6 @@ public class ScriptEvaluatorManager {
 			evaluatorContextCounter.put(evaluatorContext, count);
 			objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
 		}
-		maxObjectMap.get(maxContext).put(id, maxObject);
 		return evaluator;
 	}
 
@@ -138,10 +137,34 @@ public class ScriptEvaluatorManager {
 		if (contextAndId != null) {
 			String maxContext = contextAndId[0];
 			String oldId = contextAndId[1];
-			contextAndId[1] = id;
+
 			Map<String, Object> idMap = maxObjectMap.get(maxContext);
+			ensureIdAvailable(idMap, maxObject, id);
+
 			idMap.remove(oldId);
 			idMap.put(id, maxObject);
+			contextAndId[1] = id;
+		}
+	}
+
+	private static void ensureIdAvailable(Map<String, Object> idMap, Object maxObject, String id) {
+		Object existingObject = idMap.get(id);
+		if (existingObject != null && !existingObject.equals(maxObject)) {
+			String base = id;
+			long index = 0;
+			if (id.matches(".*\\[\\d*\\]$")) {
+				int split = id.lastIndexOf('[');
+				base = id.substring(0, split);
+				String indexStr = id.substring(split + 1);
+				indexStr = indexStr.substring(0, indexStr.length() - 1);
+				index = Long.parseLong(indexStr);
+			}
+			String suggest;
+			do {
+				index++;
+				suggest = base + "[" + index + "]";
+			} while (idMap.containsKey(suggest));
+			throw new IdInUseException(suggest);
 		}
 	}
 

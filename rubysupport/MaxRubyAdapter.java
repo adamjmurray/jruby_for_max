@@ -60,8 +60,6 @@ public class MaxRubyAdapter {
 
 	private final MaxObject maxObject;
 
-	// private final String maxObjVar;
-
 	private Logger logger;
 
 	private String maxContext;
@@ -70,25 +68,10 @@ public class MaxRubyAdapter {
 
 	private static String IGNORED_PATHS = RubyProperties.getIgnoredPaths();
 
-	public MaxRubyAdapter(MaxObject maxObj) {
-		this(maxObj, null);
-	}
-
-	public MaxRubyAdapter(MaxObject maxObj, String context) {
-		this(maxObj, context, null);
-	}
-
-	public MaxRubyAdapter(MaxObject maxObj, String context, String id) {
-		// if (id == null) {
-		// id = Integer.toHexString(maxObj.hashCode());
-		// }
-		// if (context == null) {
-		// context = "__" + id;
-		// }
-		this.maxObject = maxObj;
-		// this.maxObjVar = "MaxObject_" + id;
-		if (maxObj instanceof Logger) {
-			this.logger = (Logger) maxObj;
+	public MaxRubyAdapter(MaxObject maxObject, String context, String id) {
+		this.maxObject = maxObject;
+		if (maxObject instanceof Logger) {
+			this.logger = (Logger) maxObject;
 		}
 		this.maxContext = context;
 		this.id = id;
@@ -97,8 +80,7 @@ public class MaxRubyAdapter {
 
 	private void getEvaluator() {
 		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject);
-		// ruby.declareGlobal(maxObjVar, maxObj);
-		ruby.declareGlobal("MaxRubyAdapter", this);
+		ruby.declareGlobal("max_ruby_adapter", this);
 	}
 
 	public Logger getLogger() {

@@ -78,6 +78,7 @@ public class ScriptEvaluatorManager {
 			evaluatorContexts.put(evaluatorContext, evaluator);
 			evaluatorContextCounter.put(evaluatorContext, 1);
 			Set<Object> javaObjs = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
+			// This is confusing, because this Set uses the evaluatorContext. But I think it could be useful!
 			evaluator.declareGlobal("max_objects", javaObjs);
 
 			// We have to check if the maxContext already exists, even though this evaluatorContext is new,

@@ -233,7 +233,8 @@ public class ruby extends AbstractMaxRubyObject {
 	protected void eval(CharSequence input) {
 		try {
 			if (ruby == null) {
-				err("not initialized yet. If you are loadbanging a script, try using a deferlow.");
+				err("not initialized yet. Did not evaluate: " + input
+						+ ". If you are loadbanging a script, try using a deferlow.");
 				return;
 			}
 			Object val = ruby.eval(input, evaloutlet >= 0);

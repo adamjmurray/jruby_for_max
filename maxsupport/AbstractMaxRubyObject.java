@@ -91,7 +91,6 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		return context;
 	}
 
-	// So ruby can access with . notation
 	public String context() {
 		return context;
 	}
@@ -107,7 +106,6 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		return id;
 	}
 
-	// So ruby can access with . notation
 	public String id() {
 		return id;
 	}

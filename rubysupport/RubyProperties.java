@@ -64,8 +64,7 @@ public class RubyProperties {
 			}
 		}
 
-		File rubyDir = new File(jRubyLib, "ruby");
-		File propFile = new File(rubyDir, "ajm.ruby.properties");
+		File propFile = new File(jRubyLib, "ajm.ruby.properties");
 		properties = new Properties();
 		try {
 			properties.load(new FileInputStream(propFile));

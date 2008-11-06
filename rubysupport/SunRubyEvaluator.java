@@ -46,6 +46,7 @@ public class SunRubyEvaluator extends AbstractScriptEvaluator {
 	private ScriptContext context;
 
 	public SunRubyEvaluator() {
+		System.setProperty("com.sun.script.jruby.terminator", "off"); // remember local variable definitions
 		manager = new JRubyScriptEngineManager();
 		resetEngineContext();
 	}

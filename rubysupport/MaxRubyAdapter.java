@@ -34,6 +34,7 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 
 import ajm.maxsupport.Atomizer;
+import ajm.util.GlobalVariableStore;
 import ajm.util.LineBuilder;
 import ajm.util.Logger;
 import ajm.util.Utils;
@@ -81,6 +82,7 @@ public class MaxRubyAdapter {
 	private void getEvaluator() {
 		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject);
 		ruby.declareGlobal("max_ruby_adapter", this);
+		ruby.declareGlobal("global_variable_store", GlobalVariableStore.getInstance());
 	}
 
 	public Logger getLogger() {

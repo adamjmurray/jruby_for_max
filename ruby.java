@@ -31,9 +31,9 @@ import java.io.File;
 import java.util.Date;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
-import ajm.maxsupport.TextBlock;
 import ajm.rubysupport.RubyException;
 import ajm.util.FileWatcher;
+import ajm.util.TextBlock;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;

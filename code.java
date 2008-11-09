@@ -45,7 +45,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import ajm.maxsupport.AbstractMaxObject;
-import ajm.maxsupport.TextBlock;
+import ajm.util.TextBlock;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
@@ -53,7 +53,7 @@ import com.cycling74.max.Atom;
 /**
  * Multi-tab plaintext editor.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class code extends AbstractMaxObject {

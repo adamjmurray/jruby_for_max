@@ -1,4 +1,4 @@
-package ajm.maxsupport;
+package ajm.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * A singleton Map of Strings. Used to indirectly pass long messages in Max.
  * 
- * @version 0.8
+ * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class TextBlock {
@@ -16,15 +16,15 @@ public class TextBlock {
 	private TextBlock() {
 	}
 
-	public static void set(String name, String text) {
+	public synchronized static void set(String name, String text) {
 		textMap.put(name, text);
 	}
 
-	public static String get(String name) {
+	public synchronized static String get(String name) {
 		return textMap.get(name);
 	}
 
-	public static void remove(String name) {
+	public synchronized static void remove(String name) {
 		textMap.remove(name);
 	}
 }

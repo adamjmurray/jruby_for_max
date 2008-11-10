@@ -53,19 +53,24 @@ public class GlobalVariableStore {
 
 	private Map<String, Object> variableStore = new HashMap<String, Object>();
 
-	public synchronized Object getVariable(String name) {
+	public synchronized Object get(String name) {
 		return variableStore.get(name);
 	}
 
-	public synchronized Object setVariable(String name, Object value) {
+	public synchronized Object set(String name, Object value) {
 		return variableStore.put(name, value);
 	}
 
-	public synchronized boolean isDefined(String name) {
+	public synchronized boolean delete(String name) {
+		Object value = variableStore.remove(name);
+		return value != null;
+	}
+
+	public synchronized boolean defined(String name) {
 		return variableStore.containsKey(name);
 	}
 
-	public synchronized Set<String> variableNames() {
+	public synchronized Set<String> names() {
 		return variableStore.keySet();
 	}
 }

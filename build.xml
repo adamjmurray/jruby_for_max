@@ -1,0 +1,83 @@
+<project name="ajm objects" default="jar">
+
+	<property name="build" location="build"/>
+	<property name="lib" location="lib"/>
+	<property name="src" location="src"/>
+	<property name="test" location="test"/>
+
+	<path id="classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<fail message="max.jar not found. Copy [Max installation]/Cycling '74/java/lib/max.jar to ${basedir}/lib and try again.">
+		<condition>
+			<not><available file="${lib}/max.jar"/></not>
+		</condition>
+	</fail>
+
+	<target name="jar" description="generate ajm.jar file" depends="compile">
+		<jar destfile="${basedir}/ajm.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Library" value="ajm objects (MXJ) for MaxMSP"/>
+				<attribute name="Version" value="0.8.1"/>
+				<attribute name="Author" value="Adam Murray"/>
+				<attribute name="URL" value="http://compusition.com"/>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="OS" value="${os.name} ${os.version} (${os.arch})"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="compile" description="compile the ajm.objects source, omitting tests" depends="clean">
+		<mkdir dir="${build}/"/>
+		<javac destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5">
+			<src path="${src}"/>
+		    <exclude name="**/*Test.java"/>
+		</javac>
+	</target>
+
+	<target name="clean" description="delete build artifacts">
+		<delete dir="${build}"/>
+	</target>
+	
+	<target name="compile_tests" description="compile all ajm.objects source, including tests" depends="clean">
+		<mkdir dir="${build}/"/>
+		<javac srcdir="${src}" destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5"/>
+	</target>
+
+	<target name="test" description="run unit tests (requires junit.jar)" depends="compile_tests">
+		<junit fork="true" >
+			<classpath>
+				<path refid="classpath"/>
+				<path location="${build}"/>
+			</classpath>
+			<formatter type="brief" usefile="false"/>
+			<batchtest>
+				<fileset dir="${src}" includes="**/*Test.java"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="javadoc" description="generate standard javadoc documentation">
+		<javadoc
+			destdir="doc/api"
+			author="true"
+			version="true"
+			use="true"
+			classpathref="max.classpath"
+			windowtitle="ajm.* mxj externals">
+
+			<fileset dir="src">
+				<exclude name="**/*Test.java"/>
+			</fileset>
+			<doctitle><![CDATA[<h1>Test</h1>]]></doctitle>
+			<!-- TODO: put in a creative commons license -->
+			<bottom><![CDATA[<i>Copyright &#169; 2007-2008 Adam Murray. All Rights Reserved.</i>]]></bottom>
+			<tag name="attribute" scope="fields" description="&lt;br/&gt;This field is a Max object attribute." />
+			<tag name="nodoc" scope="all" description="" /> <!-- indicates what MaxDoclet should ignore -->	
+		</javadoc>
+	</target>
+
+</project>

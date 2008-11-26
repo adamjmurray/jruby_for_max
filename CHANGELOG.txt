@@ -1,0 +1,217 @@
+                          
+                          ajm objects changelog 
+
+******************************************************************************
+* Version 0.9 *
+*****************
+
+Starting with this release, ajm objects will officially support Max 5 only.
+All help patches have been updated to Max 5 format. 
+New objects will be introduced that depend on Max 5 objects like transport.
+
+------------------------------------------------------------------------------
+
+New Objects
+
+* ajm.text (AKA code) - tabbed text editting interface
+
+* ajm.relmetro - a transport-synced metronome that reports time relative to
+                 a given timepoint
+
+* ajm.midi2coll - reads midi files and converts them to a [coll] format that
+                  can be sequenced by ajm.relmetro 
+
+* ajm.cosy - sequencing language
+
+------------------------------------------------------------------------------
+
+Changes to sequencing objects
+
+* Support for new messages:
+  - min
+  - max
+  - subtractfrom
+  - invert
+  See the help file for details.
+  
+------------------------------------------------------------------------------
+
+Changes to [ajm.ruby]
+
+TODO: ajm.ruby.properties should provide a hook for a secondary initialization script
+
+* Renamed some variables and methods to be follow standard Ruby naming
+  convetions:
+   - $MaxObject renamed to $max_object
+   - setLocal() and getLocal() renamed to set_local() and get_local()
+  The old names are still available for backward compatibility, but they are
+  now deprecated and will be removed at some point in the future.
+
+* $max_object_map
+
+* max_object() lookup method
+
+* $max_objects is an array containing all ajm.ruby objects in the current
+  context
+
+* Ruby symbols are converted to Max Strings without a coercion warning
+
+* Fixed a bug outputting arrays with 3 or more levels of nesting
+
+* initialization code externalized to the script file ajm_ruby_initialize.rb
+
+* added global variable storage system, set_global() and get_global() methods
+
+* added convenience methods inlet_assist() and outlet_assist()
+
+* introduced ajm.ruby.properties
+
+* Experimental support for Sun's Ruby Engine (JSR 223)
+  Switch the ruby.engine setting in ajm.ruby.properties to try it
+
+* JRuby upgraded to version 1.1.5
+  Note: a bug in this version of JRuby prevented local variable definitions
+  from being rememebered across separate messages to ajm.ruby. I patched
+  jruby.jar to fix this, however, in general it is dangerous using local
+  variables to remember state as explained in the "variable scope
+  limitations" section of the help file.
+
+
+******************************************************************************
+* Version 0.8.1 *
+*****************
+
+Changes to [ajm.ruby]
+
+* varargs support fixed for puts(), print(), and error()
+  (previously reported as fixed in 0.8, oops!)
+
+* @scriptfile and '@evaloutlet -1' avoid unnecessary conversion to Max Atoms 
+  (prevents pointless "coerced to string" messages in the Max window)
+  
+* JRuby upgraded to version 1.1.2
+
+
+******************************************************************************
+* Version 0.8 *
+***************
+
+Changes to [ajm.ruby]
+
+* Upgraded to JRuby 1.1.1 from JRuby 1.1 RC1
+  Improved performance/memory usage and thousands of compatibility fixes. 
+  See http://jruby.codehaus.org/ for more info.
+
+* Added scriptfile attribute - load a script from an external file
+
+* The $0 variable will be set to the absolute path of the scriptfile, or nil
+  if no scriptfile is being used.
+  
+* ARGV and $* can be used to access any additonal arguments to scriptfile.
+  
+* Added context attribute - supports shared evaluator context between
+  any sequencer or ajm.ruby objects
+
+* Improved message parsing behavior
+  - fixed a bug parsing Max symbols containing spaces
+  - the "text" message was added to better support textedit's one symbol
+    output mode: [route text] should no longer be used before ajm.ruby
+
+* Improved search path behavior
+  - Ruby search path now includes any folder on Max's search path.
+    The search order is:
+     (1) the java/lib/ruby directory structure (standard libraries)
+     (2) Max's search path (see Options -> File Preferences)
+  - Any file on the search path can be loaded/required by filename instead
+    of the full path. 
+
+* Gems can now be loaded. But first they must be installed via a seperate
+  JRuby installation. See the NOTES section of the README for more info.
+
+* Initialization of the ruby evaluator is deferred until the first script is
+  evaluated. This speeds up loading of patches with many ruby objects, but
+  there will be a slight delay when the first script evaluates. 
+ 
+* Added an autoinit attribute - use this to force initialization of the ruby
+  evaluator when the patch loads, eating the cost of initialization up front.
+    
+* Max lists sent to the inlet of [ajm.ruby] call a list() method that takes a
+  single array as an argument:  def list(array) ...  
+  The default implementation passes through the list. Redefine as desired.
+  
+* The list() behavior can be disabled by setting @listproc false
+  
+* Added methods out0(*params), out1, ..., out9 
+  as shortcuts for outlet(0, *params), etc
+  
+* When nested arrays and hashes are coerced to Strings, the String should
+  be an accurate representation of the datastructure (i.e. you can pass it
+  to another ajm.ruby and it should evaluate correctly).
+  
+* Unnecessary conversions to Atom types are now avoided when evaloutlet < 0
+
+* Long values outside the 32-bit integer range (-2147483648 to 2147483647)
+  are now coerced to a String when outputting to Max to avoid wraparound.
+  
+* The context_destroyed() method is called when the last object in the context
+  is deleted or a new scriptfile is loaded (which resets the context). This
+  callback method should be used to do any needed cleanup, such as stopping a
+  background process like a webserver.
+
+------------------------------------------------------------------------------
+
+Changes to sequencing objects
+
+* Empty sequences now output " " (a single space) instead of 
+  "" (empty string). This makes the object more usable with pattr. 
+  Pattr does not output anything when it is set to "" (empty string), which
+  had prevented loading presets with empty sequences.
+
+* The sequencing syntax now supports embedded Ruby code snippets.
+  ajm.eval and the sequencing objects will evaluate ruby code contained in
+  {curly braces}. Ruby that evaluates to an array will be treated as a chord.
+  (This feature is in addition to the ruby and rubyseq commands supported
+  by the sequencing objects.)
+
+* added context attribute - supports shared Ruby evaluator context between
+  the sequencer objects and/or ajm.ruby objects
+  The @autoinit and @verbose attributes from ajm.ruby are now available in
+  the sequencing objects.
+
+* ajm.rseq used to output the current beat index from the second outlet. This
+  has been changed to use the current sequenced item index, which is
+  consistent with the way ajm.seq works. If you need to know the current beat
+  index, try using a [counter] object. 
+
+* ajm.rseq recognizes the special tokens INF and -INF as infinity and negative
+  infinity. After either of these symbols is encountered, ajm.rseq will not
+  output anything else until the index is set to an non infinite value.
+  ajm.rseq2seq distinguishes between INF and -INF by only passing through INF
+  as a bang. -INF represents a rest like any other negative number.
+  
+* The sequencing objects now support the message "text". This is intended for
+  connecting textedit in "output as one symbol" mode directly to ajm.seq/rseq.
+  This way, special Max characters (commas, double quotes, semicolons, 
+  backslash) do not need to be escaped so inputting Ruby code snippets is
+  easier.
+
+* The ajm.SQ16 sequencer is obsolete and no longer packaged with these
+  objects. A newer sequencing application will be released separately.
+  
+------------------------------------------------------------------------------
+
+Changes to [ajm.psui] (pattrstorage UI)
+
+* Supports decoupled queuing (manage your queue somewhere else in the patch):
+  - psui outputs the queue out the 3rd outlet
+  - setq message sets the queueu
+  - updated help file shows an example of usage with the pattr system
+  
+------------------------------------------------------------------------------
+  
+Source Code Changes
+
+I continually refactor my code as part of ongoing maintenance. The package
+structure of my java objects has changed and should makes more sense now.
+In some cases internal Class interfaces have changed, mostly related to Ruby
+support.

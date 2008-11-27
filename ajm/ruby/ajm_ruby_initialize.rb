@@ -1,0 +1,147 @@
+require 'java'
+import java.lang.System
+import com.cycling74.max.Atom
+
+def atom(obj=nil)
+  if obj
+    $max_ruby_adapter.toAtoms(obj)
+  else
+    Atom.emptyArray
+  end
+end
+
+# Placeholders for Max hooks:
+def bang
+  'bang'
+end
+
+def list(array)
+  array
+end
+
+def yield_atoms(*params,&block)
+  params.each do |param|
+    atoms_or_atom = $max_ruby_adapter.toAtoms(param)
+    if atoms_or_atom.respond_to? :each
+      atoms_or_atom.each{|atom| yield atom}
+    else
+      yield atoms_or_atom
+    end
+  end
+end
+
+def puts(*params)
+  yield_atoms(*params) {|atom| System.out.println(atom)}
+  nil
+end  
+
+def print(*params)
+  yield_atoms(*params) {|atom| System.out.print(atom)}
+  nil
+end  
+
+def error(*params)
+  yield_atoms(*params) {|atom| System.err.println(atom)}
+  nil
+end
+
+def flush
+  System.out.println
+  nil
+end
+
+def outlet(outletIdx, *params)
+  if (outletIdx >= $max_object.numOutlets)
+    error("Invalid outlet index #{outletIdx}")
+  else
+    if params.length == 1
+      # avoid unnecessary nested arrays for things like "outlet 0, [1,2]"
+      atoms = $max_ruby_adapter.toAtoms(params[0])
+    else
+      atoms = $max_ruby_adapter.toAtoms(params)
+    end
+    $max_object.outlet(outletIdx, atoms)
+  end
+  nil
+end
+
+module Kernel
+  # define_method must be called inside a module or class
+  (0..9).each do |index|
+    define_method "out#{index}" do |*params|
+      outlet(index, *params)
+    end
+  end
+end
+
+def max_object(namespace=nil)
+  return $max_object if not namespace
+  names = namespace.split '.'
+  if(names.length > 1)
+    context = names[0]
+    id = names[1]
+  else
+    context = $max_object.context
+    id = names[0]
+  end
+  $max_object_map[context][id]    
+end
+
+def on_context_destroyed(callback_script)
+  $max_ruby_adapter.on_context_destroyed(callback_script)
+end
+
+# for use with shared contexts:
+LOCAL_STORAGE = {}
+def setLocal(name,obj) # deprecated (for backward compatibility)
+  puts "setLocal() is deprecated, please use set_local() instead"
+  set_local(name,obj)
+end
+def set_local(name,obj)
+  storage = LOCAL_STORAGE[$max_object]
+  LOCAL_STORAGE[$max_object] = storage = {} if not storage
+  storage[name] = obj
+end
+def getLocal(name) # deprecated (for backward compatibility)
+  puts "getLocal() is deprecated, please use get_local() instead"
+  get_local(name)
+end
+def get_local(name)
+  storage = LOCAL_STORAGE[$max_object]
+  storage[name] if storage
+end
+def delete_local(name)
+  storage = LOCAL_STORAGE[$max_object]
+  storage.delete(name) if storage
+end
+def has_local?(name)
+  storage = LOCAL_STORAGE[$max_object]
+  if storage
+    storage.has_key?(name) 
+  else 
+    false
+  end
+end
+
+def set_global(name,obj)
+  $global_variable_store.set(name.to_s, obj) if name
+  return obj
+end
+def get_global(name)
+  $global_variable_store.get(name.to_s) if name
+end
+def delete_global(name)
+  $global_variable_store.delete(name.to_s) if name
+end
+def has_global?(name)
+  $global_variable_store.defined(name.to_s) if name
+end   
+
+
+def inlet_assist(*params)
+  $max_object.setInletAssist params.to_java(:string)  
+end
+
+def outlet_assist(*params)
+  $max_object.setOutletAssist params.to_java(:string)
+end

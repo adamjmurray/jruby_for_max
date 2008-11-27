@@ -1,0 +1,28 @@
+<html>
+<body>
+ <p>	
+  This table shows attributes set from inside Max. 
+  Reload this page to see changes made in Max.
+  <table border=1>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+    </tr>
+   <% $ATTR.to_a.each do |pair| %>
+    <tr>
+      <td><%= pair[0] %></td>
+      <td><%= pair[1].inspect %></td>
+    </tr>
+   <% end %>
+  </table>
+ </p>
+ <p>
+  <script>
+    document.write('<a href="/source'
+                   + location.pathname + '">')
+  </script>
+  view source for this page</a>
+ </p>
+ <p><a href="/">Home</a></p>
+</body>
+</html>

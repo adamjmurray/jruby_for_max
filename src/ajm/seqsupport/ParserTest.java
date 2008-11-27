@@ -17,7 +17,7 @@ public class ParserTest {
 
 	static PrintStream out = System.out;
 
-	static MaxRubyAdapter ruby = new MaxRubyAdapter(new DummyMaxObject(), null);
+	static MaxRubyAdapter ruby = new MaxRubyAdapter(new DummyMaxObject(), null, null);
 
 	static Parser p = new Parser();
 

@@ -44,42 +44,54 @@ public class RubyProperties {
 
 	public static Properties properties;
 
-	static {
-		String jRubyHome = System.getProperty("jruby.home");
-		String jRubyLib = System.getProperty("jruby.lib");
+	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.BSFRubyEvaluator";
 
-		if (jRubyHome == null) {
-			String pathToJRuby = MaxSystem.locateFile("jruby.jar");
-			if (pathToJRuby != null) {
-				File jRubyLibDir = new File(pathToJRuby).getParentFile();
-				// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
-				jRubyHome = jRubyLibDir.getParent();
-				jRubyLib = jRubyLibDir.getPath();
-				System.setProperty("jruby.home", jRubyHome);
-				System.setProperty("jruby.lib", jRubyLib);
-				System.setProperty("jruby.script", "jruby"); // seems pointless but gems won't work without it
-			}
-			else {
-				MaxSystem.error("jruby.jar not found! Maybe it was not installed correctly?");
-			}
-		}
-
-		File propFile = new File(jRubyLib, "ajm.ruby.properties");
-		properties = new Properties();
-		try {
-			properties.load(new FileInputStream(propFile));
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	public static final String DEFAULT_IGNORE_PATHS = ".*/\\..*/.*";
 
 	public static String getRubyEngine() {
-		return properties.getProperty("ruby.engine", "ajm.rubysupport.BSFRubyEvaluator");
+		return properties.getProperty("ruby.engine", DEFAULT_RUBY_ENGINE).trim();
 	}
 
 	public static String getIgnoredPaths() {
-		return properties.getProperty("paths.ignore", ".*/\\.svn/.*").trim();
+		return properties.getProperty("paths.ignore", DEFAULT_IGNORE_PATHS).trim();
 	}
 
+	static {
+		// Initialize JRuby system properties and load the ajm.ruby.properties file
+		try {
+			String jRubyHome = System.getProperty("jruby.home");
+			String jRubyLib = System.getProperty("jruby.lib");
+
+			if (jRubyHome == null) {
+
+				String pathToJRuby = MaxSystem.locateFile("jruby.jar");
+				if (pathToJRuby != null) {
+					File jRubyLibDir = new File(pathToJRuby).getParentFile();
+					// Set jruby.home to the Max installation's java directory, where it will look for lib/ruby
+					jRubyHome = jRubyLibDir.getParent();
+					jRubyLib = jRubyLibDir.getPath();
+					System.setProperty("jruby.home", jRubyHome);
+					System.setProperty("jruby.lib", jRubyLib);
+					System.setProperty("jruby.script", "jruby"); // seems pointless but gems won't work without it
+				}
+				else {
+					MaxSystem.error("jruby.jar not found! Maybe it was not installed correctly?");
+				}
+			}
+
+			File propFile = new File(jRubyLib, "ajm.ruby.properties");
+			properties = new Properties();
+			try {
+				properties.load(new FileInputStream(propFile));
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		catch (UnsatisfiedLinkError e) {
+			// we're running outside of Max, probably for unit testing
+			System.out.println("Using hard-coded defaults for RubyProperties.");
+			properties = new Properties();
+		}
+	}
 }

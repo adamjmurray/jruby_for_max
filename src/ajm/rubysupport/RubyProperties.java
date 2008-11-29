@@ -37,7 +37,6 @@ import com.cycling74.max.MaxSystem;
 /**
  * Manages all global settings for Ruby evaluation.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class RubyProperties {
@@ -46,14 +45,28 @@ public class RubyProperties {
 
 	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.BSFRubyEvaluator";
 
-	public static final String DEFAULT_IGNORE_PATHS = ".*/\\..*/.*";
+	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
+
+	public static final String DEFAULT_LOAD_PATHS = "";
 
 	public static String getRubyEngine() {
 		return properties.getProperty("ruby.engine", DEFAULT_RUBY_ENGINE).trim();
 	}
 
-	public static String getIgnoredPaths() {
-		return properties.getProperty("paths.ignore", DEFAULT_IGNORE_PATHS).trim();
+	public static String[] getInitializerFiles() {
+		String[] initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
+		for (int i = 0; i < initializers.length; i++) {
+			initializers[i] = initializers[i].trim();
+		}
+		return initializers;
+	}
+
+	public static String[] getLoadPaths() {
+		String[] loadpaths = properties.getProperty("ruby.loadpaths", DEFAULT_LOAD_PATHS).split(";");
+		for (int i = 0; i < loadpaths.length; i++) {
+			loadpaths[i] = loadpaths[i].trim();
+		}
+		return loadpaths;
 	}
 
 	static {

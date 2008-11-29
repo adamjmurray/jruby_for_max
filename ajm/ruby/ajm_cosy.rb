@@ -1,9 +1,3 @@
-# Requires:
-# Max/MSP (http://cycling74.com)
-# and ajm objects (http://compusition.com/web/software/maxmsp/ajm-objects)
-
-# this is broken right now
-
 require 'cosy'
 include Cosy
 
@@ -15,8 +9,7 @@ module Cosy
     attr_accessor :seq, :time_to_next, :prev_duration, :end, :ticks_per_bang
   
     def initialize
-      super
-      parse ''
+      super({:input => ''})
       restart
       @ticks_per_bang = DURATION['sixtyfourth'].to_f
     end

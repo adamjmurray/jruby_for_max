@@ -41,7 +41,6 @@ import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
-import com.cycling74.max.MaxSystem;
 
 /**
  * The bridge between Max and Ruby.
@@ -66,8 +65,6 @@ public class MaxRubyAdapter {
 	private String maxContext;
 
 	private String id;
-
-	private static String IGNORED_PATHS = RubyProperties.getIgnoredPaths();
 
 	public MaxRubyAdapter(MaxObject maxObject, String context, String id) {
 		this.maxObject = maxObject;
@@ -159,8 +156,14 @@ public class MaxRubyAdapter {
 
 	public void init(File scriptFile, Atom[] args) {
 		if (code.isEmpty()) {
-			String initializationCode = Utils.getFileAsString("ajm_ruby_initialize.rb");
-			code.append(initializationCode);
+			for (String load_path : RubyProperties.getLoadPaths()) {
+				code.line("$: << " + quote(load_path));
+			}
+			for (String initializer : RubyProperties.getInitializerFiles()) {
+				String initializationCode = Utils.getFileAsString(initializer);
+				code.append(initializationCode);
+			}
+
 		}
 
 		if (ruby.isInitialized()) {

@@ -36,7 +36,29 @@ Changes to sequencing objects
 
 Changes to [ajm.ruby]
 
-TODO: ajm.ruby.properties should provide a hook for a secondary initialization script
+* $max_object_map stores references to all ajm.ruby objects
+
+* max_object() lookup method (see help file)
+
+* $max_objects is an array containing all ajm.ruby objects in the current
+  context
+
+* added global variable storage system, set_global() and get_global() methods
+
+* added convenience methods inlet_assist() and outlet_assist()
+
+* initialization code externalized to the script file ajm_ruby_initialize.rb
+
+* The $LOAD_PATH no longer includes all folders on Max's search path.
+  Use this code:
+    $:.unshift File.dirname($0)
+  to add the current scriptfile's folder to the $LOAD_PATH so you can require
+  files relative to the scriptfile.
+
+* ajm.ruby.properties introduced to expose configuration options:
+  - ruby.engine: the RubyEngine to use for evaluating Ruby inside Java
+  - ruby.initializers: initialization code for ajm.ruby
+  - ruby.loadpath: additional paths to include on the $LOAD_PATH
 
 * Renamed some variables and methods to be follow standard Ruby naming
   convetions:
@@ -45,30 +67,9 @@ TODO: ajm.ruby.properties should provide a hook for a secondary initialization s
   The old names are still available for backward compatibility, but they are
   now deprecated and will be removed at some point in the future.
 
-* $max_object_map stores references to all ajm.ruby objects
-
-* max_object() lookup method
-
-* $max_objects is an array containing all ajm.ruby objects in the current
-  context
-  
-* The LOAD_PATH no longer includes all folders on Max's search path.
-  Use this code:
-    $:.unshift File.dirname($0)
-  to add the current scriptfile's folder to the LOAD_PATH so you can require
-  files relative to the scriptfile.
-
 * Ruby symbols are converted to Max Strings without a coercion warning
 
 * Fixed a bug outputting arrays with 3 or more levels of nesting
-
-* initialization code externalized to the script file ajm_ruby_initialize.rb
-
-* added global variable storage system, set_global() and get_global() methods
-
-* added convenience methods inlet_assist() and outlet_assist()
-
-* introduced ajm.ruby.properties
 
 * Experimental support for Sun's Ruby Engine (JSR 223)
   Switch the ruby.engine setting in ajm.ruby.properties to try it

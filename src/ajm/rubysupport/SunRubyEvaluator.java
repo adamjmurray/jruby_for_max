@@ -36,7 +36,6 @@ import com.sun.script.jruby.JRubyScriptEngineManager;
 /**
  * Bridge to Sun's reference implementation Ruby evaluator engine.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class SunRubyEvaluator extends AbstractScriptEvaluator {
@@ -73,4 +72,14 @@ public class SunRubyEvaluator extends AbstractScriptEvaluator {
 		}
 	}
 
+	public void exit() {
+		// This is explained at http://yokolet.blogspot.com/2008/11/recent-update-of-jruby-engine.html
+		System.setProperty("com.sun.script.jruby.terminator", "on");
+		try {
+			rubyEngine.eval("");
+		}
+		catch (ScriptException e) {
+			throw new RubyException(e);
+		}
+	}
 }

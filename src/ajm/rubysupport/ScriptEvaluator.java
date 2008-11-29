@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Interface for all script evaluator engines.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public interface ScriptEvaluator {
@@ -46,4 +45,6 @@ public interface ScriptEvaluator {
 	void undeclareGlobal(String variableName);
 
 	Object eval(CharSequence rubyCode);
+
+	void exit();
 }

@@ -33,7 +33,6 @@ import org.apache.bsf.BSFManager;
 /**
  * Bridge to Apache BSF project's Ruby evaluator engine.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class BSFRubyEvaluator extends AbstractScriptEvaluator {
@@ -64,5 +63,9 @@ public class BSFRubyEvaluator extends AbstractScriptEvaluator {
 		catch (BSFException e) {
 			throw new RubyException(e);
 		}
+	}
+
+	public void exit() {
+		manager.terminate();
 	}
 }

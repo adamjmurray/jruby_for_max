@@ -201,6 +201,10 @@ public class ScriptEvaluatorManager {
 				}
 			}
 		}
+		if (ruby != null) {
+			// The callback method behavior above should be phased out in favor of this:
+			ruby.exit();
+		}
 	}
 
 	private static ScriptEvaluator newRubyEvaluatorInstance() {

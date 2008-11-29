@@ -54,4 +54,4 @@ class AjmWebServer
   
 end
 
-on_context_destroyed 'AjmWebServer.stop_all'
+at_exit { AjmWebServer.stop_all }

@@ -1,4 +1,6 @@
+$:.unshift File.dirname($0) # put this folder on the LOAD_PATH
 require 'ajm_webserver'
+require 'ajm_servlets'
 require 'pathname'
 
 ###########################################################
@@ -25,7 +27,6 @@ server = AjmWebServer.new({
 
 ###########################################################
 # Some example servlets showing custom request handling
-require 'ajm_servlets'
 server.servlet '/to_max', OutputToMax,  WEB_ROOT
 server.servlet '/source', SourceViewer, WEB_ROOT
 

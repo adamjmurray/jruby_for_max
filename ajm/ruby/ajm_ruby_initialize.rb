@@ -87,29 +87,24 @@ def max_object(namespace=nil)
   $max_object_map[context][id]    
 end
 
+# deprecated TODO: fix at_exit
 def on_context_destroyed(callback_script)
   $max_ruby_adapter.on_context_destroyed(callback_script)
 end
 
 # for use with shared contexts:
 LOCAL_STORAGE = {}
-def setLocal(name,obj) # deprecated (for backward compatibility)
-  puts "setLocal() is deprecated, please use set_local() instead"
-  set_local(name,obj)
-end
 def set_local(name,obj)
   storage = LOCAL_STORAGE[$max_object]
   LOCAL_STORAGE[$max_object] = storage = {} if not storage
   storage[name] = obj
 end
-def getLocal(name) # deprecated (for backward compatibility)
-  puts "getLocal() is deprecated, please use get_local() instead"
-  get_local(name)
-end
+alias setLocal set_local # for backward compatibility
 def get_local(name)
   storage = LOCAL_STORAGE[$max_object]
   storage[name] if storage
 end
+alias getLocal get_local # for backward compatibility
 def delete_local(name)
   storage = LOCAL_STORAGE[$max_object]
   storage.delete(name) if storage

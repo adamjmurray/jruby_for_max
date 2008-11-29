@@ -159,12 +159,6 @@ public class MaxRubyAdapter {
 
 	public void init(File scriptFile, Atom[] args) {
 		if (code.isEmpty()) {
-			for (String path : MaxSystem.getSearchPath()) {
-				if (!path.matches(IGNORED_PATHS)) {
-					// Add the path to Ruby's search path:
-					code.line("$: << " + quote(path));
-				}
-			}
 			String initializationCode = Utils.getFileAsString("ajm_ruby_initialize.rb");
 			code.append(initializationCode);
 		}
@@ -179,6 +173,7 @@ public class MaxRubyAdapter {
 		if (scriptFile != null) {
 			String script = Utils.getFileAsString(scriptFile);
 			scriptFileInit.clear();
+			// I'd like to set __FILE__ here too, but that variable cannot be assigned
 			scriptFileInit.line("$0 = " + quote(scriptFile));
 			for (Atom arg : args) {
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));

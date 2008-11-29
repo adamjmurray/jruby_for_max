@@ -2,7 +2,7 @@
                           ajm objects changelog 
 
 ******************************************************************************
-* Version 0.9 *
+* Version 0.8.5 *
 *****************
 
 Starting with this release, ajm objects will officially support Max 5 only.
@@ -12,8 +12,6 @@ New objects will be introduced that depend on Max 5 objects like transport.
 ------------------------------------------------------------------------------
 
 New Objects
-
-* ajm.text (AKA code) - tabbed text editting interface
 
 * ajm.relmetro - a transport-synced metronome that reports time relative to
                  a given timepoint
@@ -47,12 +45,18 @@ TODO: ajm.ruby.properties should provide a hook for a secondary initialization s
   The old names are still available for backward compatibility, but they are
   now deprecated and will be removed at some point in the future.
 
-* $max_object_map
+* $max_object_map stores references to all ajm.ruby objects
 
 * max_object() lookup method
 
 * $max_objects is an array containing all ajm.ruby objects in the current
   context
+  
+* The LOAD_PATH no longer includes all folders on Max's search path.
+  Use this code:
+    $:.unshift File.dirname($0)
+  to add the current scriptfile's folder to the LOAD_PATH so you can require
+  files relative to the scriptfile.
 
 * Ruby symbols are converted to Max Strings without a coercion warning
 

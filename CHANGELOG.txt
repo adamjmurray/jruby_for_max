@@ -6,8 +6,11 @@
 *****************
 
 Starting with this release, ajm objects will officially support Max 5 only.
-All help patches have been updated to Max 5 format. 
-New objects will be introduced that depend on Max 5 objects like transport.
+
+All patches have been updated to Max 5 format. 
+
+New objects are being introduced that depend on Max 5 features like transport
+and presentation mode.
 
 ------------------------------------------------------------------------------
 
@@ -20,6 +23,8 @@ New Objects
                   can be sequenced by ajm.relmetro 
 
 * ajm.cosy - sequencing language
+
+* ajm.error - print error messages to the Max window
 
 ------------------------------------------------------------------------------
 
@@ -81,6 +86,21 @@ Changes to [ajm.ruby]
   variables to remember state as explained in the "variable scope
   limitations" section of the help file.
 
+------------------------------------------------------------------------------
+
+Changes to [ajm.busymap]
+
+* attributes to control appearance
+  @width, @height
+  @orientation, @ledposition, @reverse
+
+* @pollrate
+
+* exposed the multislider, led, and metro to an inlet
+
+* multislider and led now ignore clicks
+
+
 
 ******************************************************************************
 * Version 0.8.1 *
@@ -95,6 +115,7 @@ Changes to [ajm.ruby]
   (prevents pointless "coerced to string" messages in the Max window)
   
 * JRuby upgraded to version 1.1.2
+
 
 
 ******************************************************************************

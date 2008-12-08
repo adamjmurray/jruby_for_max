@@ -31,14 +31,22 @@ def timesig(beats_per_bar, beat_unit)
   end
 end
 
+def quantize(ticks)
+  $quantize = ticks
+end
+
 def read(midi_file)
   if File.exists?(midi_file) then
     midi2coll = Midi2Coll.new(midi_file, $beats_per_bar, $beat_unit, $quantize)
     
     num_tracks = midi2coll.number_of_tracks
-    out2 num_tracks
-    
-    has_metadata_track = (num_tracks > 1)
+    if num_tracks > 1
+      has_metadata_track = true
+      out2 num_tracks-1 # ignore metadata track
+    else
+      has_metadata_track = false
+      out2 1
+    end
     
     midi2coll.coll_entries.each_with_index do |entries_for_track, track_index|
       next if has_metadata_track and track_index == 0
@@ -53,18 +61,15 @@ def read(midi_file)
   end
 end
 
-def quantize(ticks)
-  $quantize = ticks
-end
 
 class Midi2Coll
   
-  def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize=nil)
+  def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize_in_ticks=nil)
     @midi_file = midi_file # TODO validate
     @track_tick_maps = []
     @beats_per_bar = beats_per_bar
     @ticks_per_unit = TICKS_PER_WHOLE_NOTE/beat_unit
-    @quantize = quantize/TICKS_PER_QUARTER_NOTE.to_f if quantize
+    @quantize = quantize_in_ticks
     
     # use midilib to parse the input file
     @sequence = MIDI::Sequence.new()
@@ -73,7 +78,11 @@ class Midi2Coll
     end
     
     @sequence.tracks.each_with_index do |track,index|
-      track.quantize(@quantize) if @quantize
+      # I expect quantization is done to make sure ajm.relmetro can hit all the
+      # note ons. I don't see a reason to also quantize note offs, but it could
+      # be supported as an additional option for this object...
+      # track.quantize_events_of_type(@quantize, MIDI::NoteOnEvent) if @quantize
+      
       @track_tick_maps[index] = @tick_map = {}
       @pitch_map = {}
       track.each do |event| 
@@ -90,12 +99,7 @@ class Midi2Coll
   end
   
   def number_of_tracks
-    num_tracks = @sequence.tracks.length
-    if num_tracks > 1
-      return num_tracks-1 # ignore metadata track
-    else
-      return 1
-    end
+    @sequence.tracks.length
   end
   
   def coll_entries
@@ -105,7 +109,7 @@ class Midi2Coll
       onset_times = tick_map.keys.sort
       onset_times.each do |onset|
         note_pairs = tick_map[onset]
-        bbu = ticks_to_bbu(onset) # onset is in ticks
+        bbu = ticks_to_bbu(quantize onset) # onset is in ticks
         coll_entry = ['store', bbu] # the index for [coll]
 
         note_pairs.each do |note_pair|
@@ -161,11 +165,23 @@ class Midi2Coll
   end
 
   def ticks_to_bbu(ticks)
+    ticks = ticks.to_i
     units = ticks % @ticks_per_unit
     beats = ticks / @ticks_per_unit    # total beat offset
     bars  = beats / @beats_per_bar + 1 
     beats = beats % @beats_per_bar + 1 # beats relative to start of measure
     return "#{bars}.#{beats}.#{units}"
+  end
+  
+  def quantize(ticks) 
+    if @quantize
+      diff = ticks % @quantize
+      ticks -= diff
+      if diff >= @quantize / 2
+        ticks += @quantize
+      end
+    end
+    return ticks
   end
     
 end

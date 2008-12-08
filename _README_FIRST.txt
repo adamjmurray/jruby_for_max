@@ -1,7 +1,7 @@
 
                       ajm objects for Max/MSP
 
-                           Version 0.8.1
+                           Version 0.8.5
 
 -----------------------------------------------------------------------------
 
@@ -18,24 +18,19 @@ FIRST TIME INSTALLATION
 
 UPGRADING FROM A PREVIOUS VERSION
 
- (1) If you have written any Ruby scripts and saved them under 
-     {Max installation}/Cycling '74/java/lib/ruby
-     move them up to another location. 
-     ajm objects 0.8 can find scripts anywhere on the Max search path.
-  
- (2) Delete the entire ruby directory structure
+ (1) Delete the entire ruby directory structure
      {Max installation}/Cycling '74/java/lib/ruby
      
- (3) Delete the old ajm folder (old patches/help files) 
+ (2) Delete the old ajm folder (the old patches/help files) 
      
- (4) Proceed with the first time installation instructions. 
+ (3) Proceed with the first time installation instructions. 
      The following jar files will be replaced: ajm.jar, bsf.jar, jruby.jar
  
 ------------------------------------------------------------------------------
 
 REQUIREMENTS
 
- * Max/MSP 4.6 or Max 5
+ * Max/MSP 5
 
  * Java 5 or higher
 
@@ -51,23 +46,23 @@ Sequencing with good timing
   applies whenever you need good timing from [metro].
 
 Installing Ruby Gems for ajm.ruby 
-  (1) Download JRuby 1.1.2 from http://jruby.codehaus.org
+  (1) Download JRuby 1.1.5 from http://jruby.codehaus.org
   (2) Add jruby/bin to your path. 
        From the OS X terminal or the Cygwin shell on Windows, run:
-        $ export PATH=/path/to/jruby-1.1.2/bin:$PATH
+        $ export PATH=/path/to/jruby-1.1.5/bin:$PATH
         $ which gem
-        /path/to/jruby-1.1.2/bin/gem   
+        /path/to/jruby-1.1.5/bin/gem   
   (3) Install gems as usual (see Ruby Gems documentation for details):
         $ gem install drp
   (4) Replace the {Max installation}/Cycling '74/java/lib/ruby folder with
-      /path/to/jruby-1.1.2/lib/ruby
+      /path/to/jruby-1.1.5/lib/ruby
   (5) Restart Max/MSP
 
 ------------------------------------------------------------------------------
 
 DEPENDENCIES
 
-JRuby (version 1.1.2 included)
+JRuby (version 1.1.5 included)
   The 100% Java implementation of Ruby. License info can be found under
   the thirdparty folder. Documentation and source code is available at
   http://jruby.codehaus.org/

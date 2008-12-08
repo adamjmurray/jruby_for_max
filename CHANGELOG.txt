@@ -9,8 +9,7 @@ Starting with this release, ajm objects will officially support Max 5 only.
 
 All patches have been updated to Max 5 format. 
 
-New objects are being introduced that depend on Max 5 features like transport
-and presentation mode.
+Many objects depend on Max 5 features like transport and presentation mode.
 
 ------------------------------------------------------------------------------
 

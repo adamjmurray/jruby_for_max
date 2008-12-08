@@ -4,6 +4,7 @@
 	<property name="lib" location="lib"/>
 	<property name="src" location="src"/>
 	<property name="test" location="test"/>
+	<property name="ajm.jar" location="${lib}/ajm.jar"/>
 
 	<path id="classpath">
 		<fileset dir="lib">
@@ -18,10 +19,10 @@
 	</fail>
 
 	<target name="jar" description="generate ajm.jar file" depends="compile">
-		<jar destfile="${basedir}/ajm.jar" basedir="${build}">
+		<jar destfile="${ajm.jar}" basedir="${build}">
 			<manifest>
 				<attribute name="Library" value="ajm objects (MXJ) for MaxMSP"/>
-				<attribute name="Version" value="0.8.1"/>
+				<attribute name="Version" value="0.8.5"/>
 				<attribute name="Author" value="Adam Murray"/>
 				<attribute name="URL" value="http://compusition.com"/>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -40,6 +41,7 @@
 
 	<target name="clean" description="delete build artifacts">
 		<delete dir="${build}"/>
+		<delete file="${ajm.jar}"/>
 	</target>
 	
 	<target name="compile_tests" description="compile all ajm.objects source, including tests" depends="clean">

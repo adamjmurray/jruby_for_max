@@ -21,10 +21,13 @@ Still to do:
 
 * More testing, especially on Windows
 * Automate the distribution process:
+	
 	* Not all files in this repository should be included in the release bundle:
+	
 		* max.jar
 		* ant-junit.jar
 		* junit-4.5.jar
+	
 	* JRuby's lib/ruby folder needs to be included 
 		(I'm not going to check that into my repository here, but maybe downloading and unpacking
 		it can be automated via build.xml)

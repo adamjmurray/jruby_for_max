@@ -1071,9 +1071,9 @@
 					"outlettype" : [ "signal" ],
 					"patcher" : 					{
 						"fileversion" : 1,
-						"rect" : [ 341.0, 76.0, 291.0, 313.0 ],
+						"rect" : [ 341.0, 76.0, 292.0, 249.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 341.0, 76.0, 291.0, 313.0 ],
+						"defrect" : [ 341.0, 76.0, 292.0, 249.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.1,
@@ -1092,7 +1092,7 @@
 									"text" : "sig~",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
-									"patching_rect" : [ 118.0, 84.0, 33.0, 20.0 ],
+									"patching_rect" : [ 118.0, 63.0, 33.0, 20.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 1,
 									"id" : "obj-1",
@@ -1106,7 +1106,7 @@
 									"text" : "sig~",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
-									"patching_rect" : [ 228.0, 81.0, 33.0, 20.0 ],
+									"patching_rect" : [ 228.0, 60.0, 33.0, 20.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 1,
 									"id" : "obj-2",
@@ -1120,7 +1120,7 @@
 									"text" : "+~",
 									"fontname" : "Verdana",
 									"numinlets" : 2,
-									"patching_rect" : [ 29.0, 202.0, 53.0, 20.0 ],
+									"patching_rect" : [ 29.0, 181.0, 53.0, 20.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 1,
 									"id" : "obj-3",
@@ -1132,7 +1132,7 @@
 								"box" : 								{
 									"maxclass" : "outlet",
 									"numinlets" : 1,
-									"patching_rect" : [ 29.0, 232.0, 24.0, 24.0 ],
+									"patching_rect" : [ 29.0, 211.0, 24.0, 24.0 ],
 									"numoutlets" : 0,
 									"id" : "obj-4",
 									"comment" : "signal"
@@ -1145,7 +1145,7 @@
 									"text" : "*~",
 									"fontname" : "Verdana",
 									"numinlets" : 2,
-									"patching_rect" : [ 29.0, 155.0, 33.0, 20.0 ],
+									"patching_rect" : [ 29.0, 134.0, 33.0, 20.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 1,
 									"id" : "obj-5",
@@ -1157,7 +1157,7 @@
 								"box" : 								{
 									"maxclass" : "inlet",
 									"numinlets" : 0,
-									"patching_rect" : [ 29.0, 45.0, 24.0, 24.0 ],
+									"patching_rect" : [ 29.0, 24.0, 24.0, 24.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-6",
 									"outlettype" : [ "signal" ],
@@ -1171,7 +1171,7 @@
 									"text" : "-~",
 									"fontname" : "Verdana",
 									"numinlets" : 2,
-									"patching_rect" : [ 158.0, 122.0, 56.0, 20.0 ],
+									"patching_rect" : [ 158.0, 101.0, 56.0, 20.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 1,
 									"id" : "obj-7",
@@ -1181,24 +1181,11 @@
 							}
 , 							{
 								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "Max",
-									"fontname" : "Verdana",
-									"numinlets" : 1,
-									"patching_rect" : [ 218.0, 30.0, 44.0, 20.0 ],
-									"fontsize" : 11.100006,
-									"numoutlets" : 0,
-									"id" : "obj-8"
-								}
-
-							}
-, 							{
-								"box" : 								{
 									"maxclass" : "inlet",
 									"hint" : "max",
 									"annotation" : "max",
 									"numinlets" : 0,
-									"patching_rect" : [ 228.0, 48.0, 24.0, 24.0 ],
+									"patching_rect" : [ 228.0, 24.0, 24.0, 24.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-10",
 									"outlettype" : [ "float" ],
@@ -1212,7 +1199,7 @@
 									"hint" : "min",
 									"annotation" : "min",
 									"numinlets" : 0,
-									"patching_rect" : [ 118.0, 45.0, 24.0, 24.0 ],
+									"patching_rect" : [ 118.0, 24.0, 24.0, 24.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-11",
 									"outlettype" : [ "float" ],
@@ -1227,7 +1214,7 @@
 									"linecount" : 2,
 									"fontname" : "Verdana",
 									"numinlets" : 1,
-									"patching_rect" : [ 168.0, 165.0, 113.0, 33.0 ],
+									"patching_rect" : [ 168.0, 144.0, 113.0, 33.0 ],
 									"fontsize" : 11.100006,
 									"numoutlets" : 0,
 									"id" : "obj-12"
@@ -1303,7 +1290,7 @@
 									"source" : [ "obj-7", 0 ],
 									"destination" : [ "obj-5", 1 ],
 									"hidden" : 0,
-									"midpoints" : [ 167.5, 145.0, 52.5, 145.0 ]
+									"midpoints" : [ 167.5, 124.0, 52.5, 124.0 ]
 								}
 
 							}
@@ -1417,7 +1404,7 @@
 					"destination" : [ "obj-33", 1 ],
 					"hidden" : 0,
 					"color" : [ 1.0, 0.360784, 0.682353, 1.0 ],
-					"midpoints" : [ 515.5, 325.0, 427.0, 325.0 ]
+					"midpoints" : [ 515.5, 324.0, 427.0, 324.0 ]
 				}
 
 			}

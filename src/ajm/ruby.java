@@ -42,7 +42,6 @@ import com.cycling74.max.Executable;
 /**
  * The ajm.ruby MaxObject
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class ruby extends AbstractMaxRubyObject {

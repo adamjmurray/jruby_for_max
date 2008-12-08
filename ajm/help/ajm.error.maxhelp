@@ -18,6 +18,37 @@
 		"metadata" : [  ],
 		"boxes" : [ 			{
 				"box" : 				{
+					"maxclass" : "newobj",
+					"text" : "thispatcher",
+					"fontname" : "Verdana",
+					"hidden" : 1,
+					"numinlets" : 1,
+					"patching_rect" : [ 350.0, 102.0, 73.0, 20.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 2,
+					"id" : "obj-31",
+					"outlettype" : [ "", "" ],
+					"save" : [ "#N", "thispatcher", ";", "#Q", "end", ";" ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"maxclass" : "newobj",
+					"text" : "ajm.bring-to-front-listener ajm.error",
+					"fontname" : "Verdana",
+					"hidden" : 1,
+					"numinlets" : 0,
+					"patching_rect" : [ 350.0, 76.0, 215.0, 20.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
+					"id" : "obj-17",
+					"outlettype" : [ "front" ]
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"maxclass" : "comment",
 					"text" : "There is currently no way to control what the Max window displays for the Object name (it always shows \"js\").",
 					"linecount" : 2,
@@ -131,8 +162,8 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "bpatcher",
-					"numinlets" : 1,
 					"lockeddragscroll" : 1,
+					"numinlets" : 1,
 					"args" : [  ],
 					"patching_rect" : [ 426.0, 267.0, 145.0, 55.0 ],
 					"numoutlets" : 0,
@@ -146,8 +177,8 @@
 					"maxclass" : "newobj",
 					"text" : "loadbang",
 					"fontname" : "Verdana",
-					"numinlets" : 1,
 					"hidden" : 1,
+					"numinlets" : 1,
 					"patching_rect" : [ 426.0, 216.0, 61.0, 20.0 ],
 					"fontsize" : 11.1,
 					"numoutlets" : 1,
@@ -161,8 +192,8 @@
 					"maxclass" : "message",
 					"text" : "js, print",
 					"fontname" : "Verdana",
-					"numinlets" : 2,
 					"hidden" : 1,
+					"numinlets" : 2,
 					"patching_rect" : [ 426.0, 240.0, 54.0, 18.0 ],
 					"fontsize" : 11.1,
 					"numoutlets" : 1,
@@ -174,8 +205,8 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "bpatcher",
-					"numinlets" : 0,
 					"lockeddragscroll" : 1,
+					"numinlets" : 0,
 					"args" : [  ],
 					"patching_rect" : [ 430.0, 7.0, 138.0, 55.0 ],
 					"numoutlets" : 0,
@@ -226,48 +257,48 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "panel",
+					"angle" : 270.0,
+					"grad1" : [ 0.823529, 1.0, 0.956863, 1.0 ],
 					"numinlets" : 1,
 					"patching_rect" : [ 12.0, 8.0, 377.0, 43.0 ],
+					"grad2" : [ 0.219608, 0.564706, 0.462745, 1.0 ],
 					"mode" : 1,
-					"numoutlets" : 0,
 					"rounded" : 12,
-					"grad1" : [ 0.823529, 1.0, 0.956863, 1.0 ],
-					"angle" : 270.0,
-					"id" : "obj-50",
-					"grad2" : [ 0.219608, 0.564706, 0.462745, 1.0 ]
+					"numoutlets" : 0,
+					"id" : "obj-50"
 				}
 
 			}
 , 			{
 				"box" : 				{
 					"maxclass" : "panel",
+					"angle" : 270.0,
+					"grad1" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
 					"numinlets" : 1,
 					"patching_rect" : [ 11.0, 7.0, 380.0, 47.0 ],
+					"grad2" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"mode" : 1,
-					"numoutlets" : 0,
 					"rounded" : 16,
-					"grad1" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
-					"angle" : 270.0,
-					"id" : "obj-54",
-					"grad2" : [ 0.0, 0.0, 0.0, 1.0 ]
+					"numoutlets" : 0,
+					"id" : "obj-54"
 				}
 
 			}
  ],
 		"lines" : [ 			{
 				"patchline" : 				{
-					"source" : [ "obj-2", 0 ],
-					"destination" : [ "obj-3", 0 ],
-					"hidden" : 0,
+					"source" : [ "obj-17", 0 ],
+					"destination" : [ "obj-31", 0 ],
+					"hidden" : 1,
 					"midpoints" : [  ]
 				}
 
 			}
 , 			{
 				"patchline" : 				{
-					"source" : [ "obj-4", 0 ],
-					"destination" : [ "obj-1", 0 ],
-					"hidden" : 0,
+					"source" : [ "obj-74", 0 ],
+					"destination" : [ "obj-73", 0 ],
+					"hidden" : 1,
 					"midpoints" : [  ]
 				}
 
@@ -283,9 +314,18 @@
 			}
 , 			{
 				"patchline" : 				{
-					"source" : [ "obj-74", 0 ],
-					"destination" : [ "obj-73", 0 ],
-					"hidden" : 1,
+					"source" : [ "obj-4", 0 ],
+					"destination" : [ "obj-1", 0 ],
+					"hidden" : 0,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-2", 0 ],
+					"destination" : [ "obj-3", 0 ],
+					"hidden" : 0,
 					"midpoints" : [  ]
 				}
 

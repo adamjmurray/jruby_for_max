@@ -22,7 +22,7 @@ New Objects
 * ajm.midi2coll - reads midi files and converts them to a [coll] format that
                   can be sequenced by ajm.relmetro 
 
-* ajm.cosy - sequencing language
+* ajm.makenote - a utility to help play notes with ajm.relmetro & coll
 
 * ajm.error - print error messages to the Max window
 
@@ -37,6 +37,19 @@ Changes to sequencing objects
   - invert
   See the help file for details.
   
+------------------------------------------------------------------------------
+
+Changes to MSP objects
+
+* ajm.lfo renamed to ajm.lfo~
+
+* ajm.env renamed to ajm.env~
+
+These renames were done to be more consistent with MSP objects.
+If you have patches using the old names, you can copy ajm.lfo~.maxpat
+to ajm.lfo.maxpat and ajm.env~.maxpat to ajm.env.maxpat.
+Sorry for any inconvenience.
+
 ------------------------------------------------------------------------------
 
 Changes to [ajm.ruby]

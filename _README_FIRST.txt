@@ -68,7 +68,7 @@ JRuby (version 1.1.5 included)
   http://jruby.codehaus.org/
   
   JRuby in turn depends on other libraries. I included the license info
-  for bsf.jar under the thirdparty folder. You can find license info for
+  for bsf.jar under the license folder. You can find license info for
   the Ruby language at:
     http://www.ruby-lang.org/en/LICENSE.txt
     http://www.ruby-lang.org/en/COPYING.txt

@@ -1,28 +1,37 @@
 <project name="ajm objects" default="jar">
 
+	<property name="VERSION" value="0.8.5"/>
+	
+	<property environment="env"/>
+
 	<property name="build" location="build"/>
+	<property name="dist" location="dist"/>
+	<property name="download" location="download"/>	
 	<property name="lib" location="lib"/>
 	<property name="src" location="src"/>
-	<property name="test" location="test"/>
-	<property name="ajm.jar" location="${lib}/ajm.jar"/>
 
+	<property name="jar_name" value="ajm.jar"/>
+	<property name="dist_name" value="ajm-objects-${VERSION}"/>
+
+	<property name="jruby_distrib" value="jruby-bin-1.1.5.tar.gz"/>
+	<property name="jruby_folder" value="jruby-1.1.5"/>
+
+	<condition property="gem_command" value="gem.bat">    		
+		<os family="windows"/>
+	</condition>
+	<!-- else: --><property name="gem_command" value="jgem"/>
+	
 	<path id="classpath">
 		<fileset dir="lib">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
 
-	<fail message="max.jar not found. Copy [Max installation]/Cycling '74/java/lib/max.jar to ${basedir}/lib and try again.">
-		<condition>
-			<not><available file="${lib}/max.jar"/></not>
-		</condition>
-	</fail>
-
-	<target name="jar" description="generate ajm.jar file" depends="compile">
-		<jar destfile="${ajm.jar}" basedir="${build}">
+	<target name="jar" description="generate ${jar_name} file" depends="compile">
+		<jar destfile="${lib}/${jar_name}" basedir="${build}">
 			<manifest>
 				<attribute name="Library" value="ajm objects (MXJ) for MaxMSP"/>
-				<attribute name="Version" value="0.8.5"/>
+				<attribute name="Version" value="${VERSION}"/>
 				<attribute name="Author" value="Adam Murray"/>
 				<attribute name="URL" value="http://compusition.com"/>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -35,15 +44,16 @@
 		<mkdir dir="${build}/"/>
 		<javac destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5">
 			<src path="${src}"/>
-		    <exclude name="**/*Test.java"/>
+			<exclude name="**/*Test.java"/>
 		</javac>
 	</target>
 
 	<target name="clean" description="delete build artifacts">
 		<delete dir="${build}"/>
-		<delete file="${ajm.jar}"/>
+		<delete file="${lib}/${jar_name}"/>
+		<delete dir="${dist}"/>
 	</target>
-	
+
 	<target name="compile_tests" description="compile all ajm.objects source, including tests" depends="clean">
 		<mkdir dir="${build}/"/>
 		<javac srcdir="${src}" destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5"/>
@@ -61,7 +71,7 @@
 			</batchtest>
 		</junit>
 	</target>
-	
+
 	<target name="javadoc" description="generate standard javadoc documentation">
 		<javadoc
 			destdir="doc/api"
@@ -80,6 +90,46 @@
 			<tag name="attribute" scope="fields" description="&lt;br/&gt;This field is a Max object attribute." />
 			<tag name="nodoc" scope="all" description="" /> <!-- indicates what MaxDoclet should ignore -->	
 		</javadoc>
+	</target>
+
+	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar, gems">
+		<mkdir dir="${dist}"/>
+		<zip destfile="${dist}/${dist_name}.zip">
+			<zipfileset dir="${basedir}" includes="_README_FIRST.txt, CHANGELOG.txt" prefix="${dist_name}"/>      		
+			<zipfileset dir="${basedir}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
+			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
+				<exclude name="**/max.jar"/>
+				<exclude name="**/*junit*.jar"/>				
+			</zipfileset>    		
+			<zipfileset dir="${download}/${jruby_folder}" includes="lib/ruby/**" prefix="${dist_name}">
+				<exclude name="**/doc/**"/>
+				<exclude name="**/gems/rspec*/**"/>
+				<exclude name="**/gems/rake*/**"/>
+				<exclude name="**/gems/**/html/**"/>
+				<exclude name="**/gems/**/examples/**"/>
+				<exclude name="**/gems/**/sample/**"/>    			
+				<exclude name="**/gems/**/test/**"/>    			
+			</zipfileset>
+			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
+		</zip>  		
+	</target>
+
+	<target name="gems" description="download the JRuby gems used by ajm objects">
+		<mkdir dir="${download}"/>
+		<get src="http://dist.codehaus.org/jruby/${jruby_distrib}" dest="${download}/${jruby_distrib}" 
+			verbose="true" usetimestamp="true"/>
+		<untar src="${download}/${jruby_distrib}" dest="${download}" overwrite="false" compression="gzip"/>
+		<chmod dir="${download}/${jruby_folder}/bin" includes="*" perm="u+x"/>
+		<exec executable="${download}/${jruby_folder}/bin/${gem_command}">
+			<env key="PATH" path="${download}/${jruby_folder}/bin:${env.PATH}"/>
+			<arg value="install"/>
+			<arg value="--no-ri"/>
+			<arg value="--no-rdoc"/>
+			<arg value="midilib"/>
+			<arg value="treetop"/>
+			<arg value="osc"/>
+			<arg value="drp"/>		    
+		</exec>
 	</target>
 
 </project>

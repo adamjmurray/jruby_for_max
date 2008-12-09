@@ -103,7 +103,8 @@ public class RubyProperties {
 		}
 		catch (UnsatisfiedLinkError e) {
 			// we're running outside of Max, probably for unit testing
-			System.out.println("Using hard-coded defaults for RubyProperties.");
+			// can't call System.out here, Max stole it and it will just cause another UnsatisfiedLinkError
+			// System.out.println("Using hard-coded defaults for RubyProperties.");
 			properties = new Properties();
 		}
 	}

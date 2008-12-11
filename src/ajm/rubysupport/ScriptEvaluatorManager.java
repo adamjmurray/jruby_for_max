@@ -38,7 +38,6 @@ import ajm.util.MappedSet;
 /**
  * Factory for Ruby evaluators that manages shared contexts.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class ScriptEvaluatorManager {

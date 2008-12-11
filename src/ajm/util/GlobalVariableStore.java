@@ -34,7 +34,6 @@ import java.util.Set;
 /**
  * A singleton map for sharing global variables across any object in the JVM.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class GlobalVariableStore {

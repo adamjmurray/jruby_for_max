@@ -32,6 +32,7 @@ def timesig(beats_per_bar, beat_unit)
 end
 
 def quantize(ticks)
+  puts "SET QUANTIZE to #{ticks}"
   $quantize = ticks
 end
 
@@ -109,13 +110,11 @@ class Midi2Coll
       onset_times = tick_map.keys.sort
       onset_times.each do |onset|
         note_pairs = tick_map[onset]
-        bbu = ticks_to_bbu(quantize onset) # onset is in ticks
+        bbu = ticks_to_bbu(onset) # onset is in ticks
         coll_entry = ['store', bbu] # the index for [coll]
 
         note_pairs.each do |note_pair|
-          on = note_pair[:on]
-          off = note_pair[:off]
-
+          on, off = note_pair
           pitch = on.note
           velocity = on.velocity
 
@@ -146,8 +145,8 @@ class Midi2Coll
     pitch = off_event.note
     on_event = @pitch_map[pitch]
     if on_event then
-      note_pair = {:on => on_event, :off => off_event}
-      ticks = on_event.time_from_start
+      note_pair = [on_event, off_event]
+      ticks = quantize(on_event.time_from_start)
 
       # Map onset time to list of note on/off pairs occuring at that time
       simultaneous_notes = @tick_map[ticks]

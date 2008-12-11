@@ -49,6 +49,8 @@ If you have patches using the old names, you can copy ajm.lfo~.maxpat
 to ajm.lfo.maxpat and ajm.env~.maxpat to ajm.env.maxpat.
 Sorry for any inconvenience.
 
+* ajm.env~ now has some basic transport syncing capability
+
 ------------------------------------------------------------------------------
 
 Changes to [ajm.ruby]

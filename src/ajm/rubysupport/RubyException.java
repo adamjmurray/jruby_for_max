@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Wrapper for any Ruby exceptions. Helps encapsulate the underlying Ruby implementation.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")

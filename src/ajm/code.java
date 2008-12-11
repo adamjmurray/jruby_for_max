@@ -53,7 +53,6 @@ import com.cycling74.max.Atom;
 /**
  * Multi-tab plaintext editor.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class code extends AbstractMaxObject {

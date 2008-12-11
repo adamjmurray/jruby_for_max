@@ -34,7 +34,6 @@ import java.util.TreeMap;
 /**
  * A Map where all the values are a Set. The Set maintains insertion order of its entires.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")

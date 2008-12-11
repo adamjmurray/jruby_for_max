@@ -34,7 +34,6 @@ import com.cycling74.max.Executable;
 /**
  * File watch mechanism for Max objects. Executes a callback when the file modified date changes.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class FileWatcher extends Thread {

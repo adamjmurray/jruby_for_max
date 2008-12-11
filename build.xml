@@ -94,13 +94,20 @@
 
 	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar, gems">
 		<mkdir dir="${dist}"/>
+		<copy todir="${dist}">
+		  <fileset dir="${basedir}" includes="*.txt"/>
+	  </copy>
+		<replace dir="${dist}" includes="*.txt" token="@VERSION" value="${VERSION}"/>
+		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" />
 		<zip destfile="${dist}/${dist_name}.zip">
-			<zipfileset dir="${basedir}" includes="_README_FIRST.txt, CHANGELOG.txt" prefix="${dist_name}"/>      		
+			<zipfileset dir="${dist}" includes="*.txt" prefix="${dist_name}"/>      		
 			<zipfileset dir="${basedir}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
 			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
 				<exclude name="**/max.jar"/>
-				<exclude name="**/*junit*.jar"/>				
-			</zipfileset>    		
+				<exclude name="**/*junit*.jar"/>
+				<exclude name="**/jruby-engine.jar"/>
+				<exclude name="**/script-api.jar"/>								
+			</zipfileset>    		   		
 			<zipfileset dir="${download}/${jruby_folder}" includes="lib/ruby/**" prefix="${dist_name}">
 				<exclude name="**/doc/**"/>
 				<exclude name="**/gems/rspec*/**"/>
@@ -111,7 +118,8 @@
 				<exclude name="**/gems/**/test/**"/>    			
 			</zipfileset>
 			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
-		</zip>  		
+		</zip>  
+		<delete dir="${dist}" includes="*.txt"/>		
 	</target>
 
 	<target name="gems" description="download the JRuby gems used by ajm objects">
@@ -128,7 +136,8 @@
 			<arg value="midilib"/>
 			<arg value="treetop"/>
 			<arg value="osc"/>
-			<arg value="drp"/>		    
+			<arg value="drp"/>
+			<arg value="smf"/>		    
 		</exec>
 	</target>
 

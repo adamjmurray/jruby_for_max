@@ -1,39 +1,14 @@
-
+         
                       ajm objects for Max/MSP
-
-                           Version 0.8.5
-
------------------------------------------------------------------------------
-
-FIRST TIME INSTALLATION
-
- (1) Copy all contents of the lib folder to:
-       {Max installation}/Cycling '74/java/lib
-    
- (2) Put the ajm folder somewhere on your Max search path
-     - See File Preferences under Max's Options menu.
-       
- (3) Restart Max/MSP and open ajm/ajm.overview.pat
+         
+                           Version @VERSION
+         
+         http://compusition.com/web/software/maxmsp/ajm-objects
+          
+                   Adam Murray (adam@compusition.com)
 
 
-UPGRADING FROM A PREVIOUS VERSION
-
- (1) Delete the entire ruby directory structure
-     {Max installation}/Cycling '74/java/lib/ruby
-     
- (2) Delete the old ajm folder (the old patches/help files) 
-     
- (3) Proceed with the first time installation instructions. 
-     The following jar files will be replaced: ajm.jar, bsf.jar, jruby.jar
- 
-------------------------------------------------------------------------------
-
-REQUIREMENTS
-
- * Max/MSP 5
-
- * Java 5 or higher
-
+See INSTALL.txt for installation instructions
 ------------------------------------------------------------------------------
 
 NOTES
@@ -57,6 +32,16 @@ Installing Ruby Gems for ajm.ruby
   (4) Replace the {Max installation}/Cycling '74/java/lib/ruby folder with
       /path/to/jruby-1.1.5/lib/ruby
   (5) Restart Max/MSP
+
+------------------------------------------------------------------------------
+
+SOURCE CODE
+
+ajm objects is an open source project. The source code is located at:
+http://github.com/adamjmurray/ajm_objects
+
+Feel free to hack away at it, contribute features, or whatever you want.
+Just mind my copyright and give credit where credit is due.
 
 ------------------------------------------------------------------------------
 

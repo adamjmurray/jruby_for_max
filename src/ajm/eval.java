@@ -40,7 +40,6 @@ import com.cycling74.max.Executable;
 /**
  * The ajm.eval MaxObject
  * 
- * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class eval extends AbstractMaxRubyObject {

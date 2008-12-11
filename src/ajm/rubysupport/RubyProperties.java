@@ -47,24 +47,41 @@ public class RubyProperties {
 
 	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
 
-	public static final String DEFAULT_LOAD_PATHS = "";
+	private static String rubyEngine;
+
+	private static String[] initializers;
+
+	private static String[] loadpaths;
 
 	public static String getRubyEngine() {
-		return properties.getProperty("ruby.engine", DEFAULT_RUBY_ENGINE).trim();
+		if (rubyEngine == null) {
+			rubyEngine = properties.getProperty("ruby.engine", DEFAULT_RUBY_ENGINE).trim();
+		}
+		return rubyEngine;
 	}
 
 	public static String[] getInitializerFiles() {
-		String[] initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
-		for (int i = 0; i < initializers.length; i++) {
-			initializers[i] = initializers[i].trim();
+		if (initializers == null) {
+			initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
+			for (int i = 0; i < initializers.length; i++) {
+				initializers[i] = initializers[i].trim();
+			}
 		}
 		return initializers;
 	}
 
 	public static String[] getLoadPaths() {
-		String[] loadpaths = properties.getProperty("ruby.loadpaths", DEFAULT_LOAD_PATHS).split(";");
-		for (int i = 0; i < loadpaths.length; i++) {
-			loadpaths[i] = loadpaths[i].trim();
+		if (loadpaths == null) {
+			String loadpathsProp = properties.getProperty("ruby.loadpaths");
+			if (loadpathsProp == null) {
+				loadpaths = new String[] {};
+			}
+			else {
+				loadpaths = loadpathsProp.split(";");
+				for (int i = 0; i < loadpaths.length; i++) {
+					loadpaths[i] = loadpaths[i].trim();
+				}
+			}
 		}
 		return loadpaths;
 	}

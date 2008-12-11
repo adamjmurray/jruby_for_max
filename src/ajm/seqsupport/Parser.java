@@ -44,7 +44,6 @@ import com.cycling74.max.Atom;
 /**
  * A Parser for the ajm objects sequencing syntax.
  * 
- * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class Parser {

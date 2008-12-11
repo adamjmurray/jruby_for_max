@@ -33,7 +33,6 @@ import java.util.Map;
 /**
  * Superclass for script evaluator implementations.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public abstract class AbstractScriptEvaluator implements ScriptEvaluator {
@@ -51,7 +50,9 @@ public abstract class AbstractScriptEvaluator implements ScriptEvaluator {
 		resetEngineContext();
 		try {
 			for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
-				declareGlobalInternal(global.getKey(), global.getValue());
+				String name = global.getKey();
+				undeclareGlobal(name);
+				declareGlobalInternal(name, global.getValue());
 			}
 		}
 		catch (Exception e) {

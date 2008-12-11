@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * The exception message will suggest an available id.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")

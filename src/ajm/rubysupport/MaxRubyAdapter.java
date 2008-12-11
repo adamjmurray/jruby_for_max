@@ -45,7 +45,6 @@ import com.cycling74.max.MaxObject;
 /**
  * The bridge between Max and Ruby.
  * 
- * @version 0.9
  * @author Adam Murray (adam@compusition.com)
  */
 public class MaxRubyAdapter {
@@ -138,7 +137,9 @@ public class MaxRubyAdapter {
 		Object result;
 		synchronized (ruby) {
 			// Set the $MaxObject/ID globals correctly in shared contexts:
+			ruby.undeclareGlobal("MaxObject");
 			ruby.declareGlobal("MaxObject", maxObject); // for backward compatibility
+			ruby.undeclareGlobal("max_object");
 			ruby.declareGlobal("max_object", maxObject); // the new preferred ruby-ish variable name
 			result = ruby.eval(rubyCode);
 		}

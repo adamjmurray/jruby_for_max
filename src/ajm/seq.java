@@ -48,7 +48,6 @@ import com.cycling74.max.Executable;
 /**
  * The ajm.seq MaxObject.
  * 
- * @version 0.8
  * @author Adam Murray (adam@compusition.com)
  */
 public class seq extends AbstractMaxRubyObject {
@@ -339,8 +338,7 @@ public class seq extends AbstractMaxRubyObject {
 			}
 		}
 
-		if (atoms == null || atoms.length == 0
-				|| (atoms.length == 1 && MaxRubyAdapter.NIL.equals(atoms[0].toString()))) {
+		if (atoms == null || atoms.length == 0 || (atoms.length == 1 && MaxRubyAdapter.NIL.equals(atoms[0].toString()))) {
 			atoms = Atom.emptyArray;
 		}
 		list(atoms);

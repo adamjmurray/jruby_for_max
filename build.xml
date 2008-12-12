@@ -101,7 +101,9 @@
 		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" />
 		<zip destfile="${dist}/${dist_name}.zip">
 			<zipfileset dir="${dist}" includes="*.txt" prefix="${dist_name}"/>      		
-			<zipfileset dir="${basedir}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
+			<zipfileset dir="${basedir}" includes="ajm/**" prefix="${dist_name}"> <!-- the Max patches -->
+				<exclude name="**/*cosy*"/> <!-- not ready yet -->
+			</zipfileset>
 			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
 				<exclude name="**/max.jar"/>
 				<exclude name="**/*junit*.jar"/>

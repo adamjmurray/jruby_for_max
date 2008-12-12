@@ -226,7 +226,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "js ajm.error \"ajm.relmetro: unknown output format\"",
+									"text" : "js ajm.error \"ajm.metro: unknown output format\"",
 									"linecount" : 2,
 									"numoutlets" : 1,
 									"fontname" : "Verdana",
@@ -1102,7 +1102,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "js ajm.error \"ajm.relmetro: doesn't understand\"",
+					"text" : "js ajm.error \"ajm.metro: doesn't understand\"",
 					"linecount" : 2,
 					"numoutlets" : 1,
 					"fontname" : "Verdana",

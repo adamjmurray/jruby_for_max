@@ -32,11 +32,12 @@ def timesig(beats_per_bar, beat_unit)
 end
 
 def quantize(ticks)
-  puts "SET QUANTIZE to #{ticks}"
   $quantize = ticks
 end
 
 def read(midi_file)
+  midi_file.strip!
+  if midi_file =~ /^[^:]{2,}:(.*)/ then midi_file = $1 end
   if File.exists?(midi_file) then
     midi2coll = Midi2Coll.new(midi_file, $beats_per_bar, $beat_unit, $quantize)
     
@@ -79,7 +80,7 @@ class Midi2Coll
     end
     
     @sequence.tracks.each_with_index do |track,index|
-      # I expect quantization is done to make sure ajm.relmetro can hit all the
+      # I expect quantization is done to make sure ajm.metro can hit all the
       # note ons. I don't see a reason to also quantize note offs, but it could
       # be supported as an additional option for this object...
       # track.quantize_events_of_type(@quantize, MIDI::NoteOnEvent) if @quantize

@@ -15,13 +15,13 @@ Many objects depend on Max 5 features like transport and presentation mode.
 
 New Objects
 
-* ajm.relmetro - a transport-synced metronome that reports time relative to
+* ajm.metro - a transport-synced metronome that reports time relative to
                  a given timepoint
 
 * ajm.midi2coll - reads midi files and converts them to a [coll] format that
-                  can be sequenced by ajm.relmetro 
+                  can be sequenced by ajm.metro 
 
-* ajm.makenote - a utility to help play notes with ajm.relmetro & coll
+* ajm.makenote - a utility to help play notes with ajm.metro & coll
 
 * ajm.error - print error messages to the Max window
 
@@ -99,6 +99,13 @@ Changes to [ajm.ruby]
   jruby.jar to fix this, however, in general it is dangerous using local
   variables to remember state as explained in the "variable scope
   limitations" section of the help file.
+
+* The following gems are included by default:
+  - midilib
+  - treetop
+  - osc
+  - drp
+  - smf
 
 ------------------------------------------------------------------------------
 

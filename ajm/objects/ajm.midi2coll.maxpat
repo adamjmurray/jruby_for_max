@@ -18,15 +18,43 @@
 		"metadata" : [  ],
 		"boxes" : [ 			{
 				"box" : 				{
+					"maxclass" : "newobj",
+					"text" : "prepend read",
+					"fontname" : "Verdana",
+					"numinlets" : 1,
+					"patching_rect" : [ 24.0, 271.0, 85.0, 20.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
+					"id" : "obj-23",
+					"outlettype" : [ "" ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"maxclass" : "newobj",
+					"text" : "sprintf symout \"%s \"",
+					"fontname" : "Verdana",
+					"numinlets" : 1,
+					"patching_rect" : [ 24.0, 244.0, 127.0, 20.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
+					"id" : "obj-24",
+					"outlettype" : [ "" ]
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"maxclass" : "comment",
 					"text" : "On my machine, patcherargs sometimes fails to work the first time this patch is loaded. Loadbang seems to fix that.",
 					"linecount" : 2,
-					"numoutlets" : 0,
 					"fontname" : "Verdana",
+					"numinlets" : 1,
 					"patching_rect" : [ 308.0, 20.0, 348.0, 33.0 ],
-					"id" : "obj-25",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 0,
+					"id" : "obj-25"
 				}
 
 			}
@@ -34,13 +62,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "loadbang",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "bang" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 241.0, 31.0, 61.0, 20.0 ],
-					"id" : "obj-21",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 1,
+					"id" : "obj-21",
+					"outlettype" : [ "bang" ]
 				}
 
 			}
@@ -48,13 +76,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "translate @in notevalues @out ticks",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 519.0, 238.0, 212.0, 20.0 ],
-					"id" : "obj-20",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 1,
+					"id" : "obj-20",
+					"outlettype" : [ "" ]
 				}
 
 			}
@@ -62,13 +90,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "prepend quantize",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 451.0, 273.0, 108.0, 20.0 ],
-					"id" : "obj-19",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 1,
+					"id" : "obj-19",
+					"outlettype" : [ "" ]
 				}
 
 			}
@@ -76,10 +104,10 @@
 				"box" : 				{
 					"maxclass" : "outlet",
 					"annotation" : "number of tracks",
-					"numoutlets" : 0,
-					"patching_rect" : [ 348.0, 351.0, 25.0, 25.0 ],
-					"id" : "obj-11",
 					"numinlets" : 1,
+					"patching_rect" : [ 348.0, 351.0, 25.0, 25.0 ],
+					"numoutlets" : 0,
+					"id" : "obj-11",
 					"comment" : "number of tracks"
 				}
 
@@ -89,13 +117,13 @@
 					"maxclass" : "newobj",
 					"text" : "js ajm.error \"ajm.midi2coll: file not found\"",
 					"linecount" : 2,
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 208.0, 241.0, 168.0, 33.0 ],
-					"id" : "obj-18",
-					"fontsize" : 11.1,
 					"numinlets" : 1,
+					"patching_rect" : [ 208.0, 241.0, 168.0, 33.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
+					"id" : "obj-18",
+					"outlettype" : [ "" ],
 					"color" : [ 1.0, 0.396078, 0.396078, 1.0 ]
 				}
 
@@ -104,10 +132,10 @@
 				"box" : 				{
 					"maxclass" : "outlet",
 					"annotation" : "track index",
-					"numoutlets" : 0,
-					"patching_rect" : [ 186.0, 351.0, 25.0, 25.0 ],
-					"id" : "obj-17",
 					"numinlets" : 1,
+					"patching_rect" : [ 186.0, 351.0, 25.0, 25.0 ],
+					"numoutlets" : 0,
+					"id" : "obj-17",
 					"comment" : "track index"
 				}
 
@@ -116,13 +144,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "route int float",
-					"numoutlets" : 3,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 451.0, 210.0, 87.0, 20.0 ],
-					"id" : "obj-12",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 3,
+					"id" : "obj-12",
+					"outlettype" : [ "", "", "" ]
 				}
 
 			}
@@ -131,13 +159,13 @@
 					"maxclass" : "newobj",
 					"text" : "js ajm.error \"ajm.midi2coll doesn't understand\"",
 					"linecount" : 2,
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 470.0, 150.0, 165.0, 33.0 ],
-					"id" : "obj-9",
-					"fontsize" : 11.1,
 					"numinlets" : 1,
+					"patching_rect" : [ 470.0, 150.0, 165.0, 33.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
+					"id" : "obj-9",
+					"outlettype" : [ "" ],
 					"color" : [ 1.0, 0.396078, 0.396078, 1.0 ]
 				}
 
@@ -146,13 +174,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "deferlow",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 376.0, 93.0, 58.0, 20.0 ],
-					"id" : "obj-26",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 1,
+					"id" : "obj-26",
+					"outlettype" : [ "" ]
 				}
 
 			}
@@ -160,13 +188,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "route timesig quantize done",
-					"numoutlets" : 4,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "", "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 257.0, 125.0, 232.0, 20.0 ],
-					"id" : "obj-16",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 4,
+					"id" : "obj-16",
+					"outlettype" : [ "", "", "", "" ]
 				}
 
 			}
@@ -174,13 +202,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "patcherargs @timesig 4 4",
-					"numoutlets" : 2,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 241.0, 69.0, 154.0, 20.0 ],
-					"id" : "obj-15",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 2,
+					"id" : "obj-15",
+					"outlettype" : [ "", "" ]
 				}
 
 			}
@@ -188,13 +216,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "sprintf symout timesig(%d\\,%d)",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
+					"numinlets" : 2,
 					"patching_rect" : [ 257.0, 160.0, 194.0, 20.0 ],
-					"id" : "obj-13",
 					"fontsize" : 11.1,
-					"numinlets" : 2
+					"numoutlets" : 1,
+					"id" : "obj-13",
+					"outlettype" : [ "" ]
 				}
 
 			}
@@ -202,13 +230,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "zl reg",
-					"numoutlets" : 2,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "" ],
+					"numinlets" : 2,
 					"patching_rect" : [ 208.0, 215.0, 42.0, 20.0 ],
-					"id" : "obj-10",
 					"fontsize" : 11.1,
-					"numinlets" : 2
+					"numoutlets" : 2,
+					"id" : "obj-10",
+					"outlettype" : [ "", "" ]
 				}
 
 			}
@@ -216,13 +244,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "route notfound",
-					"numoutlets" : 2,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 136.0, 172.0, 94.0, 20.0 ],
-					"id" : "obj-8",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 2,
+					"id" : "obj-8",
+					"outlettype" : [ "", "" ]
 				}
 
 			}
@@ -230,13 +258,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "opendialog Midi",
-					"numoutlets" : 2,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "bang" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 24.0, 141.0, 97.0, 20.0 ],
-					"id" : "obj-7",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 2,
+					"id" : "obj-7",
+					"outlettype" : [ "", "bang" ]
 				}
 
 			}
@@ -244,13 +272,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "route bang timesig quantize",
-					"numoutlets" : 4,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "", "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 24.0, 96.0, 167.0, 20.0 ],
-					"id" : "obj-6",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 4,
+					"id" : "obj-6",
+					"outlettype" : [ "", "", "", "" ]
 				}
 
 			}
@@ -258,27 +286,13 @@
 				"box" : 				{
 					"maxclass" : "newobj",
 					"text" : "absolutepath",
-					"numoutlets" : 1,
 					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 136.0, 143.0, 83.0, 20.0 ],
+					"fontsize" : 11.1,
+					"numoutlets" : 1,
 					"id" : "obj-5",
-					"fontsize" : 11.1,
-					"numinlets" : 1
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"maxclass" : "newobj",
-					"text" : "conformpath native boot",
-					"numoutlets" : 2,
-					"fontname" : "Verdana",
-					"outlettype" : [ "", "int" ],
-					"patching_rect" : [ 24.0, 245.0, 148.0, 20.0 ],
-					"id" : "obj-14",
-					"fontsize" : 11.1,
-					"numinlets" : 1
+					"outlettype" : [ "" ]
 				}
 
 			}
@@ -286,10 +300,10 @@
 				"box" : 				{
 					"maxclass" : "outlet",
 					"annotation" : "note data (to coll)",
-					"numoutlets" : 0,
-					"patching_rect" : [ 24.0, 351.0, 25.0, 25.0 ],
-					"id" : "obj-3",
 					"numinlets" : 1,
+					"patching_rect" : [ 24.0, 351.0, 25.0, 25.0 ],
+					"numoutlets" : 0,
+					"id" : "obj-3",
 					"comment" : "note data (to coll)"
 				}
 
@@ -298,11 +312,11 @@
 				"box" : 				{
 					"maxclass" : "inlet",
 					"annotation" : "bang / timesig / quantize / filepath",
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 24.0, 65.0, 25.0, 25.0 ],
-					"id" : "obj-2",
 					"numinlets" : 0,
+					"patching_rect" : [ 24.0, 65.0, 25.0, 25.0 ],
+					"numoutlets" : 1,
+					"id" : "obj-2",
+					"outlettype" : [ "" ],
 					"comment" : "bang / timesig / quantize / filepath"
 				}
 
@@ -310,33 +324,28 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "sprintf read '%s'",
-					"numoutlets" : 1,
-					"fontname" : "Verdana",
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 24.0, 281.0, 103.0, 20.0 ],
-					"id" : "obj-1",
-					"fontsize" : 11.1,
-					"numinlets" : 1
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"maxclass" : "newobj",
 					"text" : "mxj ajm.ruby 3 @scriptfile ajm_midi2coll.rb @evaloutlet -1",
-					"numoutlets" : 3,
 					"fontname" : "Verdana",
-					"outlettype" : [ "", "", "" ],
+					"numinlets" : 1,
 					"patching_rect" : [ 24.0, 321.0, 343.0, 20.0 ],
-					"id" : "obj-4",
 					"fontsize" : 11.1,
-					"numinlets" : 1
+					"numoutlets" : 3,
+					"id" : "obj-4",
+					"outlettype" : [ "", "", "" ]
 				}
 
 			}
  ],
 		"lines" : [ 			{
+				"patchline" : 				{
+					"source" : [ "obj-23", 0 ],
+					"destination" : [ "obj-4", 0 ],
+					"hidden" : 0,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
 				"patchline" : 				{
 					"source" : [ "obj-21", 0 ],
 					"destination" : [ "obj-15", 0 ],
@@ -429,35 +438,8 @@
 			}
 , 			{
 				"patchline" : 				{
-					"source" : [ "obj-8", 1 ],
-					"destination" : [ "obj-14", 0 ],
-					"hidden" : 0,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
 					"source" : [ "obj-5", 0 ],
 					"destination" : [ "obj-8", 0 ],
-					"hidden" : 0,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"source" : [ "obj-7", 0 ],
-					"destination" : [ "obj-14", 0 ],
-					"hidden" : 0,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"source" : [ "obj-14", 0 ],
-					"destination" : [ "obj-1", 0 ],
 					"hidden" : 0,
 					"midpoints" : [  ]
 				}
@@ -556,15 +538,6 @@
 			}
 , 			{
 				"patchline" : 				{
-					"source" : [ "obj-1", 0 ],
-					"destination" : [ "obj-4", 0 ],
-					"hidden" : 0,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
 					"source" : [ "obj-4", 0 ],
 					"destination" : [ "obj-3", 0 ],
 					"hidden" : 0,
@@ -585,6 +558,33 @@
 				"patchline" : 				{
 					"source" : [ "obj-4", 2 ],
 					"destination" : [ "obj-11", 0 ],
+					"hidden" : 0,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-24", 0 ],
+					"destination" : [ "obj-23", 0 ],
+					"hidden" : 0,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-8", 1 ],
+					"destination" : [ "obj-24", 0 ],
+					"hidden" : 0,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-7", 0 ],
+					"destination" : [ "obj-24", 0 ],
 					"hidden" : 0,
 					"midpoints" : [  ]
 				}

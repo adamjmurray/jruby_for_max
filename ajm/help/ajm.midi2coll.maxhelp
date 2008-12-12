@@ -21,8 +21,8 @@
 					"maxclass" : "newobj",
 					"text" : "thispatcher",
 					"fontname" : "Verdana",
-					"hidden" : 1,
 					"numinlets" : 1,
+					"hidden" : 1,
 					"patching_rect" : [ 119.0, 466.0, 73.0, 20.0 ],
 					"fontsize" : 11.1,
 					"numoutlets" : 2,
@@ -37,8 +37,8 @@
 					"maxclass" : "newobj",
 					"text" : "ajm.bring-to-front-listener ajm.midi2coll",
 					"fontname" : "Verdana",
-					"hidden" : 1,
 					"numinlets" : 0,
+					"hidden" : 1,
 					"patching_rect" : [ 119.0, 440.0, 237.0, 20.0 ],
 					"fontsize" : 11.1,
 					"numoutlets" : 1,
@@ -52,8 +52,8 @@
 					"maxclass" : "newobj",
 					"text" : "loadmess set",
 					"fontname" : "Verdana",
-					"hidden" : 1,
 					"numinlets" : 1,
+					"hidden" : 1,
 					"patching_rect" : [ 94.0, 349.0, 84.0, 20.0 ],
 					"fontsize" : 11.100006,
 					"numoutlets" : 1,
@@ -217,7 +217,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "bpatcher",
-					"numinlets" : 0,
+					"numinlets" : 1,
 					"args" : [ "@transport", "ajm_m2c_help" ],
 					"patching_rect" : [ 332.0, 243.0, 113.0, 115.0 ],
 					"numoutlets" : 0,
@@ -261,8 +261,8 @@
 									"text" : "I'm cheating a bit to show you what midi2coll will output if you load the midi file again",
 									"linecount" : 4,
 									"fontname" : "Verdana",
-									"hidden" : 1,
 									"numinlets" : 1,
+									"hidden" : 1,
 									"patching_rect" : [ 141.0, 144.0, 123.0, 50.0 ],
 									"fontsize" : 9.0,
 									"numoutlets" : 0,
@@ -275,8 +275,8 @@
 									"maxclass" : "newobj",
 									"text" : "loadmess 3",
 									"fontname" : "Verdana",
-									"hidden" : 1,
 									"numinlets" : 1,
+									"hidden" : 1,
 									"patching_rect" : [ 143.0, 128.0, 74.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 1,
@@ -330,7 +330,7 @@
 									"maxclass" : "newobj",
 									"text" : "ajm.makenote @transport ajm_m2c_mt",
 									"fontname" : "Verdana",
-									"numinlets" : 1,
+									"numinlets" : 2,
 									"patching_rect" : [ 310.0, 389.0, 236.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
@@ -376,7 +376,7 @@
 									"maxclass" : "newobj",
 									"text" : "ajm.makenote @transport ajm_m2c_mt",
 									"fontname" : "Verdana",
-									"numinlets" : 1,
+									"numinlets" : 2,
 									"patching_rect" : [ 152.0, 328.0, 236.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
@@ -434,7 +434,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "bpatcher",
-									"numinlets" : 0,
+									"numinlets" : 1,
 									"args" : [ "@transport", "ajm_m2c_mt" ],
 									"patching_rect" : [ 426.0, 216.0, 113.0, 115.0 ],
 									"numoutlets" : 0,
@@ -462,7 +462,7 @@
 									"maxclass" : "newobj",
 									"text" : "ajm.makenote @transport ajm_m2c_mt",
 									"fontname" : "Verdana",
-									"numinlets" : 1,
+									"numinlets" : 2,
 									"patching_rect" : [ 39.0, 275.0, 236.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
@@ -487,14 +487,14 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "ajm.relmetro 16n @transport ajm_m2c_mt",
+									"text" : "ajm.metro 16n @transport ajm_m2c_mt",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
 									"patching_rect" : [ 296.0, 162.0, 253.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
 									"id" : "obj-43",
-									"outlettype" : [ "", "bang" ]
+									"outlettype" : [ "bang", "bang" ]
 								}
 
 							}
@@ -773,6 +773,19 @@
 						"metadata" : [  ],
 						"boxes" : [ 							{
 								"box" : 								{
+									"maxclass" : "message",
+									"fontname" : "Verdana",
+									"numinlets" : 2,
+									"patching_rect" : [ 101.0, 136.0, 50.0, 18.0 ],
+									"fontsize" : 11.1,
+									"numoutlets" : 1,
+									"id" : "obj-11",
+									"outlettype" : [ "" ]
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"maxclass" : "comment",
 									"text" : "This midi file has all the notes played on upbeats",
 									"fontname" : "Verdana",
@@ -791,7 +804,7 @@
 									"linecount" : 3,
 									"fontname" : "Verdana",
 									"numinlets" : 1,
-									"patching_rect" : [ 121.0, 122.0, 202.0, 47.0 ],
+									"patching_rect" : [ 151.0, 124.0, 184.0, 47.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 0,
 									"id" : "obj-3"
@@ -815,7 +828,6 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "gswitch2",
-									"int" : 1,
 									"numinlets" : 2,
 									"patching_rect" : [ 60.0, 134.0, 39.0, 32.0 ],
 									"numoutlets" : 2,
@@ -861,7 +873,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "bpatcher",
-									"numinlets" : 0,
+									"numinlets" : 1,
 									"args" : [ "@transport", "ajm_m2c_qtz" ],
 									"patching_rect" : [ 296.0, 239.0, 113.0, 115.0 ],
 									"numoutlets" : 0,
@@ -875,7 +887,7 @@
 									"maxclass" : "newobj",
 									"text" : "ajm.makenote @transport ajm_m2c_qtz",
 									"fontname" : "Verdana",
-									"numinlets" : 1,
+									"numinlets" : 2,
 									"patching_rect" : [ 40.0, 233.0, 238.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
@@ -887,14 +899,14 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "ajm.relmetro 4n @transport ajm_m2c_qtz",
+									"text" : "ajm.metro 4n @transport ajm_m2c_qtz",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
 									"patching_rect" : [ 80.0, 104.0, 248.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
 									"id" : "obj-43",
-									"outlettype" : [ "", "bang" ]
+									"outlettype" : [ "bang", "bang" ]
 								}
 
 							}
@@ -961,6 +973,15 @@
 							}
  ],
 						"lines" : [ 							{
+								"patchline" : 								{
+									"source" : [ "obj-43", 0 ],
+									"destination" : [ "obj-11", 1 ],
+									"hidden" : 0,
+									"midpoints" : [ 89.5, 128.0, 141.5, 128.0 ]
+								}
+
+							}
+, 							{
 								"patchline" : 								{
 									"source" : [ "obj-10", 1 ],
 									"destination" : [ "obj-9", 0 ],
@@ -1080,7 +1101,7 @@
 					"maxclass" : "newobj",
 					"text" : "ajm.makenote @transport ajm_m2c_help",
 					"fontname" : "Verdana",
-					"numinlets" : 1,
+					"numinlets" : 2,
 					"patching_rect" : [ 23.0, 405.0, 244.0, 20.0 ],
 					"fontsize" : 11.100006,
 					"numoutlets" : 2,
@@ -1135,7 +1156,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "bpatcher",
-									"numinlets" : 0,
+									"numinlets" : 1,
 									"args" : [ "@transport", "ajm_m2c_ts", "@timesig", 5, 4 ],
 									"patching_rect" : [ 347.0, 213.0, 113.0, 115.0 ],
 									"numoutlets" : 0,
@@ -1149,8 +1170,8 @@
 									"maxclass" : "newobj",
 									"text" : "loadmess set",
 									"fontname" : "Verdana",
-									"hidden" : 1,
 									"numinlets" : 1,
+									"hidden" : 1,
 									"patching_rect" : [ 214.0, 192.0, 84.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 1,
@@ -1205,7 +1226,7 @@
 									"maxclass" : "newobj",
 									"text" : "ajm.makenote @transport ajm_m2c_ts",
 									"fontname" : "Verdana",
-									"numinlets" : 1,
+									"numinlets" : 2,
 									"patching_rect" : [ 51.0, 223.0, 231.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
@@ -1244,14 +1265,14 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "ajm.relmetro 8n @transport ajm_m2c_ts",
+									"text" : "ajm.metro 8n @transport ajm_m2c_ts",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
 									"patching_rect" : [ 113.0, 148.0, 241.0, 20.0 ],
 									"fontsize" : 11.1,
 									"numoutlets" : 2,
 									"id" : "obj-43",
-									"outlettype" : [ "", "bang" ]
+									"outlettype" : [ "bang", "bang" ]
 								}
 
 							}
@@ -1417,9 +1438,9 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "bpatcher",
-					"lockeddragscroll" : 1,
 					"numinlets" : 1,
-					"args" : [ "ajm.relmetro", "ajm.makenote", "coll" ],
+					"lockeddragscroll" : 1,
+					"args" : [ "ajm.metro", "ajm.makenote", "coll" ],
 					"patching_rect" : [ 365.0, 424.0, 145.0, 55.0 ],
 					"numoutlets" : 0,
 					"id" : "obj-60",
@@ -1430,8 +1451,8 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "bpatcher",
-					"lockeddragscroll" : 1,
 					"numinlets" : 0,
+					"lockeddragscroll" : 1,
 					"args" : [  ],
 					"patching_rect" : [ 372.0, 8.0, 138.0, 55.0 ],
 					"numoutlets" : 0,
@@ -1484,12 +1505,12 @@
 					"maxclass" : "panel",
 					"grad1" : [ 0.823529, 1.0, 0.956863, 1.0 ],
 					"grad2" : [ 0.219608, 0.564706, 0.462745, 1.0 ],
-					"angle" : 270.0,
 					"numinlets" : 1,
 					"patching_rect" : [ 8.0, 8.0, 327.0, 50.0 ],
 					"mode" : 1,
-					"rounded" : 12,
 					"numoutlets" : 0,
+					"rounded" : 12,
+					"angle" : 270.0,
 					"id" : "obj-50"
 				}
 
@@ -1499,12 +1520,12 @@
 					"maxclass" : "panel",
 					"grad1" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
 					"grad2" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"angle" : 270.0,
 					"numinlets" : 1,
 					"patching_rect" : [ 7.0, 7.0, 330.0, 54.0 ],
 					"mode" : 1,
-					"rounded" : 16,
 					"numoutlets" : 0,
+					"rounded" : 16,
+					"angle" : 270.0,
 					"id" : "obj-54"
 				}
 
@@ -1512,14 +1533,14 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "ajm.relmetro 4n @transport ajm_m2c_help",
+					"text" : "ajm.metro 4n @transport ajm_m2c_help",
 					"fontname" : "Verdana",
 					"numinlets" : 1,
 					"patching_rect" : [ 50.0, 323.0, 254.0, 20.0 ],
 					"fontsize" : 11.1,
 					"numoutlets" : 2,
 					"id" : "obj-43",
-					"outlettype" : [ "", "bang" ]
+					"outlettype" : [ "bang", "bang" ]
 				}
 
 			}
@@ -1616,8 +1637,8 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "dropfile",
-					"types" : [ "Midi" ],
 					"numinlets" : 1,
+					"types" : [ "Midi" ],
 					"patching_rect" : [ 42.0, 159.0, 106.0, 55.0 ],
 					"numoutlets" : 2,
 					"id" : "obj-1",

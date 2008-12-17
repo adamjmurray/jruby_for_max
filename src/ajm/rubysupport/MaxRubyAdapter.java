@@ -138,7 +138,7 @@ public class MaxRubyAdapter {
 		synchronized (ruby) {
 			// Set the $MaxObject/ID globals correctly in shared contexts:
 			ruby.undeclareGlobal("MaxObject");
-			ruby.declareGlobal("MaxObject", maxObject); // for backward compatibility
+			ruby.declareGlobal("MaxObject", maxObject); // for backward compatibility, deprecated
 			ruby.undeclareGlobal("max_object");
 			ruby.declareGlobal("max_object", maxObject); // the new preferred ruby-ish variable name
 			result = ruby.eval(rubyCode);
@@ -164,7 +164,6 @@ public class MaxRubyAdapter {
 				String initializationCode = Utils.getFileAsString(initializer);
 				code.append(initializationCode);
 			}
-
 		}
 
 		if (ruby.isInitialized()) {

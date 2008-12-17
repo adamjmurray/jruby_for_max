@@ -87,7 +87,7 @@ def max_object(namespace=nil)
   $max_object_map[context][id]    
 end
 
-# deprecated TODO: fix at_exit
+# deprecated, use at_exit
 def on_context_destroyed(callback_script)
   $max_ruby_adapter.on_context_destroyed(callback_script)
 end

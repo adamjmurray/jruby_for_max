@@ -3,7 +3,6 @@ require 'midilib/sequence'
 
 VALID_BEAT_UNITS = [1,2,4,8,16]
 TICKS_PER_QUARTER_NOTE = 480
-TICKS_PER_WHOLE_NOTE = TICKS_PER_QUARTER_NOTE*4
 
 $beats_per_bar = 4
 $beat_unit = 4
@@ -37,7 +36,7 @@ end
 
 def read(midi_file)
   midi_file.strip!
-  if midi_file =~ /^[^:]{2,}:(.*)/ then midi_file = $1 end
+  if midi_file =~ /^[^:]{2,}:(.*)/ then midi_file = $1 end # Fixes cross platform issues with drive letters (strip off drive name on OS X)
   if File.exists?(midi_file) then
     midi2coll = Midi2Coll.new(midi_file, $beats_per_bar, $beat_unit, $quantize)
     
@@ -69,8 +68,9 @@ class Midi2Coll
   def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize_in_ticks=nil)
     @midi_file = midi_file # TODO validate
     @track_tick_maps = []
-    @beats_per_bar = beats_per_bar
-    @ticks_per_unit = TICKS_PER_WHOLE_NOTE/beat_unit
+    @ticks_per_beat = (4.0/beat_unit * TICKS_PER_QUARTER_NOTE).to_i
+    @beats_per_bar = beats_per_bar.to_i
+    
     @quantize = quantize_in_ticks
     
     # use midilib to parse the input file
@@ -166,8 +166,8 @@ class Midi2Coll
 
   def ticks_to_bbu(ticks)
     ticks = ticks.to_i
-    units = ticks % @ticks_per_unit
-    beats = ticks / @ticks_per_unit    # total beat offset
+    units = ticks % @ticks_per_beat
+    beats = ticks / @ticks_per_beat    # total beat offset
     bars  = beats / @beats_per_bar + 1 
     beats = beats % @beats_per_bar + 1 # beats relative to start of measure
     return "#{bars}.#{beats}.#{units}"

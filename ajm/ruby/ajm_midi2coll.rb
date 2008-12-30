@@ -122,10 +122,8 @@ class Midi2Coll
           offset = off.time_from_start # in ticks
           duration_in_ticks = offset - onset
           duration_in_beats = duration_in_ticks/480.0
-
-          coll_entry << pitch
-          coll_entry << velocity
-          coll_entry << (duration_in_beats*1000).round / 1000.0 # limit digits for readability
+          duration = (duration_in_beats*1000).round / 1000.0 # limit digits for readability
+          coll_entry << "#{pitch} #{velocity} #{duration}"
         end
         coll_entries_for_track << coll_entry
       end  

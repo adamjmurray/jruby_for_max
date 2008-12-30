@@ -66,7 +66,7 @@ end
 class Midi2Coll
   
   def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize_in_ticks=nil)
-    @midi_file = midi_file # TODO validate
+    @midi_file = midi_file # TODO validate (meh, currently this is handled by the ajm.cosy abstraction)
     @track_tick_maps = []
     @ticks_per_beat = (4.0/beat_unit * TICKS_PER_QUARTER_NOTE).to_i
     @beats_per_bar = beats_per_bar.to_i
@@ -80,22 +80,15 @@ class Midi2Coll
     end
     
     @sequence.tracks.each_with_index do |track,index|
-      # I expect quantization is done to make sure ajm.metro can hit all the
-      # note ons. I don't see a reason to also quantize note offs, but it could
-      # be supported as an additional option for this object...
-      # track.quantize_events_of_type(@quantize, MIDI::NoteOnEvent) if @quantize
-      
       @track_tick_maps[index] = @tick_map = {}
       @pitch_map = {}
-      track.each do |event| 
-        if event.note? then 
-          if event.note_on? then
-            start_note(event)
-          elsif event.note_off? then
-            end_note(event)
-          end
+      track.each do |event|
+        case event
+        when MIDI::NoteOnEvent then start_note(event)
+        when MIDI::NoteOffEvent then end_note(event)
+        when MIDI::Controller then simple_event(event)
         end
-        # TODO: support other event types? CC messages? Program changes? Time Signature changes?
+        # TODO: support other event types? Pitch Bends? Program changes? Time Signature changes?
       end
     end    
   end
@@ -110,20 +103,26 @@ class Midi2Coll
       coll_entries_for_track = []
       onset_times = tick_map.keys.sort
       onset_times.each do |onset|
-        note_pairs = tick_map[onset]
+        events = tick_map[onset]
         bbu = ticks_to_bbu(onset) # onset is in ticks
         coll_entry = ['store', bbu] # the index for [coll]
 
-        note_pairs.each do |note_pair|
-          on, off = note_pair
-          pitch = on.note
-          velocity = on.velocity
-
-          offset = off.time_from_start # in ticks
-          duration_in_ticks = offset - onset
-          duration_in_beats = duration_in_ticks/480.0
-          duration = (duration_in_beats*1000).round / 1000.0 # limit digits for readability
-          coll_entry << "#{pitch} #{velocity} #{duration}"
+        events.each do |event|
+          case event
+          when Array
+            on, off = event
+            pitch = on.note
+            velocity = on.velocity
+            offset = off.time_from_start # in ticks
+            duration = ticks_to_beats(offset - onset)
+            coll_entry << "#{pitch} #{velocity} #{duration}"
+            
+          when MIDI::Controller
+            ccval = event.value
+            ccnum = event.controller
+            coll_entry << "cc #{ccval} #{ccnum}"
+            
+          end
         end
         coll_entries_for_track << coll_entry
       end  
@@ -144,21 +143,28 @@ class Midi2Coll
     pitch = off_event.note
     on_event = @pitch_map[pitch]
     if on_event then
-      note_pair = [on_event, off_event]
-      ticks = quantize(on_event.time_from_start)
-
-      # Map onset time to list of note on/off pairs occuring at that time
-      simultaneous_notes = @tick_map[ticks]
-      if simultaneous_notes then
-        simultaneous_notes << note_pair 
-      else
-        @tick_map[ticks] = [note_pair]
-      end
-
+      note = [on_event, off_event]
+      add_event(note, on_event.time_from_start)
     else
       # This will happen if multiple note ons occur at the
       # same pitch before the first note off. 
+      # TODO: handle this case by making pitch_map smarter
       error "Warning: unmatched note off for pitch #{pitch} at #{ticks_to_bbu(off_time)}"
+    end
+  end
+  
+  def simple_event(event) 
+    add_event(event, event.time_from_start)
+  end
+  
+  def add_event(event, time_in_ticks)
+    time_in_ticks = quantize(time_in_ticks)
+    # Map time to list of events occuring at that time:
+    events = @tick_map[time_in_ticks]
+    if events then
+      events << event 
+    else
+      @tick_map[time_in_ticks] = [event]
     end
   end
 
@@ -169,6 +175,13 @@ class Midi2Coll
     bars  = beats / @beats_per_bar + 1 
     beats = beats % @beats_per_bar + 1 # beats relative to start of measure
     return "#{bars}.#{beats}.#{units}"
+  end
+  
+  def ticks_to_beats(ticks, sig_digits_multiplier=1000.0)
+    beats = ticks/480.0
+    # limit digits for readability:
+    beats = (beats*sig_digits_multiplier).round / sig_digits_multiplier if sig_digits_multiplier  
+    return beats
   end
   
   def quantize(ticks) 

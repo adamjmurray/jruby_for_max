@@ -2,7 +2,7 @@
                           ajm objects changelog 
 
 ******************************************************************************
-* Version 0.8.5 *
+* Version 0.8.6 *
 *****************
 
 Starting with this release, ajm objects will officially support Max 5 only.

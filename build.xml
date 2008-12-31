@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.8.5"/>
+	<property name="VERSION" value="0.8.6"/>
 	
 	<property environment="env"/>
 

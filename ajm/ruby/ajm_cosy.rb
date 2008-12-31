@@ -2,6 +2,7 @@ require 'cosy'
 include Cosy
 
 OBJECT_NAME = 'ajm.cosy'
+TICKS_PER_QUARTER_NOTE = 480
 
 module Cosy
   
@@ -157,4 +158,3 @@ end
 
 inlet_assist 'sequence/define/play'
 outlet_assist 'pitch','velocity','duration','other','bang when done','parsed successfully?'
-

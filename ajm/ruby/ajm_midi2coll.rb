@@ -4,10 +4,6 @@ require 'midilib/sequence'
 VALID_BEAT_UNITS = [1,2,4,8,16]
 TICKS_PER_QUARTER_NOTE = 480
 
-$beats_per_bar = 4
-$beat_unit = 4
-$quantize = nil
-
 inlet_assist 'read/timesig/quantize'
 outlet_assist 'note data in coll format', 'track index', 'number of tracks'
 
@@ -25,20 +21,32 @@ def timesig(beats_per_bar, beat_unit)
     valid = false
   end
   if valid
-    $beats_per_bar = beats_per_bar
-    $beat_unit = beat_unit
+    set_local(:beats_per_bar, beats_per_bar)
+    set_local(:beat_unit, beat_unit)
   end
 end
 
 def quantize(ticks)
-  $quantize = ticks
+  set_local(:quantize, ticks)
+end
+
+def ccfilter(state=nil)
+  state = false if not state or state == 0
+  set_local(:cc_filter, state)
 end
 
 def read(midi_file)
   midi_file.strip!
   if midi_file =~ /^[^:]{2,}:(.*)/ then midi_file = $1 end # Fixes cross platform issues with drive letters (strip off drive name on OS X)
   if File.exists?(midi_file) then
-    midi2coll = Midi2Coll.new(midi_file, $beats_per_bar, $beat_unit, $quantize)
+    # Settings are stored as local variables to this instance,
+    # because I am using a shared context for this object to improve performance
+    # (if not used shared context, these could be globals)
+    beats_per_bar = get_local(:beats_per_bar) || 4
+    beat_unit = get_local(:beat_unit) || 4
+    quantize = get_local(:quantize)
+    cc_filter = get_local(:cc_filter)   
+    midi2coll = Midi2Coll.new(midi_file, beats_per_bar, beat_unit, quantize, cc_filter)
     
     num_tracks = midi2coll.number_of_tracks
     if num_tracks > 1
@@ -65,13 +73,13 @@ end
 
 class Midi2Coll
   
-  def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize_in_ticks=nil)
+  def initialize(midi_file, beats_per_bar=4, beat_unit=4, quantize_in_ticks=nil, cc_filter=false)
     @midi_file = midi_file # TODO validate (meh, currently this is handled by the ajm.cosy abstraction)
     @track_tick_maps = []
     @ticks_per_beat = (4.0/beat_unit * TICKS_PER_QUARTER_NOTE).to_i
     @beats_per_bar = beats_per_bar.to_i
-    
     @quantize = quantize_in_ticks
+    @cc_filter = cc_filter
     
     # use midilib to parse the input file
     @sequence = MIDI::Sequence.new()
@@ -84,9 +92,12 @@ class Midi2Coll
       @pitch_map = {}
       track.each do |event|
         case event
-        when MIDI::NoteOnEvent then start_note(event)
-        when MIDI::NoteOffEvent then end_note(event)
-        when MIDI::Controller then simple_event(event)
+        when MIDI::NoteOnEvent
+          start_note(event)
+        when MIDI::NoteOffEvent 
+          end_note(event)
+        when MIDI::Controller 
+          simple_event(event) if not @cc_filter
         end
         # TODO: support other event types? Pitch Bends? Program changes? Time Signature changes?
       end

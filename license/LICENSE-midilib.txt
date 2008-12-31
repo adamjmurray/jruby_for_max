@@ -1,0 +1,6 @@
+Author:	Jim Menard (jimm@io.com)
+Copyright:	Copyright (c) 2003-2005 Jim Menard
+License:	Distributed under the same license as Ruby.
+
+midilib is copyrighted free software by Jim Menard and is released under the same license as Ruby. 
+See the Ruby license at www.ruby-lang.org/en/LICENSE.txt.

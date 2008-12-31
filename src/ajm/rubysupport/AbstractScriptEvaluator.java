@@ -51,11 +51,7 @@ public abstract class AbstractScriptEvaluator implements ScriptEvaluator {
 		try {
 			for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
 				String name = global.getKey();
-				// It should be a best practice to undeclare any global varaibles before redeclaring them,
-				// but when I try to do this, somehow $max_ruby_adapter is null inside my scripts even though
-				// I can verify here that it is being redeclared as a non-null value. So commenting this out
-				// for now until I can figure out what's going on (might be a bug in JRuby)
-				// undeclareGlobalInternal(name);
+				undeclareGlobalInternal(name);
 				declareGlobalInternal(name, global.getValue());
 			}
 		}

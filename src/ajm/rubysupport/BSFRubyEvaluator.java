@@ -53,7 +53,14 @@ public class BSFRubyEvaluator extends AbstractScriptEvaluator {
 	}
 
 	protected void undeclareGlobalInternal(String variableName) throws BSFException {
-		manager.undeclareBean(variableName);
+		// BUG
+		// It should be a best practice to undeclare any global varaibles before redeclaring them,
+		// but when I try to do this, somehow $max_ruby_adapter and $global_variable_store can end up
+		// null inside my scripts even thoug I can verify that it is being redeclared as a non-null value,
+		// or not even being undeclared at all!
+
+		// Commenting this out for now until I can figure out what's going on (probably a bug in JRuby?)
+		// manager.undeclareBean(variableName);
 	}
 
 	public Object eval(CharSequence rubyCode) {

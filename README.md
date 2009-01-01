@@ -1,22 +1,22 @@
-For more info on this project, see:
+# ajm objects #
+
+A library of objects for Max 5 (<http://www.cycling74.com/products/max5>)
 
 <http://compusition.com/web/software/maxmsp/ajm-objects>
 
+  
+## Author ##
 
-# Status #
+Adam Murray (adam@compusition.com)
 
-I've added some new objects, done a lot of testing, 
-and more or less finished updating everything for Max 5. 
-There's some new stuff related to sequencing MIDI with Max 5's transport system.
 
-I'm gearing up for the next release pretty soon, version 0.8.5. 
-It should be out by mid-December.
+## Status ##
 
-I've been meaning to do Cosy support for Max, but there's just too much still to
-do in terms of feature work, debugging, and documentation. Although I already have an
-ajm.cosy object here, it's not fully functional and I'm not going to try to finish it
-for the 0.8.5 release. I will probably release an update to that separately later.
+Version 0.8.6 is the latest stable version, released on January 1, 2009.
 
-Still to do:
 
-* More testing, especially on Windows
+## Future ##
+
+* ajm.cosy - an object for using Cosy (<http://github.com/adamjmurray/cosy>) in Max/MSP.
+  This object has been started and is in the repository but doesn't work yet
+  and was not included in the 0.8.6 release.

@@ -1,7 +1,7 @@
          
                       ajm objects for Max/MSP
          
-                           Version @VERSION
+                           Version @@VERSION
          
          http://compusition.com/web/software/maxmsp/ajm-objects
           

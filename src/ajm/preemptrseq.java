@@ -71,7 +71,7 @@ public class preemptrseq extends rseq {
 		actualSeq.addAll(defaultSeq);
 		setPreemptiveSeq();
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	// The seq needs to look the same externally

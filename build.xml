@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.8.6"/>
+	<property name="VERSION" value="0.8.6b"/>
 	
 	<property environment="env"/>
 
@@ -92,18 +92,25 @@
 		</javadoc>
 	</target>
 
-	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar, gems">
+	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar"> <!-- gems -->
 		<mkdir dir="${dist}"/>
 		<copy todir="${dist}">
-		  <fileset dir="${basedir}" includes="*.txt"/>
-	  </copy>
-		<replace dir="${dist}" includes="*.txt" token="@VERSION" value="${VERSION}"/>
-		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" />
+		  	<fileset dir="${basedir}" includes="*.txt"/>
+	  	</copy>
+		<copy todir="${dist}">
+			<fileset dir="${basedir}" includes="ajm/**">
+				<exclude name="**/*cosy*"/> <!-- not ready yet -->
+			</fileset>
+		</copy>				
+		<replace dir="${dist}" token="@@VERSION" value="${VERSION}">
+			<include name="**/*.txt"/>
+			<include name="**/*.maxpat"/>
+			<include name="**/*.maxhelp"/>
+		</replace>
+		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" /> <!-- So things display properly on Notepad in Windows -->
 		<zip destfile="${dist}/${dist_name}.zip">
 			<zipfileset dir="${dist}" includes="*.txt" prefix="${dist_name}"/>      		
-			<zipfileset dir="${basedir}" includes="ajm/**" prefix="${dist_name}"> <!-- the Max patches -->
-				<exclude name="**/*cosy*"/> <!-- not ready yet -->
-			</zipfileset>
+			<zipfileset dir="${dist}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
 			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
 				<exclude name="**/max.jar"/>
 				<exclude name="**/*junit*.jar"/>
@@ -120,8 +127,8 @@
 				<exclude name="**/gems/**/test/**"/>    			
 			</zipfileset>
 			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
-		</zip>  
-		<delete dir="${dist}" includes="*.txt"/>		
+		</zip>
+		<delete dir="${dist}" excludes="${dist_name}.zip" includeEmptyDirs="true"/>
 	</target>
 
 	<target name="gems" description="download the JRuby gems used by ajm objects">

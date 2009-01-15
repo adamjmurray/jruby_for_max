@@ -58,6 +58,7 @@ public class seq extends AbstractMaxRubyObject {
 		declareAttribute("cmode", "getchordmode", "chordmode");
 		declareAttribute("iter", "getiter", "iter");
 		declareAttribute("step", "getstep", "step");
+		declareAttribute("autooutputseq");
 		declareIO(1, 4);
 		setInletAssist(new String[] { "list / bang / commands" });
 		setOutletAssist(new String[] { "value", "index", "iteration", "sequence" });
@@ -81,7 +82,9 @@ public class seq extends AbstractMaxRubyObject {
 			if (!seq.isEmpty()) {
 				defaultSeq.addAll(seq);
 			}
-			outputSeq();
+			if (autooutputseq) {
+				outputseq();
+			}
 		}
 	}
 
@@ -113,6 +116,7 @@ public class seq extends AbstractMaxRubyObject {
 	protected int iter = 0;
 	protected int step = 1;
 	protected CHORDMODE chordmode = CHORDMODE.CHORD;
+	protected boolean autooutputseq = false;
 
 	// Defaults (for reset commands)
 	protected ArrayList<Item> defaultSeq = new ArrayList<Item>();
@@ -216,7 +220,7 @@ public class seq extends AbstractMaxRubyObject {
 
 	public void list(Atom[] list) {
 		set(list);
-		outputSeq();
+		outputseq();
 	}
 
 	public void set(Atom[] list) {
@@ -244,7 +248,7 @@ public class seq extends AbstractMaxRubyObject {
 			return;
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void text(Atom[] args) {
@@ -303,7 +307,7 @@ public class seq extends AbstractMaxRubyObject {
 				seq.clear();
 				seq.addAll(newSeq);
 				onSeqChange();
-				outputSeq();
+				outputseq();
 			}
 			catch (IllegalStateException e) {
 				err("Could not evaluate: " + input + "\n" + e.getMessage());
@@ -378,7 +382,7 @@ public class seq extends AbstractMaxRubyObject {
 	public void append(Atom[] list) {
 		seq.addAll(parser.parse(list));
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void prepend(Atom[] list) {
@@ -417,7 +421,7 @@ public class seq extends AbstractMaxRubyObject {
 			index += newSeq.size(); // keep the index at the correct current element
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void insertsort(Atom[] list) {
@@ -452,7 +456,7 @@ public class seq extends AbstractMaxRubyObject {
 				}
 			}
 			onSeqChange();
-			outputSeq();
+			outputseq();
 		}
 	}
 
@@ -471,7 +475,7 @@ public class seq extends AbstractMaxRubyObject {
 				seq.addAll(currVals);
 			}
 			onSeqChange();
-			outputSeq();
+			outputseq();
 		}
 	}
 
@@ -499,7 +503,7 @@ public class seq extends AbstractMaxRubyObject {
 						seq.add(new Item(pad[i % pad.length]));
 					}
 				}
-				outputSeq();
+				outputseq();
 			}
 			onSeqChange();
 		}
@@ -536,7 +540,7 @@ public class seq extends AbstractMaxRubyObject {
 
 				}
 			}
-			outputSeq();
+			outputseq();
 			onSeqChange();
 		}
 	}
@@ -616,7 +620,7 @@ public class seq extends AbstractMaxRubyObject {
 		seq = newVals;
 
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void deleterange(int left, int right) {
@@ -639,7 +643,7 @@ public class seq extends AbstractMaxRubyObject {
 			}
 			seq = newVals;
 			onSeqChange();
-			outputSeq();
+			outputseq();
 		}
 	}
 
@@ -660,13 +664,13 @@ public class seq extends AbstractMaxRubyObject {
 		/*
 		 * if (seq.isEmpty()) { index = 0; }
 		 */
-		outputSeq();
+		outputseq();
 	}
 
 	public void sort() {
 		Collections.sort(seq);
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void sortrange(int left, int right) {
@@ -685,7 +689,7 @@ public class seq extends AbstractMaxRubyObject {
 			deleterange(left, right);
 			seq.addAll(left, sorted);
 			onSeqChange();
-			outputSeq();
+			outputseq();
 		}
 	}
 
@@ -745,13 +749,13 @@ public class seq extends AbstractMaxRubyObject {
 			seq.set(idx2, tmp);
 			onSeqChange();
 		}
-		outputSeq();
+		outputseq();
 	}
 
 	public void reverse() {
 		reverseVals(0, seq.size() - 1);
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void reverserange(int idx1, int idx2) {
@@ -764,7 +768,7 @@ public class seq extends AbstractMaxRubyObject {
 		}
 		reverseVals(lr[0], lr[1]);
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	protected void reverseVals(int left, int right) {
@@ -809,7 +813,7 @@ public class seq extends AbstractMaxRubyObject {
 			reverseVals(left, right);
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	/*
@@ -832,7 +836,7 @@ public class seq extends AbstractMaxRubyObject {
 			seq.set(i, seq.get(i).add(args[i % args.length]));
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	/*
@@ -866,7 +870,7 @@ public class seq extends AbstractMaxRubyObject {
 			j++;
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	@Deprecated
@@ -896,7 +900,7 @@ public class seq extends AbstractMaxRubyObject {
 			j++;
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void multiply(Atom[] args) {
@@ -914,7 +918,7 @@ public class seq extends AbstractMaxRubyObject {
 			seq.set(i, seq.get(i).multiply(args[i % args.length]));
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	@Deprecated
@@ -944,7 +948,7 @@ public class seq extends AbstractMaxRubyObject {
 			j++;
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	@Deprecated
@@ -974,7 +978,7 @@ public class seq extends AbstractMaxRubyObject {
 			j++;
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	public void invert(Atom[] args) {
@@ -1028,7 +1032,7 @@ public class seq extends AbstractMaxRubyObject {
 			seq.set(i, seq.get(i).subtractFrom(args[i % args.length]));
 		}
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	protected static Atom ATOM_MAX = Atom.newAtom("max");
@@ -1239,7 +1243,7 @@ public class seq extends AbstractMaxRubyObject {
 		}
 	}
 
-	protected void outputSeq() {
+	public void outputseq() {
 		Atom[] atoms = getseq();
 		if (atoms.length > 0) {
 			output(OUTLET.SEQ, getseq());
@@ -1327,7 +1331,7 @@ public class seq extends AbstractMaxRubyObject {
 		seq.clear();
 		seq.addAll(defaultSeq);
 		onSeqChange();
-		outputSeq();
+		outputseq();
 	}
 
 	protected void onSeqChange() {

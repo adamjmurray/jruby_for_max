@@ -56,7 +56,7 @@ public class BSFRubyEvaluator extends AbstractScriptEvaluator {
 		// BUG
 		// It should be a best practice to undeclare any global varaibles before redeclaring them,
 		// but when I try to do this, somehow $max_ruby_adapter and $global_variable_store can end up
-		// null inside my scripts even thoug I can verify that it is being redeclared as a non-null value,
+		// null inside my scripts even though I can verify that it is being redeclared as a non-null value,
 		// or not even being undeclared at all!
 
 		// Commenting this out for now until I can figure out what's going on (probably a bug in JRuby?)

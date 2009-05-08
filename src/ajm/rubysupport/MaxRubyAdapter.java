@@ -227,7 +227,7 @@ public class MaxRubyAdapter {
 			// so letting it downcast seems ok:
 			return Atom.newAtom(((Number) obj).doubleValue());
 		}
-		else if (obj instanceof Long || obj instanceof Integer || obj instanceof Short) {
+		else if (obj instanceof Long || obj instanceof Integer || obj instanceof Short || obj instanceof Byte) {
 			long val = ((Number) obj).longValue();
 			if (val > Integer.MAX_VALUE || val < Integer.MIN_VALUE) {
 				if (logger != null) {

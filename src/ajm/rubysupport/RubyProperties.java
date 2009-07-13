@@ -46,6 +46,8 @@ public class RubyProperties {
 	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.BSFRubyEvaluator";
 
 	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
+	
+	public static final String DEFAULT_RUBY_VERSION = "RUBY1_8";
 
 	private static String rubyEngine;
 
@@ -93,7 +95,6 @@ public class RubyProperties {
 			String jRubyLib = System.getProperty("jruby.lib");
 
 			if (jRubyHome == null) {
-
 				String pathToJRuby = MaxSystem.locateFile("jruby.jar");
 				if (pathToJRuby != null) {
 					File jRubyLibDir = new File(pathToJRuby).getParentFile();
@@ -117,6 +118,9 @@ public class RubyProperties {
 			catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+			System.setProperty("jruby.compat.version",
+								properties.getProperty("ruby.version", DEFAULT_RUBY_VERSION));
+				
 		}
 		catch (UnsatisfiedLinkError e) {
 			// we're running outside of Max, probably for unit testing

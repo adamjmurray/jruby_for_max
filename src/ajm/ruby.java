@@ -36,6 +36,7 @@ import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.RubyException;
 import ajm.util.FileWatcher;
 import ajm.util.TextBlock;
+import ajm.util.TextViewer;
 import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
@@ -50,7 +51,6 @@ public class ruby extends AbstractMaxRubyObject {
 
 	private int evaloutlet = 0;
 
-	private String scriptFilePath;
 	private File scriptFile;
 	private Atom[] scriptFileArgs;
 
@@ -114,7 +114,7 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 
 	public String getscriptfile() {
-		return scriptFilePath;
+		return scriptFile.getAbsolutePath();
 	}
 
 	public void scriptfile(Atom[] args) {
@@ -261,4 +261,21 @@ public class ruby extends AbstractMaxRubyObject {
 			}
 		}
 	}
+	
+	private TextViewer textViewer;
+
+	@Override 
+	protected void dblclick() { 
+		if(scriptFile != null) {
+			if(textViewer == null) {
+				textViewer = new TextViewer(scriptFile.getName());
+			} 
+			textViewer.setText(Utils.getFileAsString(scriptFile));
+			int[] rect = getMaxBox().getRect();
+			int[] loc = getParentPatcher().getWindow().getLocation();
+			textViewer.setCenter(loc[0]+(rect[0]+rect[2])/2, loc[1]+(rect[1]+rect[3])/2);
+			textViewer.show();
+		}
+	}	
+	
 }

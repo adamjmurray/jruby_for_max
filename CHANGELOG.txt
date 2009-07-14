@@ -2,6 +2,29 @@
                           ajm objects changelog 
 
 ******************************************************************************
+* Version 0.8.8 *
+*****************
+
+Changes to ajm.ruby
+
+* JRuby upgraded to version 1.3.1
+* Enabled Ruby 1.9 support (see the ajm.ruby.properties file)
+
+
+Changes to ajm.seq/ajm.rseq
+
+* The sequence (the value of the @seq attribute) no longer outputs by default
+  when the object initializes. Automatically outputting was atypical Max
+  behavior that could cause problems in some patches. To get the old behavior
+  set the attribute "@autooutputseq 1" or send an "outputseq" message to the
+  object.
+
+
+Fixed a bug in the ajm.metro help patches that was causing a Stack Overflow.
+
+
+
+******************************************************************************
 * Version 0.8.6 *
 *****************
 
@@ -16,7 +39,7 @@ Many objects depend on Max 5 features like transport and presentation mode.
 New Objects
 
 * ajm.metro - a transport-synced metronome that reports time relative to
-                 a given timepoint
+              a given timepoint
 
 * ajm.midi2coll - reads midi files and converts them to a [coll] format that
                   can be sequenced by ajm.metro 

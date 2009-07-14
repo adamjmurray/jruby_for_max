@@ -1,1 +1,1 @@
-out0 'You found me'
+out0 'Hello from ajm_scriptfile.rb'

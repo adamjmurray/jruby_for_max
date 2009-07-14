@@ -22,23 +22,11 @@ Sequencing with good timing
 
 ------------------------------------------------------------------------------
 
-KNOWN ISSUES
-
-As of Max 5.0.5, there are transport bugs that affect ajm.metro:
-
-  Sometimes the bars.beats.units output of ajm.metro gets off by
-  a few ticks. In this situation, I have found that restarting the transport
-  from the beginning often helps, but in some situations it was broken until
-  I restarted Max.
-
-  The interactive start features for ajm.metro (startnextbar, startnextbeat)
-  do not work properly when multiple ajm.metro objects are being used.
-  
-  These issues should be fixed by an upcoming version of Max.
-
-------------------------------------------------------------------------------
-
 ADVANCED RUBY USAGE
+
+Enabling Ruby 1.9 Support
+  (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties
+  (2) Change the ruby.version option from RUBY1_8 to RUBY1_9
 
 Adding additional Ruby projects to the LOAD_PATH for ajm.ruby 
   (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties
@@ -49,17 +37,18 @@ Adding additional Ruby projects to the LOAD_PATH for ajm.ruby
   (4) You should now be able to require your project in any script
 
 Installing Ruby Gems for ajm.ruby
-  (1) Download JRuby 1.1.5 from http://jruby.codehaus.org
+  (1) Download JRuby 1.3.1 from http://jruby.codehaus.org
   (2) Add jruby/bin to your path. 
        From the OS X terminal or the Cygwin shell on Windows, run:
-        $ export PATH=/path/to/jruby-1.1.5/bin:$PATH
-        $ which gem
-        /path/to/jruby-1.1.5/bin/gem   
-  (3) Install gems as usual (see Ruby Gems documentation for details):
-        $ gem install midilib
+        $ export PATH=/path/to/jruby-1.3.1 /bin:$PATH
+        $ which jgem
+        /path/to/jruby-1.3.1/bin/jgem   
+  (3) Install gems as usual (see Ruby Gems documentation for details),
+      but use the 'jgem' command instead of 'gem':
+        $ jgem install midilib
 			NOTE: you must install the midilib gem for ajm.midi2coll to function!
   (4) Replace the {Max installation}/Cycling '74/java/lib/ruby folder with
-      /path/to/jruby-1.1.5/lib/ruby
+      /path/to/jruby-1.3.1/lib/ruby
   (5) Restart Max/MSP
 
 ------------------------------------------------------------------------------

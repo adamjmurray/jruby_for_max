@@ -12,7 +12,7 @@ Adam Murray (adam@compusition.com)
 
 ## Status ##
 
-Version 0.8.6 is the latest stable version, released on January 1, 2009.
+Version 0.8.8 is the latest stable version, released on July 13, 2009.
 
 
 ## Future ##

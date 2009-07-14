@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
+import java.math.BigInteger;
 
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -210,6 +211,9 @@ public class MaxRubyAdapter {
 		return toAtoms(obj, (logCoercions ? logger : null));
 	}
 
+	private static BigInteger MAX_BINT = new BigInteger(Integer.MAX_VALUE + "");
+	private static BigInteger MIN_BINT = new BigInteger(Integer.MIN_VALUE + "");
+	
 	private Object toAtoms(Object obj, Logger logger) {
 		if (obj == null) {
 			return Atom.newAtom("nil");
@@ -236,6 +240,16 @@ public class MaxRubyAdapter {
 				return Atom.newAtom(obj.toString());
 			}
 			else return Atom.newAtom(val);
+		}
+		else if (obj instanceof BigInteger) {
+			BigInteger bigInt = (BigInteger)obj;
+			if(bigInt.compareTo(MAX_BINT) > 0 || bigInt.compareTo(MIN_BINT) < 0) {
+				if (logger != null) {
+					logger.info("coerced type " + obj.getClass().getName() + " to String");
+				}
+				return Atom.newAtom(obj.toString());
+			}
+			else return Atom.newAtom(bigInt.intValue());
 		}
 
 		else if (obj instanceof CharSequence || obj instanceof RubySymbol) {

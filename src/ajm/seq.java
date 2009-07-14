@@ -179,8 +179,7 @@ public class seq extends AbstractMaxRubyObject {
 	public void step(int s) {
 		if (!initialized) {
 			step = s;
-		}
-		else {
+		} else {
 			// undo the last step and apply the new one.
 			// the behavior is unintuitive if we don't do this
 			index -= step;

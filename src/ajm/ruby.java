@@ -1,7 +1,7 @@
 package ajm;
 
 /*
- Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
+ Copyright (c) 2008-2009, Adam Murray (adam@compusition.com). All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,8 @@ package ajm;
 
 import java.io.File;
 import java.util.Date;
+
+import org.apache.bsf.BSFException;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.RubyException;
@@ -64,7 +66,6 @@ public class ruby extends AbstractMaxRubyObject {
 	 */
 	public ruby(Atom[] args) {
 		super();
-
 		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
 		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
 		declareAttribute("listproc");
@@ -251,6 +252,13 @@ public class ruby extends AbstractMaxRubyObject {
 		}
 		catch (RubyException e) {
 			err("could not evaluate: " + input);
+			Throwable t = e.getCause();
+			if(t != null && !(t instanceof BSFException)) {
+				String st = Utils.getStackTrace(t);
+				for(String s : st.split("\n")) {
+					error(s);
+				}
+			}
 		}
 	}
 }

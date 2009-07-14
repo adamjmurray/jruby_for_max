@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 
 import ajm.maxsupport.Atomizer;
@@ -189,5 +192,11 @@ public class Utils {
 				}
 			}
 		}
+	}
+	
+	public static String getStackTrace(Throwable t) {
+		Writer stw = new StringWriter();
+		t.printStackTrace(new PrintWriter(stw));
+		return stw.toString();
 	}
 }

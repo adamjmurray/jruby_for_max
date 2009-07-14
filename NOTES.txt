@@ -24,9 +24,11 @@ Sequencing with good timing
 
 ADVANCED RUBY USAGE
 
-Enabling Ruby 1.9 Support
+Enabling Ruby 1.9 Support (Experimental)
   (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties
   (2) Change the ruby.version option from RUBY1_8 to RUBY1_9
+  (3) Save the file and restart Max
+  (4) The ajm.ruby help file should indicate it's running in Ruby 1.9 mode
 
 Adding additional Ruby projects to the LOAD_PATH for ajm.ruby 
   (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties

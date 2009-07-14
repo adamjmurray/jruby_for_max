@@ -75,7 +75,7 @@ public class RubyProperties {
 	public static String[] getLoadPaths() {
 		if (loadpaths == null) {
 			String loadpathsProp = properties.getProperty("ruby.loadpaths");
-			if (loadpathsProp == null) {
+			if (loadpathsProp == null || loadpathsProp.trim().equals("")) {
 				loadpaths = new String[] {};
 			}
 			else {

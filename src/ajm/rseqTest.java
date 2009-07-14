@@ -120,9 +120,6 @@ public class rseqTest {
 	}
 
 	protected rStub makeSeq(int... vals) {
-		if (false) {
-			return null;
-		}
 		rStub s = new rStub(Atom.emptyArray);
 		s.set(Atom.newAtom(vals));
 		return s;

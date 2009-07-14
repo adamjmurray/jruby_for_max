@@ -29,7 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import java.util.ArrayList;
 
-import org.apache.bsf.BSFManager;
 import org.jruby.Ruby;
 import org.jruby.RubyNil;
 import org.jruby.RubyRuntimeAdapter;

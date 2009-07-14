@@ -1,4 +1,4 @@
-$LOAD_PATH << File.dirname($0) # put this folder on the LOAD_PATH
+$LOAD_PATH.unshift File.dirname($0) # put this folder on the LOAD_PATH
 require 'ajm_webserver'
 require 'ajm_servlets'
 require 'pathname'

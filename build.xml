@@ -8,6 +8,7 @@
 	<property name="dist" location="dist"/>
 	<property name="download" location="download"/>	
 	<property name="lib" location="lib"/>
+	<property name="patch" location="patch"/>
 	<property name="src" location="src"/>
 
 	<property name="jar_name" value="ajm.jar"/>
@@ -137,6 +138,9 @@
 		<get src="http://dist.codehaus.org/jruby/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
 			verbose="true" usetimestamp="true"/>
 		<untar src="${download}/${jruby_distrib_file}" dest="${download}" overwrite="false" compression="gzip"/>
+		<copy todir="${download}/${jruby_folder}" overwrite="true">
+			<fileset dir="${patch}/${jruby_folder}" includes="**/*"/>
+		</copy>
 		<chmod dir="${download}/${jruby_folder}/bin" includes="*" perm="u+x"/>
 		<exec executable="${download}/${jruby_folder}/bin/${gem_command}">
 			<env key="PATH" path="${download}/${jruby_folder}/bin:${env.PATH}"/>

@@ -34,13 +34,9 @@ import org.apache.bsf.BSFException;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.RubyException;
-import ajm.util.FileWatcher;
-import ajm.util.TextBlock;
-import ajm.util.TextViewer;
-import ajm.util.Utils;
+import ajm.util.*;
 
-import com.cycling74.max.Atom;
-import com.cycling74.max.Executable;
+import com.cycling74.max.*;
 
 /**
  * The ajm.ruby MaxObject
@@ -49,233 +45,236 @@ import com.cycling74.max.Executable;
  */
 public class ruby extends AbstractMaxRubyObject {
 
-	private int evaloutlet = 0;
+  private int evaloutlet = 0;
 
-	private File scriptFile;
-	private Atom[] scriptFileArgs;
+  private File scriptFile;
+  private Atom[] scriptFileArgs;
 
-	private boolean listproc = true;
-	private boolean autowatch = false;
-	private FileWatcher fileWatcher;
+  private boolean listproc = true;
+  private boolean autowatch = false;
+  private FileWatcher fileWatcher;
 
-	/**
-	 * The Constructor
-	 * 
-	 * @param args
-	 *            1 optional integer arg specifies the number of outlets
-	 */
-	public ruby(Atom[] args) {
-		super();
-		declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
-		declareAttribute("scriptfile", "getscriptfile", "scriptfile");
-		declareAttribute("listproc");
-		declareAttribute("autowatch", "getautowatch", "autowatch");
+  /**
+   * The Constructor
+   * 
+   * @param args
+   *          1 optional integer arg specifies the number of outlets
+   */
+  public ruby(Atom[] args) {
+    super();
+    declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
+    declareAttribute("scriptfile", "getscriptfile", "scriptfile");
+    declareAttribute("listproc");
+    declareAttribute("autowatch", "getautowatch", "autowatch");
 
-		int outlets = 1;
-		if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
-			outlets = args[0].getInt();
-		}
-		declareIO(1, outlets);
-		createInfoOutlet(false);
-	}
+    int outlets = 1;
+    if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
+      outlets = args[0].getInt();
+    }
+    declareIO(1, outlets);
+    createInfoOutlet(false);
+  }
 
-	@Override
-	protected Executable getInitializer() {
-		return new RubyInitializer();
-	}
+  @Override
+  protected Executable getInitializer() {
+    return new RubyInitializer();
+  }
 
-	protected class RubyInitializer extends DefaultRubyInitializer {
-		@Override
-		public void execute() {
-			super.execute();
-			if (scriptFile != null) {
-				initFile();
-			}
-		}
-	}
+  protected class RubyInitializer extends DefaultRubyInitializer {
+    @Override
+    public void execute() {
+      super.execute();
+      if (scriptFile != null) {
+        initFile();
+      }
+    }
+  }
 
-	@Override
-	public void notifyDeleted() {
-		stopFileWatcher();
-		super.notifyDeleted();
-	}
+  @Override
+  public void notifyDeleted() {
+    stopFileWatcher();
+    super.notifyDeleted();
+  }
 
-	public int getevaloutlet() {
-		return evaloutlet;
-	}
+  public int getevaloutlet() {
+    return evaloutlet;
+  }
 
-	public void evaloutlet(int evaloutlet) {
-		if (evaloutlet >= getNumOutlets()) {
-			err("Invalid evaloutlet " + evaloutlet);
-		}
-		else {
-			this.evaloutlet = evaloutlet;
-		}
-	}
+  public void evaloutlet(int evaloutlet) {
+    if (evaloutlet >= getNumOutlets()) {
+      err("Invalid evaloutlet " + evaloutlet);
+    }
+    else {
+      this.evaloutlet = evaloutlet;
+    }
+  }
 
-	public String getscriptfile() {
-		return scriptFile.getAbsolutePath();
-	}
+  public String getscriptfile() {
+    return scriptFile.getAbsolutePath();
+  }
 
-	public void scriptfile(Atom[] args) {
-		if (args != null && args.length > 0) {
-			scriptFile = Utils.getFile(args[0].toString());
-			scriptFileArgs = Atom.removeFirst(args);
-		}
-		else {
-			scriptFile = Utils.getFile(null);
-			scriptFileArgs = Atom.emptyArray;
-		}
+  public void scriptfile(Atom[] args) {
+    if (args != null && args.length > 0) {
+      scriptFile = Utils.getFile(args[0].toString());
+      scriptFileArgs = Atom.removeFirst(args);
+    }
+    else {
+      scriptFile = Utils.getFile(null);
+      scriptFileArgs = Atom.emptyArray;
+    }
 
-		if (scriptFile != null && initialized) {
-			initFile();
-		} // if not initialized initFile() will be called by the Initializer
-	}
+    if (scriptFile != null && initialized) {
+      initFile();
+    } // if not initialized initFile() will be called by the Initializer
+  }
 
-	public boolean getautowatch() {
-		return autowatch;
-	}
+  public boolean getautowatch() {
+    return autowatch;
+  }
 
-	public void autowatch(boolean autowatch) {
-		this.autowatch = autowatch;
-		if (initialized) {
-			if (autowatch) {
-				startFileWatcher();
-			}
-			else {
-				stopFileWatcher();
-			}
-		}
-	}
+  public void autowatch(boolean autowatch) {
+    this.autowatch = autowatch;
+    if (initialized) {
+      if (autowatch) {
+        startFileWatcher();
+      }
+      else {
+        stopFileWatcher();
+      }
+    }
+  }
 
-	private void startFileWatcher() {
-		if (fileWatcher == null && scriptFile != null && autowatch) {
-			fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
-			fileWatcher.start();
-		}
-	}
+  private void startFileWatcher() {
+    if (fileWatcher == null) {
+      if (scriptFile != null && autowatch) {
+        fileWatcher = new FileWatcher(scriptFile, fileWatcherCallback);
+        fileWatcher.start();
+      }
+    }
+    else {
+      fileWatcher.setFile(scriptFile); // in case a new file was loaded - see scriptfile() / initFile()
+      fileWatcher.resumeWatching();
+    }
+  }
 
-	private void stopFileWatcher() {
-		if (fileWatcher != null) {
-			fileWatcher.stopWatching();
-			fileWatcher = null; // this lets me ensure only one watcher thread exists at a time
-		}
-	}
+  private void stopFileWatcher() {
+    if (fileWatcher != null) {
+      fileWatcher.pauseWatching();
+    }
+  }
 
-	private Executable fileWatcherCallback = new Executable() {
-		public void execute() {
-			loadFile();
-		}
-	};
+  private Executable fileWatcherCallback = new Executable() {
+    public void execute() {
+      loadFile();
+    }
+  };
 
-	private void initFile() {
-		stopFileWatcher();
-		loadFile();
-		startFileWatcher();
-	}
+  private void initFile() {
+    stopFileWatcher();
+    loadFile();
+    startFileWatcher();
+  }
 
-	private synchronized void loadFile() {
-		info("loading script '" + scriptFile + "' on " + new Date());
-		try {
-			ruby.init(scriptFile, scriptFileArgs);
-		}
-		catch (RubyException e) {
-			err("Error evaluating script file: " + scriptFile.getPath());
-		}
-	}
+  private synchronized void loadFile() {
+    info("loading script '" + scriptFile + "' on " + new Date());
+    try {
+      ruby.init(scriptFile, scriptFileArgs);
+    } catch (RubyException e) {
+      err("Error evaluating script file: " + scriptFile.getPath());
+    }
+  }
 
-	public void bang() {
-		eval("bang()");
-	}
+  public void bang() {
+    eval("bang()");
+  }
 
-	public void list(Atom[] args) {
-		if (listproc) {
-			StringBuilder s = new StringBuilder("list([");
-			for (int i = 0; i < args.length; i++) {
-				if (i > 0) {
-					s.append(",");
-				}
-				s.append(args[i]);
-			}
-			s.append("])");
-			eval(s);
-		}
-		else {
-			anything(null, args);
-		}
-	}
+  public void list(Atom[] args) {
+    if (listproc) {
+      StringBuilder s = new StringBuilder("list([");
+      for (int i = 0; i < args.length; i++) {
+        if (i > 0) {
+          s.append(",");
+        }
+        s.append(args[i]);
+      }
+      s.append("])");
+      eval(s);
+    }
+    else {
+      anything(null, args);
+    }
+  }
 
-	public void anything(String msg, Atom[] args) {
-		StringBuilder input = new StringBuilder();
-		if (msg != null) {
-			input.append(Utils.detokenize(msg));
-		}
-		for (Atom arg : args) {
-			input.append(" ").append(Utils.detokenize(arg.toString()));
-		}
-		eval(input.toString().trim());
-	}
+  public void anything(String msg, Atom[] args) {
+    StringBuilder input = new StringBuilder();
+    if (msg != null) {
+      input.append(Utils.detokenize(msg));
+    }
+    for (Atom arg : args) {
+      input.append(" ").append(Utils.detokenize(arg.toString()));
+    }
+    eval(input.toString().trim());
+  }
 
-	public void text(String script) {
-		eval(script.trim());
-	}
+  public void text(String script) {
+    eval(script.trim());
+  }
 
-	public void textblock(String name) {
-		String script = TextBlock.get(name);
-		if (script != null) {
-			eval(script);
-		}
-		else {
-			error("No textblock named '" + name + "'");
-		}
-	}
+  public void textblock(String name) {
+    String script = TextBlock.get(name);
+    if (script != null) {
+      eval(script);
+    }
+    else {
+      error("No textblock named '" + name + "'");
+    }
+  }
 
-	protected void eval(CharSequence input) {
-		try {
-			if (ruby == null) {
-				err("not initialized yet. Did not evaluate: " + input
-						+ ". If you are loadbanging a script, try using a deferlow.");
-				return;
-			}
-			Object val = ruby.eval(input, evaloutlet >= 0);
-			if (evaloutlet >= 0) {
-				// this check occurs here instead of evaloutlet() because we want
-				// to allow negative numbers to suppress eval output
+  protected void eval(CharSequence input) {
+    try {
+      if (ruby == null) {
+        err("not initialized yet. Did not evaluate: " + input
+            + ". If you are loadbanging a script, try using a deferlow.");
+        return;
+      }
+      Object val = ruby.eval(input, evaloutlet >= 0);
+      if (evaloutlet >= 0) {
+        // this check occurs here instead of evaloutlet() because we want
+        // to allow negative numbers to suppress eval output
 
-				if (val instanceof Atom[]) {
-					outlet(evaloutlet, (Atom[]) val);
-				}
-				else {
-					outlet(evaloutlet, (Atom) val);
-				}
-			}
-		}
-		catch (RubyException e) {
-			err("could not evaluate: " + input);
-			Throwable t = e.getCause();
-			if(t != null && !(t instanceof BSFException)) {
-				String st = Utils.getStackTrace(t);
-				for(String s : st.split("\n")) {
-					error(s);
-				}
-			}
-		}
-	}
-	
-	private TextViewer textViewer;
+        if (val instanceof Atom[]) {
+          outlet(evaloutlet, (Atom[]) val);
+        }
+        else {
+          outlet(evaloutlet, (Atom) val);
+        }
+      }
+    } catch (RubyException e) {
+      err("could not evaluate: " + input);
+      Throwable t = e.getCause();
+      if (t != null && !(t instanceof BSFException)) {
+        String st = Utils.getStackTrace(t);
+        for (String s : st.split("\n")) {
+          error(s);
+        }
+      }
+    }
+  }
 
-	@Override 
-	protected void dblclick() { 
-		if(scriptFile != null) {
-			if(textViewer == null) {
-				textViewer = new TextViewer(scriptFile.getName());
-			} 
-			textViewer.setText(Utils.getFileAsString(scriptFile));
-			int[] rect = getMaxBox().getRect();
-			int[] loc = getParentPatcher().getWindow().getLocation();
-			textViewer.setCenter(loc[0]+(rect[0]+rect[2])/2, loc[1]+(rect[1]+rect[3])/2);
-			textViewer.show();
-		}
-	}	
-	
+  private TextViewer textViewer;
+
+  @Override
+  protected void dblclick() {
+    if (scriptFile != null) {
+      if (textViewer == null) {
+        textViewer = new TextViewer(scriptFile.getName());
+      }
+      textViewer.setText(Utils.getFileAsString(scriptFile));
+      int[] rect = getMaxBox().getRect();
+      int[] loc = getParentPatcher().getWindow().getLocation();
+      textViewer.setCenter(loc[0] + (rect[0] + rect[2]) / 2, loc[1] + (rect[1] + rect[3]) / 2);
+      textViewer.show();
+    }
+  }
+
 }

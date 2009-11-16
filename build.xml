@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.8.8"/>
+	<property name="VERSION" value="0.9b0"/>
 	
 	<property environment="env"/>
 
@@ -14,10 +14,10 @@
 	<property name="jar_name" value="ajm.jar"/>
 	<property name="dist_name" value="ajm-objects-${VERSION}"/>
 
-	<property name="jruby_distrib_folder" value="1.3.1"/>
-	<property name="jruby_distrib_file" value="jruby-bin-1.3.1.tar.gz"/>
-	<property name="jruby_folder" value="jruby-1.3.1"/>
-
+	<property name="jruby_distrib_folder" value="1.4.0"/>
+	<property name="jruby_distrib_file" value="jruby-bin-1.4.0.tar.gz"/>
+	<property name="jruby_folder" value="jruby-1.4.0"/>
+	
 	<condition property="gem_command" value="gem.bat">    		
 		<os family="windows"/>
 	</condition>
@@ -135,12 +135,9 @@
 
 	<target name="gems" description="download the JRuby gems used by ajm objects">
 		<mkdir dir="${download}"/>
-		<get src="http://dist.codehaus.org/jruby/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
+		<get src="http://jruby.kenai.com/downloads/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
 			verbose="true" usetimestamp="true"/>
 		<untar src="${download}/${jruby_distrib_file}" dest="${download}" overwrite="false" compression="gzip"/>
-		<copy todir="${download}/${jruby_folder}" overwrite="true">
-			<fileset dir="${patch}/${jruby_folder}" includes="**/*"/>
-		</copy>
 		<chmod dir="${download}/${jruby_folder}/bin" includes="*" perm="u+x"/>
 		<exec executable="${download}/${jruby_folder}/bin/${gem_command}">
 			<env key="PATH" path="${download}/${jruby_folder}/bin:${env.PATH}"/>

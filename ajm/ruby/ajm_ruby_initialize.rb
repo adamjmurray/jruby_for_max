@@ -15,7 +15,7 @@ def bang
   'bang'
 end
 
-def list(array)
+def list(*array)
   array
 end
 

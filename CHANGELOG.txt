@@ -2,6 +2,21 @@
                           ajm objects changelog 
 
 ******************************************************************************
+* Version 0.9 *
+***************
+
+Changes to ajm.ruby
+
+* JRuby upgraded to version 1.4
+
+* list() method now uses a splat for it's arguments, 
+  so you now define this method like
+    def list(arg1, arg2, arg3)
+  or
+    def list(*args)
+
+
+******************************************************************************
 * Version 0.8.8 *
 *****************
 

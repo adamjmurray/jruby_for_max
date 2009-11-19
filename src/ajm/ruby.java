@@ -190,14 +190,14 @@ public class ruby extends AbstractMaxRubyObject {
 
   public void list(Atom[] args) {
     if (listproc) {
-      StringBuilder s = new StringBuilder("list([");
+      StringBuilder s = new StringBuilder("list(");
       for (int i = 0; i < args.length; i++) {
         if (i > 0) {
           s.append(",");
         }
         s.append(args[i]);
       }
-      s.append("])");
+      s.append(")");
       eval(s);
     }
     else {

@@ -259,6 +259,7 @@ public class ruby extends AbstractMaxRubyObject {
         }
       }
     }
+    System.err.flush();
   }
 
   private TextViewer textViewer;

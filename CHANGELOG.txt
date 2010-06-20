@@ -7,7 +7,7 @@
 
 Changes to ajm.ruby
 
-* JRuby upgraded to version 1.4
+* JRuby upgraded to version 1.5.1
 
 * list() method now uses a splat for it's arguments, 
   so you now define this method like

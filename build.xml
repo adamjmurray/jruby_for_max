@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.9b0"/>
+	<property name="VERSION" value="0.9b1"/>
 	
 	<property environment="env"/>
 
@@ -14,9 +14,9 @@
 	<property name="jar_name" value="ajm.jar"/>
 	<property name="dist_name" value="ajm-objects-${VERSION}"/>
 
-	<property name="jruby_distrib_folder" value="1.4.0"/>
-	<property name="jruby_distrib_file" value="jruby-bin-1.4.0.tar.gz"/>
-	<property name="jruby_folder" value="jruby-1.4.0"/>
+	<property name="jruby_distrib_folder" value="1.5.1"/>
+	<property name="jruby_distrib_file" value="jruby-bin-1.5.1.tar.gz"/>
+	<property name="jruby_folder" value="jruby-1.5.1"/>
 	
 	<condition property="gem_command" value="gem.bat">    		
 		<os family="windows"/>
@@ -135,7 +135,7 @@
 
 	<target name="gems" description="download the JRuby gems used by ajm objects">
 		<mkdir dir="${download}"/>
-		<get src="http://jruby.kenai.com/downloads/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
+		<get src="http://jruby.org.s3.amazonaws.com/downloads/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
 			verbose="true" usetimestamp="true"/>
 		<untar src="${download}/${jruby_distrib_file}" dest="${download}" overwrite="false" compression="gzip"/>
 		<chmod dir="${download}/${jruby_folder}/bin" includes="*" perm="u+x"/>

@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.Date;
 
 import org.apache.bsf.BSFException;
+import org.jruby.embed.EvalFailedException;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.RubyException;
@@ -181,6 +182,7 @@ public class ruby extends AbstractMaxRubyObject {
       ruby.init(scriptFile, scriptFileArgs);
     } catch (RubyException e) {
       err("Error evaluating script file: " + scriptFile.getPath());
+      printRubyException(e);
     }
   }
 
@@ -251,15 +253,26 @@ public class ruby extends AbstractMaxRubyObject {
       }
     } catch (RubyException e) {
       err("could not evaluate: " + input);
-      Throwable t = e.getCause();
-      if (t != null && !(t instanceof BSFException)) {
-        String st = Utils.getStackTrace(t);
-        for (String s : st.split("\n")) {
-          error(s);
-        }
-      }
+      printRubyException(e);
     }
     System.err.flush();
+  }
+  
+  private void printRubyException(RubyException e) {
+  	Throwable t = e;
+  	if(t.getCause() != null) {
+  		t = t.getCause();
+  	}
+  	if (t instanceof EvalFailedException && t.getCause() != null) {
+  		t = t.getCause();
+    }
+    String st = Utils.getStackTrace(t);
+    for (String s : st.split("\n")) {
+    	// strip out some generic jruby error strings that aren't useful:
+    	if (!s.equals("	...internal jruby stack elided...") && !s.startsWith("	from (unknown).(unknown)(:")) { 
+    		error(s);
+    	}
+    }
   }
 
   private TextViewer textViewer;

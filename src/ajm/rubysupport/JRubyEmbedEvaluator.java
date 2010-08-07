@@ -1,6 +1,8 @@
 package ajm.rubysupport;
 
 import org.jruby.embed.ScriptingContainer;
+import org.jruby.embed.LocalContextScope;
+import org.jruby.embed.LocalVariableBehavior;
 
 public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
 
@@ -11,24 +13,22 @@ public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
   }
 
   protected void resetEngineContext() {
-    container = new ScriptingContainer();
+    container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);
   }
 
-  // Var names in next two methods might need a "$" prepended?
   protected void declareGlobalInternal(String variableName, Object obj) {
-    container.put(variableName, obj);
+    container.put("$" + variableName, obj);
   }
 
   protected void undeclareGlobalInternal(String variableName) {
-    container.removeAttribute(variableName);
+    container.removeAttribute("$" + variableName);
   }
 
   public Object eval(CharSequence rubyCode) {
     try {
       return container.runScriptlet(rubyCode.toString());
     } catch (Exception e) {
-      throw new RubyException((Throwable) null);
-      // JRuby Embed takes care of printing out the cause, so set the cause to null to avoid duplicate error messages
+      throw new RubyException(e);
     }
   }
 

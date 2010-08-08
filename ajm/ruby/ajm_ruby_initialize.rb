@@ -19,7 +19,11 @@ end
 
 def yield_atoms(*params,&block)
   params.each do |param|
-    atoms_or_atom = $max_ruby_adapter.toAtoms(param)
+    begin
+      atoms_or_atom = $max_ruby_adapter.toAtoms(param)
+    rescue # this compensates for http://jira.codehaus.org/browse/JRUBY-4998
+      atoms_or_atom = param.to_s
+    end
     if atoms_or_atom.respond_to? :each
       atoms_or_atom.each{|atom| yield atom}
     else
@@ -52,11 +56,19 @@ def outlet(outletIdx, *params)
   if (outletIdx >= $max_object.numOutlets)
     error("Invalid outlet index #{outletIdx}")
   else
-    if params.length == 1
-      # avoid unnecessary nested arrays for things like "outlet 0, [1,2]"
-      atoms = $max_ruby_adapter.toAtoms(params[0])
-    else
-      atoms = $max_ruby_adapter.toAtoms(params)
+    begin
+      if params.length == 1
+        # avoid unnecessary nested arrays for things like "outlet 0, [1,2]"
+        atoms = $max_ruby_adapter.toAtoms(params[0])
+      else
+        atoms = $max_ruby_adapter.toAtoms(params)
+      end
+    rescue # this compensates for http://jira.codehaus.org/browse/JRUBY-4998
+      if params.length == 1
+        atoms = $max_ruby_adapter.toAtoms(params[0].to_s)
+      else
+        atoms = $max_ruby_adapter.toAtoms( params.map{|p| p.to_s} )
+      end
     end
     $max_object.outlet(outletIdx, atoms)
   end

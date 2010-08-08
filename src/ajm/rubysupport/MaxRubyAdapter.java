@@ -124,8 +124,8 @@ public class MaxRubyAdapter {
 		eval(rubyCode, false);
 	}
 
-	public void eval(CharSequence rubyCode) {
-		eval(rubyCode, true);
+	public Object eval(CharSequence rubyCode) {
+		return eval(rubyCode, true);
 	}
 
 	/**
@@ -158,9 +158,11 @@ public class MaxRubyAdapter {
 
 	public void init(File scriptFile, Atom[] args) {
 		if (code.isEmpty()) {
-			for (String load_path : RubyProperties.getLoadPaths()) {
-				code.line("$: << " + quote(load_path));
+			// setup the $LOAD_PATH
+			for (String loadPath : RubyProperties.getLoadPaths()) {
+				code.line("$: << " + quote(loadPath));				
 			}
+			// and include any initializer files:
 			for (String initializer : RubyProperties.getInitializerFiles()) {
 				String initializationCode = Utils.getFileAsString(initializer);
 				code.append(initializationCode);
@@ -175,17 +177,25 @@ public class MaxRubyAdapter {
 		exec(code);
 
 		if (scriptFile != null) {
-			String script = Utils.getFileAsString(scriptFile);
+			String script = Utils.getFileAsString(scriptFile);			
 			scriptFileInit.clear();
-			// I'd like to set __FILE__ here too, but that variable cannot be assigned
+			
+			String scriptFileFolder = scriptFile.getParent();
+			if(scriptFileFolder != null) {
+				// include the folder containing the scriptFile, so scripts can require files relative to themselves
+				scriptFileInit.line("$: << " + quote(scriptFileFolder));
+			}			
+			
+			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned			
 			scriptFileInit.line("$0 = " + quote(scriptFile));
+			
+			// any set the arguments
 			for (Atom arg : args) {
 				scriptFileInit.line("$* << " + Utils.detokenize(arg));
 			}
+			
 			exec(scriptFileInit);
-			if (script != null) {
-				exec(script);
-			}
+			exec(script);
 		}
 	}
 

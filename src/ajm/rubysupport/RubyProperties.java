@@ -43,7 +43,7 @@ public class RubyProperties {
 
 	public static Properties properties;
 
-	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.BSFRubyEvaluator";
+	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.JRubyEmbedEvaluator";
 
 	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
 	

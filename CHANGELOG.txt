@@ -15,6 +15,14 @@ Changes to ajm.ruby
   or
     def list(*args)
 
+* ajm.ruby now provides more useful error messages
+
+* the number of files installed with ajm.ruby has decreased significantly
+  (we now use jruby-complete.jar instead of an unpacked ruby installation)
+
+* various bug fixes
+
+
 
 ******************************************************************************
 * Version 0.8.8 *

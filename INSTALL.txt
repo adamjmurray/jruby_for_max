@@ -33,11 +33,11 @@ UPGRADING FROM A PREVIOUS VERSION
 
  (1) Delete the entire ruby directory structure
      {Max installation}/Cycling '74/java/lib/ruby
-     
+
  (2) Delete the old ajm folder (the old patches & help files) 
      
  (3) Proceed with the first time installation instructions. 
-     The following jar files will be replaced: ajm.jar, bsf.jar, jruby.jar
+     The following files will be replaced: ajm.jar, ajm.ruby.properties, jruby.jar
  
 -----------------------------------------------------------------------------
 

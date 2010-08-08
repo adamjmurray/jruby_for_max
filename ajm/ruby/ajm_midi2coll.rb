@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'midilib/sequence'
 
 VALID_BEAT_UNITS = [1,2,4,8,16]

@@ -30,8 +30,6 @@ package ajm;
 import java.io.File;
 import java.util.Date;
 
-import org.apache.bsf.BSFException;
-import org.jruby.embed.EvalFailedException;
 import org.jruby.exceptions.RaiseException;
 
 import ajm.maxsupport.AbstractMaxRubyObject;

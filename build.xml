@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.9b1"/>
+	<property name="VERSION" value="0.9b2"/>
 	
 	<property environment="env"/>
 
@@ -94,7 +94,7 @@
 		</javadoc>
 	</target>
 
-	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar, gems">
+	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar">
 		<mkdir dir="${dist}"/>
 		<copy todir="${dist}">
 		  	<fileset dir="${basedir}" includes="*.txt"/>
@@ -115,10 +115,10 @@
 			<zipfileset dir="${dist}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
 			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
 				<exclude name="**/max.jar"/>
-				<exclude name="**/*junit*.jar"/>
-				<exclude name="**/jruby-engine.jar"/>
-				<exclude name="**/script-api.jar"/>								
+				<exclude name="**/*junit*.jar"/>						
+				<exclude name="**/bsf.jar"/>				
 			</zipfileset>    		   		
+			<!-- these files are no longer distributed individually because we're using jruby-complete jar:
 			<zipfileset dir="${download}/${jruby_folder}" includes="lib/ruby/**" prefix="${dist_name}">
 				<exclude name="**/doc/**"/>
 				<exclude name="**/gems/rspec*/**"/>
@@ -128,11 +128,13 @@
 				<exclude name="**/gems/**/sample/**"/>    			
 				<exclude name="**/gems/**/test/**"/>    			
 			</zipfileset>
+			-->
 			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
 		</zip>
 		<delete dir="${dist}" excludes="${dist_name}.zip" includeEmptyDirs="true"/>
 	</target>
 
+	<!-- the gems target is no longer used -->
 	<target name="gems" description="download the JRuby gems used by ajm objects">
 		<mkdir dir="${download}"/>
 		<get src="http://jruby.org.s3.amazonaws.com/downloads/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 

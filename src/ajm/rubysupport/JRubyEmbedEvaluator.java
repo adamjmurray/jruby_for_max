@@ -25,11 +25,7 @@ public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
   }
 
   public Object eval(CharSequence rubyCode) {
-    try {
-      return container.runScriptlet(rubyCode.toString());
-    } catch (Exception e) {
-      throw new RubyException(e);
-    }
+  	return container.runScriptlet(rubyCode.toString());    
   }
 
   public void exit() {

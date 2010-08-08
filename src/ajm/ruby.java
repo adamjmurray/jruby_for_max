@@ -32,6 +32,7 @@ import java.util.Date;
 
 import org.apache.bsf.BSFException;
 import org.jruby.embed.EvalFailedException;
+import org.jruby.exceptions.RaiseException;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
 import ajm.rubysupport.RubyException;
@@ -180,11 +181,11 @@ public class ruby extends AbstractMaxRubyObject {
     info("loading script '" + scriptFile + "' on " + new Date());
     try {
       ruby.init(scriptFile, scriptFileArgs);
-    } catch (RubyException e) {
+    } catch (Exception e) { 
       err("Error evaluating script file: " + scriptFile.getPath());
       printRubyException(e);
     }
-  }
+  } 
 
   public void bang() {
     eval("bang()");
@@ -251,28 +252,28 @@ public class ruby extends AbstractMaxRubyObject {
           outlet(evaloutlet, (Atom) val);
         }
       }
-    } catch (RubyException e) {
+    } catch (Exception e) {
       err("could not evaluate: " + input);
       printRubyException(e);
     }
     System.err.flush();
   }
   
-  private void printRubyException(RubyException e) {
+  private void printRubyException(Exception e) {
   	Throwable t = e;
-  	if(t.getCause() != null) {
+  	if(t instanceof RubyException && t.getCause() != null) { 
   		t = t.getCause();
   	}
-  	if (t instanceof EvalFailedException && t.getCause() != null) {
+  	if (t.getCause() instanceof RaiseException) {
   		t = t.getCause();
-    }
+    } 
     String st = Utils.getStackTrace(t);
     for (String s : st.split("\n")) {
     	// strip out some generic jruby error strings that aren't useful:
     	if (!s.equals("	...internal jruby stack elided...") && !s.startsWith("	from (unknown).(unknown)(:")) { 
     		error(s);
     	}
-    }
+    } 
   }
 
   private TextViewer textViewer;

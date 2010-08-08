@@ -1,12 +1,10 @@
 require 'java'
-import java.lang.System
-import com.cycling74.max.Atom
 
 def atom(obj=nil)
   if obj
     $max_ruby_adapter.toAtoms(obj)
   else
-    Atom.emptyArray
+    com.cycling74.max.Atom.emptyArray
   end
 end
 
@@ -31,22 +29,22 @@ def yield_atoms(*params,&block)
 end
 
 def puts(*params)
-  yield_atoms(*params) {|atom| System.out.println(atom)}
+  yield_atoms(*params) {|atom| java.lang.System.out.println(atom)}
   nil
 end  
 
 def print(*params)
-  yield_atoms(*params) {|atom| System.out.print(atom)}
+  yield_atoms(*params) {|atom| java.lang.System.out.print(atom)}
   nil
 end  
 
 def error(*params)
-  yield_atoms(*params) {|atom| System.err.println(atom)}
+  yield_atoms(*params) {|atom| java.lang.System.err.println(atom)}
   nil
 end
 
 def flush
-  System.out.println
+  java.lang.System.out.println
   nil
 end
 

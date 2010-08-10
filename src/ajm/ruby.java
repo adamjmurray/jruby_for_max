@@ -45,12 +45,9 @@ import com.cycling74.max.*;
  */
 public class ruby extends AbstractMaxRubyObject {
 
-  private int evaloutlet = 0;
-
   private File scriptFile;
   private Atom[] scriptFileArgs;
 
-  private boolean listproc = true;
   private boolean autowatch = false;
   private FileWatcher fileWatcher;
 
@@ -62,9 +59,8 @@ public class ruby extends AbstractMaxRubyObject {
    */
   public ruby(Atom[] args) {
     super();
-    declareAttribute("evaloutlet", "getevaloutlet", "evaloutlet");
-    declareAttribute("scriptfile", "getscriptfile", "scriptfile");
-    declareAttribute("listproc");
+    declareAttribute("file", "getfile", "file"); 
+    declareAttribute("scriptfile", "getfile", "file"); // deprecated, for backward compatibility    
     declareAttribute("autowatch", "getautowatch", "autowatch");
 
     int outlets = 1;
@@ -96,24 +92,11 @@ public class ruby extends AbstractMaxRubyObject {
     super.notifyDeleted();
   }
 
-  public int getevaloutlet() {
-    return evaloutlet;
-  }
-
-  public void evaloutlet(int evaloutlet) {
-    if (evaloutlet >= getNumOutlets()) {
-      err("Invalid evaloutlet " + evaloutlet);
-    }
-    else {
-      this.evaloutlet = evaloutlet;
-    }
-  }
-
-  public String getscriptfile() {
+  public String getfile() {
     return scriptFile.getAbsolutePath();
   }
 
-  public void scriptfile(Atom[] args) {
+  public void file(Atom[] args) {
     if (args != null && args.length > 0) {
       scriptFile = Utils.getFile(args[0].toString());
       scriptFileArgs = Atom.removeFirst(args);
@@ -186,70 +169,78 @@ public class ruby extends AbstractMaxRubyObject {
   } 
 
   public void bang() {
-    eval("bang()");
+    evalRuby("bang()");
   }
 
-  public void list(Atom[] args) {
-    if (listproc) {
-      StringBuilder s = new StringBuilder("list(");
-      for (int i = 0; i < args.length; i++) {
-        if (i > 0) {
-          s.append(",");
-        }
-        s.append(args[i]);
-      }
-      s.append(")");
-      eval(s);
-    }
-    else {
-      anything(null, args);
-    }
+  public void list(Atom[] args) {	
+  	StringBuilder s = new StringBuilder("list");
+  	joinArgs(args, s, 0);
+  	evalRuby(s);
   }
 
-  public void anything(String msg, Atom[] args) {
-    StringBuilder input = new StringBuilder();
-    if (msg != null) {
-      input.append(Utils.detokenize(msg));
-    }
-    for (Atom arg : args) {
-      input.append(" ").append(Utils.detokenize(arg.toString()));
-    }
-    eval(input.toString().trim());
-  }
-
-  public void text(String script) {
-    eval(script.trim());
-  }
-
+	/** 
+	 * @param args - method methods_args
+	 */	
+	public void call(Atom[] args) {
+		if(args.length < 1 || args[0] == null) return;		
+		StringBuilder s = new StringBuilder();
+		s.append(args[0]);
+		joinArgs(args, s, 1);
+		evalRuby(s);
+	}
+	
+	/**
+	 * @param args - receiver method methods_args
+	 */
+	public void send(Atom[] args) {
+		if(args.length < 2 || args[0] == null || args[1] == null) return;		
+		StringBuilder s = new StringBuilder();
+		s.append(args[0]).append(".").append(args[1]);
+		joinArgs(args, s, 2);
+		evalRuby(s);
+	}
+	
+	public void eval(Atom[] args) {
+		StringBuilder input = new StringBuilder();
+		for (Atom arg : args) {
+			input.append( Utils.detokenize(arg.toString()) ).append(" ");
+		}
+		evalRuby(input.toString().trim());
+	}
+	
+	private void joinArgs(Atom[] args, StringBuilder s, int startIndex) {
+		s.append("(");
+		for (int i = startIndex; i < args.length; i++) {
+			if (i > startIndex) {
+				s.append(",");
+			}
+			s.append(  Utils.detokenize(args[i]) );
+		}
+		s.append(")");
+	}
+  
+	public void text(String script) {
+		evalRuby(script.trim());
+	}
+	
   public void textblock(String name) {
     String script = TextBlock.get(name);
     if (script != null) {
-      eval(script);
+      evalRuby(script);
     }
     else {
       error("No textblock named '" + name + "'");
     }
   }
 
-  protected void eval(CharSequence input) {
+  protected void evalRuby(CharSequence input) {
     try {
       if (ruby == null) {
         err("not initialized yet. Did not evaluate: " + input
             + ". If you are loadbanging a script, try using a deferlow.");
         return;
       }
-      Object val = ruby.eval(input, evaloutlet >= 0);
-      if (evaloutlet >= 0) {
-        // this check occurs here instead of evaloutlet() because we want
-        // to allow negative numbers to suppress eval output
-
-        if (val instanceof Atom[]) {
-          outlet(evaloutlet, (Atom[]) val);
-        }
-        else {
-          outlet(evaloutlet, (Atom) val);
-        }
-      }
+      ruby.eval(input);      
     } catch (Exception e) {
       err("could not evaluate: " + input);
       printRubyException(e);

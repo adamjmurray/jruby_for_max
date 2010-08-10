@@ -82,10 +82,6 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		}
 	}
 
-	protected void contructRubyEvaluator() {
-
-	}
-
 	public String getcontext() {
 		return context;
 	}

@@ -27,7 +27,7 @@ package ajm;
 
  */
 
-import java.io.File;
+import java.io.*;
 import java.util.Date;
 
 import org.jruby.exceptions.RaiseException;
@@ -274,20 +274,23 @@ public class ruby extends AbstractMaxRubyObject {
     } 
   }
 
-  private TextViewer textViewer;
-
-  @Override
-  protected void dblclick() {
-    if (scriptFile != null) {
-      if (textViewer == null) {
-        textViewer = new TextViewer(scriptFile.getName());
-      }
-      textViewer.setText(Utils.getFileAsString(scriptFile));
-      int[] rect = getMaxBox().getRect();
-      int[] loc = getParentPatcher().getWindow().getLocation();
-      textViewer.setCenter(loc[0] + (rect[0] + rect[2]) / 2, loc[1] + (rect[1] + rect[3]) / 2);
-      textViewer.show();
-    }
-  }
-
+	@Override
+	protected void dblclick() {
+		try {
+			if(scriptFile != null) {
+				String cmd;
+				if (MaxSystem.isOsWindows()) {
+					cmd = "start";
+				}
+				else {
+					cmd = "open";
+				}
+				String filePath = scriptFile.getAbsolutePath();
+				info("Attempting to open file '" + filePath + "'");
+				Runtime.getRuntime().exec(cmd + " " + filePath.replaceAll(" ", "\\ "));
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

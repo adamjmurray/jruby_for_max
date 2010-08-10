@@ -1,5 +1,9 @@
 require 'java'
 
+def inlet
+  $max_object.getInlet
+end
+
 def atom(obj=nil)
   if obj
     $max_ruby_adapter.toAtoms(obj)

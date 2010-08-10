@@ -63,11 +63,15 @@ public class ruby extends AbstractMaxRubyObject {
     declareAttribute("scriptfile", "getfile", "file"); // deprecated, for backward compatibility    
     declareAttribute("autowatch", "getautowatch", "autowatch");
 
-    int outlets = 1;
+    int inlets = 1;
     if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
-      outlets = args[0].getInt();
+    	inlets = args[0].getInt();
+    }        
+    int outlets = 1;
+    if (args.length > 1 && args[1].isInt() && args[1].getInt() > 1) {
+    	outlets = args[1].getInt();
     }
-    declareIO(1, outlets);
+    declareIO(inlets, outlets);    
     createInfoOutlet(false);
   }
 

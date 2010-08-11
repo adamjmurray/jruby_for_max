@@ -87,4 +87,7 @@ public abstract class AbstractScriptEvaluator implements ScriptEvaluator {
 		}
 		persitentGlobals.remove(variableName);
 	}
+	
+	public void setScriptFilename(String scriptFilename) {		
+	}
 }

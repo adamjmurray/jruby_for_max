@@ -174,6 +174,8 @@ public class MaxRubyAdapter {
 			ruby.resetContext();
 		}
 		ruby.setInitialized(true);
+		
+		ruby.setScriptFilename(scriptFile == null ? null : scriptFile.getName());
 		exec(code);
 
 		if (scriptFile != null) {

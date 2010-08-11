@@ -24,7 +24,14 @@ public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
     container.removeAttribute("$" + variableName);
   }
 
-  public Object eval(CharSequence rubyCode) {
+  public void setScriptFilename(String scriptFilename) {
+  	if(scriptFilename == null) {
+  		scriptFilename = "";
+  	}
+  	container.setScriptFilename(scriptFilename);
+  }
+  
+  public Object eval(CharSequence rubyCode) {  	
   	return container.runScriptlet(rubyCode.toString());    
   }
 

@@ -44,6 +44,8 @@ public interface ScriptEvaluator {
 
 	void undeclareGlobal(String variableName);
 
+	void setScriptFilename(String scriptFilename);
+	
 	Object eval(CharSequence rubyCode);
 
 	void exit();

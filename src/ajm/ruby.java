@@ -47,6 +47,8 @@ public class ruby extends AbstractMaxRubyObject {
 
   private File scriptFile;
   private Atom[] scriptFileArgs;
+  
+  private int evalOutlet = -1;
 
   private boolean autowatch = false;
   private FileWatcher fileWatcher;
@@ -59,6 +61,8 @@ public class ruby extends AbstractMaxRubyObject {
    */
   public ruby(Atom[] args) {
     super();
+    declareAttribute("evalout", "getevalout", "evalout");
+    declareAttribute("evaloutlet", "getevalout", "evalout");  // deprecated, for backward compatibility
     declareAttribute("file", "getfile", "file"); 
     declareAttribute("scriptfile", "getfile", "file"); // deprecated, for backward compatibility    
     declareAttribute("autowatch", "getautowatch", "autowatch");
@@ -94,6 +98,19 @@ public class ruby extends AbstractMaxRubyObject {
   public void notifyDeleted() {
     stopFileWatcher();
     super.notifyDeleted();
+  }
+  
+  public int getevalout() {
+    return evalOutlet;
+  }
+
+  public void evalout(int evalout) {
+    if (evalout >= getNumOutlets()) {
+      err("Invalid evaloutt " + evalout);
+    }
+    else {
+      this.evalOutlet = evalout;
+    }
   }
 
   public String getfile() {
@@ -244,7 +261,17 @@ public class ruby extends AbstractMaxRubyObject {
             + ". If you are loadbanging a script, try using a deferlow.");
         return;
       }
-      ruby.eval(input);      
+      Object val = ruby.eval(input, evalOutlet >= 0);
+      if (evalOutlet >= 0) {       
+        if (val instanceof Atom[]) {
+          outlet(evalOutlet, (Atom[]) val);
+        }
+        else {
+          outlet(evalOutlet, (Atom) val);
+        }
+      }
+      // else negative numbers to suppress eval output
+    
     } catch (Exception e) {
       err("could not evaluate: " + input);
       printRubyException(e);

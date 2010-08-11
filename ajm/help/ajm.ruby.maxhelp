@@ -4634,7 +4634,23 @@
 						"enablehscroll" : 1,
 						"enablevscroll" : 1,
 						"devicewidth" : 0.0,
+						"visible" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"maxclass" : "comment",
+									"text" : "turns into:\n $object.method('blah')",
+									"linecount" : 2,
+									"presentation_rect" : [ 339.0, 371.0, 0.0, 0.0 ],
+									"fontsize" : 11.0,
+									"patching_rect" : [ 276.0, 370.0, 264.0, 33.0 ],
+									"id" : "obj-52",
+									"numinlets" : 1,
+									"fontname" : "Verdana",
+									"numoutlets" : 0
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"maxclass" : "comment",
 									"text" : "TODO: after re-enabling @evaloutlet, get rid of out0 calls...",
@@ -4651,11 +4667,11 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "send $an_instance instance_method 'blahblahblah'",
+									"text" : "send $object method 'blah'",
 									"outlettype" : [ "" ],
 									"presentation_rect" : [ 128.0, 368.0, 0.0, 0.0 ],
 									"fontsize" : 11.595187,
-									"patching_rect" : [ 128.0, 368.0, 273.0, 18.0 ],
+									"patching_rect" : [ 128.0, 368.0, 148.0, 18.0 ],
 									"id" : "obj-49",
 									"numinlets" : 2,
 									"fontname" : "Arial",

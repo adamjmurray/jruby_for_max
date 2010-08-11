@@ -29,6 +29,7 @@ package ajm.rubysupport;
 
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
+import org.jruby.CompatVersion;
 
 /**
  * Bridge to Apache BSF project's Ruby evaluator engine.
@@ -39,7 +40,7 @@ public class BSFRubyEvaluator extends AbstractScriptEvaluator {
 
 	private BSFManager manager;
 
-	public BSFRubyEvaluator() {
+	public BSFRubyEvaluator(CompatVersion version) {
 		BSFManager.registerScriptingEngine("ruby", "org.jruby.javasupport.bsf.JRubyEngine", new String[] { "rb" });
 		resetEngineContext();
 	}

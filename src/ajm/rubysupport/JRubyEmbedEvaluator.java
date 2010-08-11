@@ -1,5 +1,6 @@
 package ajm.rubysupport;
 
+import org.jruby.CompatVersion;
 import org.jruby.embed.ScriptingContainer;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
@@ -7,13 +8,18 @@ import org.jruby.embed.LocalVariableBehavior;
 public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
 
   private ScriptingContainer container;
+  
+  private CompatVersion compatVersion;
 
-  public JRubyEmbedEvaluator() {
-    resetEngineContext();
+  public JRubyEmbedEvaluator(CompatVersion rubyVersion) {
+  	// if compatVersion isn't set right away, it won't work (maybe because of the global var setup?)
+  	compatVersion = rubyVersion;
+  	resetEngineContext();
   }
 
   protected void resetEngineContext() {
-    container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);
+  	container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);
+  	container.setCompatVersion(compatVersion);
   }
 
   protected void declareGlobalInternal(String variableName, Object obj) {

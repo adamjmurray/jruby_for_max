@@ -32,6 +32,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.jruby.CompatVersion;
+
 import com.cycling74.max.MaxSystem;
 
 /**
@@ -46,8 +48,6 @@ public class RubyProperties {
 	public static final String DEFAULT_RUBY_ENGINE = "ajm.rubysupport.JRubyEmbedEvaluator";
 
 	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
-	
-	public static final String DEFAULT_RUBY_VERSION = "RUBY1_8";
 
 	private static String rubyEngine;
 
@@ -103,8 +103,6 @@ public class RubyProperties {
 			catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			System.setProperty("jruby.compat.version",
-								properties.getProperty("ruby.version", DEFAULT_RUBY_VERSION));
 			
 			String jrubyHome = properties.getProperty("jruby.home");
 			if(jrubyHome != null) {
@@ -119,4 +117,17 @@ public class RubyProperties {
 			properties = new Properties();
 		}
 	}
+	
+	public static CompatVersion getRubyVersion(String version) {
+		if("1.9".equals(version)) {
+  		return CompatVersion.RUBY1_9;
+  	}
+  	else if("1.8".equals(version)) {
+  		return CompatVersion.RUBY1_8;
+  	}
+  	else return null;
+	}
+	
+	public static String DEFAULT_RUBY_VERSION_STRING = "1.8";
+	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_8;
 }

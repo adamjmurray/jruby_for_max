@@ -27,10 +27,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-import com.cycling74.max.Executable;
+import org.jruby.CompatVersion;
 
-import ajm.rubysupport.IdInUseException;
-import ajm.rubysupport.MaxRubyAdapter;
+import com.cycling74.max.*;
+
+import ajm.rubysupport.*;
 
 /**
  * Superclass for objects that support Ruby scripting.
@@ -42,7 +43,10 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 	protected String context = null;
 	protected String id = defaultId();
 	private boolean autoinit = false;
-
+	
+	protected Atom[] rubyVersionValue;
+	protected CompatVersion rubyVersion;
+  
 	protected MaxRubyAdapter ruby;
 
 	protected AbstractMaxRubyObject self = this;
@@ -52,6 +56,7 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		declareAttribute("context", "getcontext", "context");
 		declareAttribute("id", "getid", "id");
 		declareAttribute("autoinit");
+		declareAttribute("ruby_version", "getruby_version", "ruby_version");
 	}
 
 	@Override
@@ -64,13 +69,13 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		public void execute() {
 			super.execute();
 			try {
-				ruby = new MaxRubyAdapter(self, context, id);
+				ruby = new MaxRubyAdapter(self, context, id, rubyVersion);
 			}
 			catch (IdInUseException e) {
 				String availableId = e.getMessage();
 				error("id " + id + " not available. Using: " + availableId);
 				id = availableId;
-				ruby = new MaxRubyAdapter(self, context, id);
+				ruby = new MaxRubyAdapter(self, context, id, rubyVersion);
 			}
 			if (autoinit) {
 				ruby.init();
@@ -126,6 +131,35 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 	private String defaultId() {
 		return Integer.toHexString(hashCode());
 	}
+	
+  public Atom[] getruby_version() {
+    return rubyVersionValue;
+  }
+
+  // Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
+  public void ruby_version(Atom[] rubyVersionValue) {
+  	if(initialized) {
+  		err("ruby_version cannot be changed. Use @ruby_version when creating the object.");
+  		return;
+  	}  	
+  	if(rubyVersionValue == null || rubyVersionValue.length < 1) return;
+  	
+  	String rubyVersionString = rubyVersionValue[0].toString();
+  	while(rubyVersionString.endsWith("0")) {
+  		// @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
+  		rubyVersionString = rubyVersionString.substring(0, rubyVersionString.length()-1);
+  	}
+  	
+  	this.rubyVersion = RubyProperties.getRubyVersion(rubyVersionString);  	  
+  	if(this.rubyVersion == null) {
+  		err("Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported. " + 
+  				"Defaulting to version " + RubyProperties.DEFAULT_RUBY_VERSION_STRING + ".");
+  		this.rubyVersionValue = Atom.newAtom(new String[]{RubyProperties.DEFAULT_RUBY_VERSION_STRING});
+  		rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
+  	} else {
+  		this.rubyVersionValue = Atom.newAtom(new String[]{rubyVersionString});
+  	}
+  }
 
 	@Override
 	public void notifyDeleted() {

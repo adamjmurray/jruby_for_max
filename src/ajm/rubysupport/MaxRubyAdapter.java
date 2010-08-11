@@ -30,9 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import java.io.File;
 import java.math.BigInteger;
 
-import org.jruby.RubyArray;
-import org.jruby.RubyHash;
-import org.jruby.RubySymbol;
+import org.jruby.*;
 
 import ajm.maxsupport.Atomizer;
 import ajm.util.GlobalVariableStore;
@@ -57,7 +55,7 @@ public class MaxRubyAdapter {
 	private LineBuilder code = new LineBuilder();
 
 	private LineBuilder scriptFileInit = new LineBuilder();
-
+	
 	private final MaxObject maxObject;
 
 	private Logger logger;
@@ -65,19 +63,22 @@ public class MaxRubyAdapter {
 	private String maxContext;
 
 	private String id;
+	
+	private CompatVersion rubyVersion;
 
-	public MaxRubyAdapter(MaxObject maxObject, String context, String id) {
+	public MaxRubyAdapter(MaxObject maxObject, String context, String id, CompatVersion rubyVersion) {
 		this.maxObject = maxObject;
 		if (maxObject instanceof Logger) {
 			this.logger = (Logger) maxObject;
 		}
 		this.maxContext = context;
 		this.id = id;
+		this.rubyVersion = rubyVersion;
 		getEvaluator();
 	}
 
 	private void getEvaluator() {
-		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject);
+		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject, rubyVersion);
 		ruby.declareGlobal("max_ruby_adapter", this);
 		ruby.declareGlobal("global_variable_store", GlobalVariableStore.getInstance());
 	}

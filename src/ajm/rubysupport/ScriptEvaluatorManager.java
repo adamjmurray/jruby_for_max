@@ -33,6 +33,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.jruby.CompatVersion;
+
 import ajm.util.MappedSet;
 
 /**
@@ -63,7 +66,7 @@ public class ScriptEvaluatorManager {
 	 * 
 	 * @return
 	 */
-	public static ScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject) {
+	public static ScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject, CompatVersion rubyVersion) {
 
 		Map<String, Object> idMap = maxObjectMap.get(maxContext);
 		if (idMap == null) {
@@ -81,7 +84,7 @@ public class ScriptEvaluatorManager {
 
 		ScriptEvaluator evaluator = evaluatorContexts.get(evaluatorContext);
 		if (evaluator == null) {
-			evaluator = newRubyEvaluatorInstance();
+			evaluator = newRubyEvaluatorInstance(rubyVersion);
 			evaluatorContexts.put(evaluatorContext, evaluator);
 			evaluatorContextCounter.put(evaluatorContext, 1);
 			Set<Object> maxObjects = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
@@ -206,13 +209,13 @@ public class ScriptEvaluatorManager {
 		}
 	}
 
-	private static ScriptEvaluator newRubyEvaluatorInstance() {
+	private static ScriptEvaluator newRubyEvaluatorInstance(CompatVersion rubyVersion) {
 		if (evaluatorConstructor == null) {
 			String evaluatorClassName = RubyProperties.getRubyEngine();
 			try {
 				@SuppressWarnings("unchecked")
 				Class<ScriptEvaluator> evaluatorClass = (Class<ScriptEvaluator>) Class.forName(evaluatorClassName);
-				evaluatorConstructor = evaluatorClass.getConstructor();
+				evaluatorConstructor = evaluatorClass.getConstructor(CompatVersion.class);
 			}
 			catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
@@ -222,7 +225,7 @@ public class ScriptEvaluatorManager {
 			}
 		}
 		try {
-			return evaluatorConstructor.newInstance();
+			return evaluatorConstructor.newInstance(rubyVersion);
 		}
 		catch (InstantiationException e) {
 			throw new RuntimeException(e);

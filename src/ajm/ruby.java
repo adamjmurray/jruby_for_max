@@ -106,7 +106,7 @@ public class ruby extends AbstractMaxRubyObject {
 
   public void evalout(int evalout) {
     if (evalout >= getNumOutlets()) {
-      err("Invalid evaloutt " + evalout);
+      err("Invalid evalout " + evalout);
     }
     else {
       this.evalOutlet = evalout;

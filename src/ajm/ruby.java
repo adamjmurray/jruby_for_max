@@ -27,16 +27,18 @@ package ajm;
 
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
-import org.jruby.exceptions.RaiseException;
-
 import ajm.maxsupport.AbstractMaxRubyObject;
-import ajm.rubysupport.RubyException;
-import ajm.util.*;
+import ajm.util.FileWatcher;
+import ajm.util.TextBlock;
+import ajm.util.Utils;
 
-import com.cycling74.max.*;
+import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
+import com.cycling74.max.MaxSystem;
 
 /**
  * The ajm.ruby MaxObject
@@ -184,9 +186,14 @@ public class ruby extends AbstractMaxRubyObject {
     try {
       ruby.init(scriptFile, scriptFileArgs);
     } catch (Exception e) { 
-      err("Error evaluating script file: " + scriptFile.getPath());
-      printRubyException(e);
+      err("Error evaluating script file: " + scriptFile.getPath());      
+      // It seems that System.err.flush() takes care of printing out the error message.
+//      if(verbose) {
+//      	printRubyException(e);
+//      }
     }
+    System.err.flush();
+
   } 
 
   public void bang() {
@@ -271,14 +278,18 @@ public class ruby extends AbstractMaxRubyObject {
         }
       }
       // else negative numbers to suppress eval output
-    
+     
     } catch (Exception e) {
-      err("could not evaluate: " + input);
-      printRubyException(e);
+    	err("could not evaluate: " + input);
+      // It seems that System.err.flush() takes care of printing out the error message.
+//      if(verbose) {
+//      	printRubyException(e);
+//      }
     }
     System.err.flush();
   }
   
+  /*
   private void printRubyException(Exception e) {
   	Throwable t = e;
   	if(t instanceof RubyException && t.getCause() != null) { 
@@ -287,14 +298,15 @@ public class ruby extends AbstractMaxRubyObject {
   	if (t.getCause() instanceof RaiseException) {
   		t = t.getCause();
     } 
-    String st = Utils.getStackTrace(t);
+  	String st = Utils.getStackTrace(t);
     for (String s : st.split("\n")) {
     	// strip out some generic jruby error strings that aren't useful:
     	if (!s.equals("	...internal jruby stack elided...") && !s.startsWith("	from (unknown).(unknown)(:")) { 
     		error(s);
     	}
-    } 
+    }
   }
+  */
 
 	@Override
 	protected void dblclick() {

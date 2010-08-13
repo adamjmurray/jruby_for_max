@@ -6,8 +6,31 @@
 ***************
 
 Changes to ajm.ruby
+DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
 
-* JRuby upgraded to version 1.5.1
+** Multiple inlets are now supported. This is the first argument to the object,
+   and number of outlets is the second argument (it was previous the first).
+   If you were using multiple outlets, you must now add a first argument for
+   1 inlet. So [mxj ajm.ruby 3] becomes [mxj ajm.ruby 1 3].
+   The inlet() method reports the current inlet in your Ruby script.
+
+** Evaluation by sending ruby code messages to the object's inlet now needs to be
+   prepended with the 'eval' message.
+   So instead of sending [puts 'hello'] you must now send [eval puts 'hello']
+   Adding a [prepend eval] before ajm.ruby's inlet is a simple way to update
+   existing patches that relied on the old behavior.
+
+** @listproc is no longer supported. Any input that is a list automatically calls 
+   the list method. Use the 'eval' message to evaluate Ruby code.
+
+** @evaloutlet's default value has changed from 0 to -1 (no output)
+   If you rely on evaluating scripts on-the-fly from Max messages, you either 
+   explicit call out0 to send output to the outlet, or expliclty set @evalout 0
+   (note the preferred name of @evaloutlet is @evalout)
+
+** The @scriptfile attribute is now deprecated in favor of @file
+
+** The @evaloutlet attribute is now deprecated in favor of @evalout
 
 * list() method now uses a splat for it's arguments, 
   so you now define this method like
@@ -15,13 +38,31 @@ Changes to ajm.ruby
   or
     def list(*args)
 
-* ajm.ruby now provides more useful error messages
+* ajm.ruby now provides much more useful error messages
+
+* The directory of the @file is added to $LOAD_PATH so you can require
+  files relative to it.
+
+* Double clicking a script that's running a @file will open that file
+  in the associated editor (based on your OS file associations)
+
+* A 'call' message was introduced, see the "receiving input from Max"
+  section of the help patch
+
+* A 'send' message was introduced	, see the "receiving input from Max"
+	section of the help patch
 
 * the number of files installed with ajm.ruby has decreased significantly
   (we now use jruby-complete.jar instead of an unpacked ruby installation)
 
-* various bug fixes
+* __FILE__ is now set correctly when using @file to load a script
 
+* A @ruby_version attribute was introduced to control the Ruby version on
+  a per-object basis. Valid values are @ruby_version 1.9 and @ruby_version 1.8
+  1.8 is the default. 1.9 support is still under development by the JRuby
+  developers so it may not be completely compatible with MRI Ruby 1.9.
+
+* JRuby upgraded to version 1.5.1
 
 
 ******************************************************************************

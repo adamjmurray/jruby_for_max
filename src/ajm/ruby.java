@@ -192,8 +192,7 @@ public class ruby extends AbstractMaxRubyObject {
 //      	printRubyException(e);
 //      }
     }
-    System.err.flush();
-
+    flush();
   } 
 
   public void bang() {
@@ -286,7 +285,7 @@ public class ruby extends AbstractMaxRubyObject {
 //      	printRubyException(e);
 //      }
     }
-    System.err.flush();
+    flush();
   }
   
   /*
@@ -307,6 +306,11 @@ public class ruby extends AbstractMaxRubyObject {
     }
   }
   */
+  
+  private void flush() {
+  	 System.out.flush();
+     System.err.flush();
+  }
 
 	@Override
 	protected void dblclick() {

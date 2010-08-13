@@ -8,7 +8,7 @@ end
 
 class MyClass
   def method(arg)
-    "the class received value=#{arg}"
+    %w{the class received value} << arg.inspect
   end
 end
 

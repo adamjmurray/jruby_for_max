@@ -32,6 +32,8 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
 
 ** The @evaloutlet attribute is now deprecated in favor of @evalout
 
+** No gems are included with ajm.ruby anymore
+
 * list() method now uses a splat for it's arguments, 
   so you now define this method like
     def list(arg1, arg2, arg3)
@@ -49,8 +51,8 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
 * A 'call' message was introduced, see the "receiving input from Max"
   section of the help patch
 
-* A 'send' message was introduced	, see the "receiving input from Max"
-	section of the help patch
+* A 'send' message was introduced, see the "receiving input from Max"
+  section of the help patch
 
 * the number of files installed with ajm.ruby has decreased significantly
   (we now use jruby-complete.jar instead of an unpacked ruby installation)

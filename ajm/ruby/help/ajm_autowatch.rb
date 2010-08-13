@@ -1,2 +1,2 @@
-puts "change this message"
+ out0 "uncomment me and save this file"
 

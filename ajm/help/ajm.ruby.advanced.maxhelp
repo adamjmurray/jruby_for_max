@@ -1452,7 +1452,7 @@
 									"text" : "verbose mode indicates when a non-string type is converted to a string.",
 									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 177.0, 287.0, 232.0, 33.0 ],
+									"patching_rect" : [ 178.0, 316.0, 232.0, 33.0 ],
 									"id" : "obj-15",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
@@ -1562,7 +1562,7 @@
 									"maxclass" : "comment",
 									"text" : "Hashes also turn into a single string.",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 145.0, 247.0, 223.0, 20.0 ],
+									"patching_rect" : [ 157.0, 248.0, 223.0, 20.0 ],
 									"id" : "obj-23",
 									"fontname" : "Verdana",
 									"numinlets" : 1,
@@ -1586,10 +1586,10 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "{1=>2\\, 3=>[4\\,5]}",
+									"text" : "( {:a=>1\\, :b=>2} )",
 									"fontsize" : 11.0,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 20.0, 248.0, 125.0, 18.0 ],
+									"patching_rect" : [ 20.0, 248.0, 134.0, 18.0 ],
 									"id" : "obj-25",
 									"fontname" : "Verdana",
 									"numinlets" : 2,
@@ -1669,6 +1669,24 @@
  ],
 						"lines" : [ 							{
 								"patchline" : 								{
+									"source" : [ "obj-29", 0 ],
+									"destination" : [ "obj-32", 0 ],
+									"hidden" : 0,
+									"midpoints" : [  ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-32", 0 ],
+									"destination" : [ "obj-5", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 14.5, 345.0, 8.0, 345.0, 8.0, 522.0, 21.5, 522.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"source" : [ "obj-5", 3 ],
 									"destination" : [ "obj-1", 0 ],
 									"hidden" : 0,
@@ -1741,15 +1759,6 @@
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-32", 0 ],
-									"destination" : [ "obj-5", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 14.5, 345.0, 8.0, 345.0, 8.0, 522.0, 21.5, 522.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
 									"source" : [ "obj-14", 0 ],
 									"destination" : [ "obj-29", 0 ],
 									"hidden" : 0,
@@ -1817,15 +1826,6 @@
 									"destination" : [ "obj-29", 0 ],
 									"hidden" : 0,
 									"midpoints" : [ 30.5, 187.0, 15.5, 187.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-29", 0 ],
-									"destination" : [ "obj-32", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ]
 								}
 
 							}

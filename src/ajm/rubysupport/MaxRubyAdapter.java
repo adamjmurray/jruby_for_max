@@ -217,7 +217,7 @@ public class MaxRubyAdapter {
 	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
 	public Object toAtoms(Object obj) {
-		return toAtoms(obj, null);
+		return toAtoms(obj, logger);
 	}
 
 	public Object toAtoms(Object obj, boolean logCoercions) {

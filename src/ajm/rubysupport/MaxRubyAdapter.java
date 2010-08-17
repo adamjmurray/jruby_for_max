@@ -265,10 +265,14 @@ public class MaxRubyAdapter {
 			else return Atom.newAtom(bigInt.intValue());
 		}
 
-		else if (obj instanceof CharSequence || obj instanceof RubySymbol) {
+		else if (obj instanceof CharSequence) {
 			return Atom.newAtom(obj.toString());
 		}
 
+		else if (obj instanceof RubySymbol) {
+			return Atom.newAtom(":" + obj);
+		}
+		
 		else if (obj instanceof Boolean) {
 			return Atom.newAtom(((Boolean) obj).booleanValue());
 		}

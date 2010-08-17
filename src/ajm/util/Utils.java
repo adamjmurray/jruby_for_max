@@ -12,6 +12,7 @@ import java.util.Collection;
 import ajm.maxsupport.Atomizer;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.MaxPatcher;
 import com.cycling74.max.MaxSystem;
 
 /*
@@ -128,33 +129,58 @@ public class Utils {
 	 * @return a File object referencing an existing file, otherwise null
 	 */
 	public static File getFile(String path) {
+		return getFile(path, null);
+	}
+	
+	/**
+	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
+	 * path will be searched to locate the file. If patcher is not null, then before searching the Max search path,
+	 * the path relative to the patcher will be searched.
+	 * 
+	 * @param path -
+	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
+	 * @param patcher -
+	 *            the patcher relative to which the path should be searched for first, before the Max search path
+           
+	 * @return a File object referencing an existing file, otherwise null
+	 */	
+	public static File getFile(String path, MaxPatcher patcher) {
 		if (path == null || path.length() == 0) {
 			path = MaxSystem.openDialog();
-		}
-
-		if (path != null) {
-			String location = null;
-			if (path.contains(File.separator)) {
-				location = MaxSystem.maxPathToNativePath(path);
-			}
-			else {
-				location = MaxSystem.locateFile(path);
-			}
-
-			if (location != null) {
-				File file = new File(location);
-				if (file != null && file.isFile()) {
-					return file;
-				}
-				else {
-					System.err.println("File not found: " + path);
-				}
-			}
-			else {
-				System.err.println("File not found: " + path);
+			if(path == null) {
+				return null; // user canceled the file open dialog
 			}
 		}
 
+		File file;
+		// first see if it's an absolute path		
+		String location = MaxSystem.maxPathToNativePath(path);
+		if (location != null) {							
+			file = new File(location);
+			if (file != null && file.isFile()) {
+				return file;
+			}
+		}		
+		
+		// then see if we can find the file relative to the patcher
+		if (patcher != null) {
+			File patcherFolder = new File(patcher.getPath());
+			file = new File(patcherFolder, path);
+			if (file != null && file.isFile()) {
+				return file;
+			}
+		}
+				
+		// finally just try to locate the file via the Max search path
+		location = MaxSystem.locateFile(path);
+		if(location != null) {
+			file = new File(location);
+			if (file != null && file.isFile()) {
+				return file;
+			}
+		}				
+			
+		System.err.println("File not found: " + path);
 		return null;
 	}
 

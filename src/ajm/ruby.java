@@ -121,7 +121,7 @@ public class ruby extends AbstractMaxRubyObject {
 
   public void file(Atom[] args) {
     if (args != null && args.length > 0) {
-      scriptFile = Utils.getFile(args[0].toString());
+      scriptFile = Utils.getFile(args[0].toString(), this.getParentPatcher());
       scriptFileArgs = Atom.removeFirst(args);
     }
     else {

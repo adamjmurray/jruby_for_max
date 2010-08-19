@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import ajm.maxsupport.AbstractMaxRubyObject;
+import ajm.rubysupport.SymbolConversionOption;
 import ajm.util.FileWatcher;
 import ajm.util.TextBlock;
 import ajm.util.Utils;
@@ -54,7 +55,10 @@ public class ruby extends AbstractMaxRubyObject {
 
   private boolean autowatch = false;
   private FileWatcher fileWatcher;
-
+  
+  private String[] symbolsTo;
+  private SymbolConversionOption[] symbolConversionOptions;
+  
   /**
    * The Constructor
    * 
@@ -68,7 +72,8 @@ public class ruby extends AbstractMaxRubyObject {
     declareAttribute("file", "getfile", "file"); 
     declareAttribute("scriptfile", "getfile", "file"); // deprecated, for backward compatibility    
     declareAttribute("autowatch", "getautowatch", "autowatch");
-
+    declareAttribute("symbols_to", "getsymbols_to", "symbols_to");
+    
     int inlets = 1;
     if (args.length > 0 && args[0].isInt() && args[0].getInt() > 1) {
     	inlets = args[0].getInt();
@@ -79,6 +84,12 @@ public class ruby extends AbstractMaxRubyObject {
     }
     declareIO(inlets, outlets);    
     createInfoOutlet(false);
+    
+    symbolConversionOptions = new SymbolConversionOption[inlets];
+    for(int i=0; i<symbolConversionOptions.length; i++) {
+    	// the default behavior is to treat input literally
+    	symbolConversionOptions[i] = SymbolConversionOption.DEFAULT;
+    }
   }
 
   @Override
@@ -152,6 +163,51 @@ public class ruby extends AbstractMaxRubyObject {
         stopFileWatcher();
       }
     }
+  }
+  
+  public String[] getsymbols_to() {
+  	return symbolsTo;
+  }
+  
+  public void symbols_to(String[] params) {
+  	for(int i=0; i<params.length; i++) {
+  		String param = params[i];
+  		
+  		if(i >= symbolConversionOptions.length) {
+  			err("More @symbols_to arguments than inlets, ignoring extra arguments.");
+  			break;
+  		}  		
+  		
+  		SymbolConversionOption option = SymbolConversionOption.fromString(param);  		
+  		if(option == null) {
+  			err("Invalid @symbols_to argument '" + param + "'. Defaulting to " + SymbolConversionOption.DEFAULT);
+  			// it was already initialized to the default in the constructor so there's nothing to do
+  			continue;
+  		}
+  		else if(option == SymbolConversionOption.REMAINING_INLETS) {
+  			if(i > 0) {  			
+  				SymbolConversionOption previousOption = symbolConversionOptions[i-1];
+  				for(int j=i; j<symbolConversionOptions.length; j++) {
+  					symbolConversionOptions[j] = previousOption;
+  				}  				
+  			}
+  			// else the first arg is a '*' in which case there's nothing to do (everything remains the default)
+  			
+  			if(i < params.length-1) {
+  				err("Ignoring @symbols_to argument(s) after the " + SymbolConversionOption.REMAINING_INLETS);
+  			}
+  			// and we're done:
+  			break;
+  		}
+  		else {
+  			// handle all non-REMAINING_INLETS options:
+  			symbolConversionOptions[i] = option;
+  		}  		
+  	} 
+  	symbolsTo = new String[symbolConversionOptions.length];
+  	for(int i=0; i<symbolsTo.length; i++) {
+  		symbolsTo[i] = symbolConversionOptions[i].toString();
+  	}
   }
 
   private void startFileWatcher() {
@@ -256,7 +312,26 @@ public class ruby extends AbstractMaxRubyObject {
 			if (i > startIndex) {
 				s.append(",");
 			}
-			s.append(  Utils.detokenize(args[i]) );
+			Atom arg = args[i];
+			if(arg == null) {
+				continue;
+			}
+			String value = arg.toString();			
+			switch (symbolConversionOptions[getInlet()]) {
+				case STRING:
+					// This might not work well with evaluated strings #{} if the double quotes is part of the evaluated expression.
+					// In that case a workaround could be to try to refer to the quote with the unicode escape code?
+					value = '"' + value.replaceAll("\"", "\\\\\"") + '"';
+					break;
+
+				case SYMBOL:
+					value = ':' + value.replaceAll(" ", "_");
+					break;
+				
+				default:
+					value = Utils.detokenize(value);
+			}
+			s.append(value);
 		}
 	}
   

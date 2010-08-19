@@ -1,7 +1,11 @@
 require 'java'
 
-def inlet
-  $max_object.getInlet
+def inlet_assist(*params)
+  $max_object.setInletAssist params.to_java(:string)  
+end
+
+def outlet_assist(*params)
+  $max_object.setOutletAssist params.to_java(:string)
 end
 
 def atom(obj=nil)
@@ -56,8 +60,8 @@ def flush
   nil
 end
 
-def outlet(outletIdx, *params)
-  if (outletIdx >= $max_object.numOutlets)
+def outlet(outlet_index, *params)
+  if (outlet_index >= $max_object.numOutlets)
     error("Invalid outlet index #{outletIdx}")
   else
     begin
@@ -74,9 +78,17 @@ def outlet(outletIdx, *params)
         atoms = $max_ruby_adapter.toAtoms( params.map{|p| p.to_s} )
       end
     end
-    $max_object.outlet(outletIdx, atoms)
+    $max_object.outlet(outlet_index, atoms)
   end
   nil
+end
+
+def inlet(inlet_index, *params)
+  params
+end
+
+def inlet_index
+  $max_object.getInlet
 end
 
 module Kernel
@@ -85,6 +97,9 @@ module Kernel
     define_method "out#{index}" do |*params|
       outlet(index, *params)
     end
+    define_method "in#{index}" do |*params|
+      inlet(index, *params)
+    end    
   end
 end
 
@@ -146,11 +161,3 @@ def has_global?(name)
   $global_variable_store.defined(name.to_s) if name
 end   
 
-
-def inlet_assist(*params)
-  $max_object.setInletAssist params.to_java(:string)  
-end
-
-def outlet_assist(*params)
-  $max_object.setOutletAssist params.to_java(:string)
-end

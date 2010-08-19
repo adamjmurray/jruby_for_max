@@ -116,7 +116,11 @@ public class ruby extends AbstractMaxRubyObject {
   }
 
   public String getfile() {
-    return scriptFile.getAbsolutePath();
+  	if(scriptFile != null) {
+  		return scriptFile.getAbsolutePath();
+  	} else {
+  		return null;
+  	}
   }
 
   public void file(Atom[] args) {
@@ -199,9 +203,17 @@ public class ruby extends AbstractMaxRubyObject {
     evalRuby("bang()");
   }
 
-  public void list(Atom[] args) {	
-  	StringBuilder s = new StringBuilder("list");
+  public void list(Atom[] args) {
+  	StringBuilder s = new StringBuilder();
+  	int inletIdx = getInlet();  	
+  	if(inletIdx <= 9) {
+  		s.append("in").append(inletIdx).append("(");
+  	}
+  	else {
+  		s.append("inlet(").append(inletIdx).append(",");
+  	}
   	joinArgs(args, s, 0);
+  	s.append(")");
   	evalRuby(s);
   }
 
@@ -212,7 +224,9 @@ public class ruby extends AbstractMaxRubyObject {
 		if(args.length < 1 || args[0] == null) return;		
 		StringBuilder s = new StringBuilder();
 		s.append(args[0]);
+		s.append("(");		
 		joinArgs(args, s, 1);
+		s.append(")");
 		evalRuby(s);
 	}
 	
@@ -223,7 +237,9 @@ public class ruby extends AbstractMaxRubyObject {
 		if(args.length < 2 || args[0] == null || args[1] == null) return;		
 		StringBuilder s = new StringBuilder();
 		s.append(args[0]).append(".").append(args[1]);
+		s.append("(");		
 		joinArgs(args, s, 2);
+		s.append(")");
 		evalRuby(s);
 	}
 	
@@ -236,14 +252,12 @@ public class ruby extends AbstractMaxRubyObject {
 	}
 	
 	private void joinArgs(Atom[] args, StringBuilder s, int startIndex) {
-		s.append("(");
 		for (int i = startIndex; i < args.length; i++) {
 			if (i > startIndex) {
 				s.append(",");
 			}
 			s.append(  Utils.detokenize(args[i]) );
 		}
-		s.append(")");
 	}
   
 	public void text(String script) {

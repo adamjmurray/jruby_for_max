@@ -1,12 +1,6 @@
 package ajm.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.Collection;
 
 import ajm.maxsupport.Atomizer;
@@ -16,7 +10,7 @@ import com.cycling74.max.MaxPatcher;
 import com.cycling74.max.MaxSystem;
 
 /*
-Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
+Copyright (c) 2008-2010, Adam Murray (adam@compusition.com). All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -192,11 +186,24 @@ public class Utils {
 		if (file == null || !file.exists()) {
 			return null;
 		}
+		try {
+			return getReaderAsString(new FileReader(file));
+		}
+		catch (IOException e) {
+			System.err.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	public static String getInputStreamAsString(InputStream in) {
+		return getReaderAsString(new InputStreamReader(in));
+	}
 
+	public static String getReaderAsString(Reader r) {
 		StringBuilder text = new StringBuilder(5000);
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(r);
 			char[] buf = new char[1024];
 			int charsRead = 0;
 			while ((charsRead = reader.read(buf)) != -1) {

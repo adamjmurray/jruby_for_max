@@ -339,7 +339,16 @@ public class ruby extends AbstractMaxRubyObject {
 				}
 				String filePath = scriptFile.getAbsolutePath();
 				info("Attempting to open file '" + filePath + "'");
-				Runtime.getRuntime().exec(cmd + " " + filePath.replaceAll(" ", "\\ "));
+				Process p = Runtime.getRuntime().exec(new String[]{cmd, filePath});
+				try {
+					p.waitFor();
+					if(p.exitValue() != 0) {
+						err(Utils.getInputStreamAsString(p.getErrorStream()));
+					}
+				}
+				catch(InterruptedException e) {
+					err(e.getMessage());
+				}				
 			}
 		} catch(IOException e) {
 			throw new RuntimeException(e);

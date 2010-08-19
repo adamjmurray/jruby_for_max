@@ -6,7 +6,7 @@ def bang
   out0 'Hello from a custom handler for bang'
 end
 
-def list(*args)
+def inlet(inlet_index, *args)
   out0 'check the Max window'
-  puts "received a list with #{args.length} items: ", args
+  puts "received a list from inlet #{inlet_index} with #{args.length} items: ", args
 end

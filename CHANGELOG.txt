@@ -21,7 +21,11 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
    existing patches that relied on the old behavior.
 
 ** @listproc is no longer supported. Any input that is a list automatically calls 
-   the list method. Use the 'eval' message to evaluate Ruby code.
+   the inlet() method. Use the 'eval' message to evaluate Ruby code.
+
+** def list(*params) in Ruby has now been replace with def inlet(inlet_index, *params)
+   There are also in0, in1, ... in9(*params) convenience methods.
+   See the help patch for examples of usage.
 
 ** @evaloutlet's default value has changed from 0 to -1 (no output)
    If you rely on evaluating scripts on-the-fly from Max messages, you either 
@@ -34,16 +38,20 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
 
 ** No gems are included with ajm.ruby anymore
 
-* list() method now uses a splat for it's arguments, 
-  so you now define this method like
-    def list(arg1, arg2, arg3)
-  or
-    def list(*args)
-
 * ajm.ruby now provides much more useful error messages
+
+* unlike the old list() method, the inlet() method uses a splat for it's parameters, 
+  so you can define this method like
+    def inlet(inlet_index, param1, param2, param3)
+  or
+    def inlet(inlet_index, *params)
+  to handle any number of parameters.
+  This is true for the in0, in1, ..., in9 convenience methods too.
 
 * The directory of the @file is added to $LOAD_PATH so you can require
   files relative to it.
+
+* @files can be located relative to the current patch
 
 * Double clicking a script that's running a @file will open that file
   in the associated editor (based on your OS file associations)
@@ -63,6 +71,8 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
   a per-object basis. Valid values are @ruby_version 1.9 and @ruby_version 1.8
   1.8 is the default. 1.9 support is still under development by the JRuby
   developers so it may not be completely compatible with MRI Ruby 1.9.
+
+* Ruby symbols now have the ':' prefix when output to Max
 
 * JRuby upgraded to version 1.5.1
 

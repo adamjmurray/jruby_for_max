@@ -405,16 +405,17 @@ public class ruby extends AbstractMaxRubyObject {
 	protected void dblclick() {
 		try {
 			if(scriptFile != null) {
-				String cmd;
-				if (MaxSystem.isOsWindows()) {
-					cmd = "start";
-				}
-				else {
-					cmd = "open";
-				}
 				String filePath = scriptFile.getAbsolutePath();
 				info("Attempting to open file '" + filePath + "'");
-				Process p = Runtime.getRuntime().exec(new String[]{cmd, filePath});
+				Process p;
+				if (MaxSystem.isOsWindows()) {
+					// "file editor" is a dummy argument, I guess it controls the window title if a command prompt is opened.
+					// This dummy argument has to contain spaces or be explicitly wrapped in double quotes.
+					p = Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "file editor", filePath});					
+				}
+				else {
+					p = Runtime.getRuntime().exec(new String[]{"open", filePath});
+				}
 				try {
 					p.waitFor();
 					if(p.exitValue() != 0) {

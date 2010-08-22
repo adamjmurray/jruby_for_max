@@ -23,7 +23,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"@symbols_to (working with Max Symbols)\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 24.0, 13.0, 267.0, 20.0 ],
+					"patching_rect" : [ 22.0, 47.0, 267.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-5",
 					"fontname" : "Verdana",
@@ -387,7 +387,6 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "Strings: \"1\" \"2\" inlet_index()",
 									"fontsize" : 11.0,
 									"patching_rect" : [ 22.0, 184.0, 176.0, 18.0 ],
 									"numinlets" : 2,
@@ -649,7 +648,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"message and textedit\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 266.0, 77.287369, 151.0, 20.0 ],
+					"patching_rect" : [ 310.0, 77.287369, 151.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-12",
 					"fontname" : "Verdana",
@@ -657,9 +656,9 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
-						"rect" : [ 432.0, 45.0, 592.0, 397.0 ],
+						"rect" : [ 432.0, 45.0, 607.0, 411.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 432.0, 45.0, 592.0, 397.0 ],
+						"defrect" : [ 432.0, 45.0, 607.0, 411.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
@@ -676,11 +675,40 @@
 						"devicewidth" : 0.0,
 						"boxes" : [ 							{
 								"box" : 								{
+									"maxclass" : "comment",
+									"text" : "There's no need to 'prepend eval' with the output of a textedit object (textedit messages are prepended with 'text', which is treated like 'eval)",
+									"linecount" : 3,
+									"fontsize" : 11.0,
+									"patching_rect" : [ 298.0, 311.0, 287.0, 47.0 ],
+									"numinlets" : 1,
+									"id" : "obj-27",
+									"fontname" : "Verdana",
+									"numoutlets" : 0
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"maxclass" : "newobj",
+									"text" : "mxj ajm.ruby",
+									"fontsize" : 11.0,
+									"patching_rect" : [ 12.0, 345.0, 85.0, 20.0 ],
+									"numinlets" : 1,
+									"id" : "obj-21",
+									"fontname" : "Verdana",
+									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
+									"numoutlets" : 1,
+									"outlettype" : [ "" ]
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"maxclass" : "newobj",
 									"text" : "loadmess set",
 									"fontsize" : 11.0,
 									"hidden" : 1,
-									"patching_rect" : [ 196.0, 316.0, 83.0, 20.0 ],
+									"patching_rect" : [ 195.0, 345.0, 83.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-15",
 									"fontname" : "Verdana",
@@ -693,7 +721,7 @@
 								"box" : 								{
 									"maxclass" : "message",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 13.0, 348.0, 199.0, 18.0 ],
+									"patching_rect" : [ 12.0, 377.0, 199.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-14",
 									"fontname" : "Verdana",
@@ -706,7 +734,7 @@
 								"box" : 								{
 									"maxclass" : "textbutton",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 384.0, 261.0, 100.0, 20.0 ],
+									"patching_rect" : [ 399.0, 261.0, 100.0, 20.0 ],
 									"textovercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgovercolor" : [ 0.490196, 0.984314, 0.74902, 1.0 ],
@@ -724,15 +752,15 @@
 								"box" : 								{
 									"maxclass" : "number",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 167.0, 194.0, 37.0, 20.0 ],
 									"triscale" : 0.9,
+									"patching_rect" : [ 195.0, 197.0, 53.0, 20.0 ],
+									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ],
 									"numinlets" : 1,
 									"id" : "obj-3",
 									"fontname" : "Verdana",
 									"numoutlets" : 2,
 									"bgcolor" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
-									"outlettype" : [ "int", "bang" ],
-									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ]
+									"outlettype" : [ "int", "bang" ]
 								}
 
 							}
@@ -741,7 +769,7 @@
 									"maxclass" : "message",
 									"text" : "cube $1",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 167.0, 217.0, 54.0, 18.0 ],
+									"patching_rect" : [ 195.0, 220.0, 54.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-4",
 									"fontname" : "Verdana",
@@ -809,9 +837,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "def cube n\\; n**3 end",
+									"text" : "eval def cube n\\; n**3 end",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 24.0, 206.0, 135.0, 18.0 ],
+									"patching_rect" : [ 24.0, 206.0, 161.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-9",
 									"fontname" : "Verdana",
@@ -824,24 +852,24 @@
 								"box" : 								{
 									"maxclass" : "number",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 26.0, 253.0, 37.0, 20.0 ],
 									"triscale" : 0.9,
+									"patching_rect" : [ 26.0, 253.0, 37.0, 20.0 ],
+									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ],
 									"numinlets" : 1,
 									"id" : "obj-10",
 									"fontname" : "Verdana",
 									"numoutlets" : 2,
 									"bgcolor" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
-									"outlettype" : [ "int", "bang" ],
-									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ]
+									"outlettype" : [ "int", "bang" ]
 								}
 
 							}
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "if $1< 0 then 'negative' else 'positive' end",
+									"text" : "(if $1 < 0 then 'negative' else 'positive' end)",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 26.0, 280.0, 241.0, 18.0 ],
+									"patching_rect" : [ 26.0, 280.0, 258.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-11",
 									"fontname" : "Verdana",
@@ -883,7 +911,7 @@
 									"maxclass" : "newobj",
 									"text" : "t b",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 273.0, 102.0, 28.0, 20.0 ],
+									"patching_rect" : [ 288.0, 102.0, 28.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-18",
 									"fontname" : "Verdana",
@@ -897,7 +925,7 @@
 									"maxclass" : "newobj",
 									"text" : "grab",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 273.0, 125.0, 36.0, 20.0 ],
+									"patching_rect" : [ 288.0, 125.0, 36.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-20",
 									"fontname" : "Verdana",
@@ -912,11 +940,11 @@
 									"text" : "x = 5\nx = x + 10\nout0 x",
 									"linecount" : 3,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 290.0, 152.0, 278.0, 107.0 ],
-									"tabmode" : 0,
+									"patching_rect" : [ 305.0, 152.0, 278.0, 107.0 ],
 									"numinlets" : 1,
 									"id" : "obj-22",
 									"fontname" : "Geneva",
+									"tabmode" : 0,
 									"numoutlets" : 4,
 									"outputmode" : 1,
 									"outlettype" : [ "", "int", "", "" ]
@@ -929,7 +957,7 @@
 									"text" : "This textedit has \"Output as One Symbol\" enabled, so escaping quotes and commas is not neccessary. Multi-line scripts work too.",
 									"linecount" : 3,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 311.0, 102.0, 256.0, 47.0 ],
+									"patching_rect" : [ 326.0, 102.0, 256.0, 47.0 ],
 									"numinlets" : 1,
 									"id" : "obj-23",
 									"fontname" : "Verdana",
@@ -940,13 +968,12 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "prepend eval out0",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 13.0, 316.0, 85.0, 20.0 ],
+									"patching_rect" : [ 12.0, 314.0, 112.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-25",
 									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
 									"numoutlets" : 1,
 									"outlettype" : [ "" ]
 								}
@@ -955,101 +982,20 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "panel",
-									"patching_rect" : [ 285.0, 148.0, 288.0, 137.0 ],
+									"patching_rect" : [ 300.0, 148.0, 288.0, 137.0 ],
 									"mode" : 1,
 									"border" : 2,
 									"angle" : -90.0,
 									"grad1" : [ 0.156863, 0.670588, 0.8, 1.0 ],
 									"numinlets" : 1,
-									"id" : "obj-12",
 									"grad2" : [ 0.043137, 0.223529, 0.196078, 1.0 ],
+									"id" : "obj-12",
 									"numoutlets" : 0
 								}
 
 							}
  ],
 						"lines" : [ 							{
-								"patchline" : 								{
-									"source" : [ "obj-20", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 282.5, 307.0, 22.5, 307.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-5", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 42.5, 177.0, 22.5, 177.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-4", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 176.5, 238.0, 22.5, 238.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-6", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 104.5, 151.0, 22.5, 151.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-7", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 41.5, 151.0, 22.5, 151.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-11", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 35.5, 307.0, 22.5, 307.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-9", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 33.5, 238.0, 22.5, 238.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-8", 0 ],
-									"destination" : [ "obj-25", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 44.5, 119.0, 22.5, 119.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-25", 0 ],
-									"destination" : [ "obj-14", 1 ],
-									"hidden" : 0,
-									"midpoints" : [ 22.5, 341.5, 202.5, 341.5 ]
-								}
-
-							}
-, 							{
 								"patchline" : 								{
 									"source" : [ "obj-15", 0 ],
 									"destination" : [ "obj-14", 0 ],
@@ -1063,7 +1009,7 @@
 									"source" : [ "obj-1", 0 ],
 									"destination" : [ "obj-18", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 393.5, 290.0, 578.0, 290.0, 578.0, 95.0, 282.5, 95.0 ]
+									"midpoints" : [ 408.5, 290.0, 593.0, 290.0, 593.0, 95.0, 297.5, 95.0 ]
 								}
 
 							}
@@ -1103,6 +1049,96 @@
 								}
 
 							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-21", 0 ],
+									"destination" : [ "obj-14", 1 ],
+									"hidden" : 0,
+									"midpoints" : [ 21.5, 370.5, 201.5, 370.5 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-20", 0 ],
+									"destination" : [ "obj-21", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 297.5, 340.0, 21.5, 340.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-5", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 42.5, 177.0, 21.5, 177.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-6", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 104.5, 151.0, 21.5, 151.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-7", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 41.5, 151.0, 21.5, 151.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-11", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 35.5, 307.0, 21.5, 307.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-8", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 44.5, 119.0, 21.5, 119.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-25", 0 ],
+									"destination" : [ "obj-21", 0 ],
+									"hidden" : 0,
+									"midpoints" : [  ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-9", 0 ],
+									"destination" : [ "obj-21", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 33.5, 229.0, 6.0, 248.0, 6.0, 333.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-4", 0 ],
+									"destination" : [ "obj-25", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 204.5, 243.0, 21.5, 243.0 ]
+								}
+
+							}
  ]
 					}
 ,
@@ -1124,7 +1160,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"Ruby 1.9\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 266.0, 168.149414, 81.0, 20.0 ],
+					"patching_rect" : [ 310.0, 168.149414, 81.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-3",
 					"fontname" : "Verdana",
@@ -1183,7 +1219,7 @@
 									"text" : "String indexing makes more sense in Ruby 1.9",
 									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 95.0, 56.0, 143.0, 33.0 ],
+									"patching_rect" : [ 77.0, 68.0, 143.0, 33.0 ],
 									"numinlets" : 1,
 									"id" : "obj-8",
 									"fontname" : "Verdana",
@@ -1278,6 +1314,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
+									"text" : "42",
 									"fontsize" : 11.595187,
 									"patching_rect" : [ 238.0, 273.0, 50.0, 18.0 ],
 									"numinlets" : 2,
@@ -1291,6 +1328,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
+									"text" : "42",
 									"fontsize" : 11.595187,
 									"patching_rect" : [ 53.0, 268.0, 70.0, 18.0 ],
 									"numinlets" : 2,
@@ -1321,7 +1359,7 @@
 									"text" : "$str = 'STRING', out0 $str[-1]",
 									"linecount" : 2,
 									"fontsize" : 11.595187,
-									"patching_rect" : [ 101.0, 95.0, 96.0, 31.0 ],
+									"patching_rect" : [ 83.0, 107.0, 96.0, 31.0 ],
 									"numinlets" : 2,
 									"id" : "obj-14",
 									"fontname" : "Arial",
@@ -1530,7 +1568,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"inlet & outlet assist\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 266.0, 137.574722, 138.0, 20.0 ],
+					"patching_rect" : [ 310.0, 137.574722, 138.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-4",
 					"fontname" : "Verdana",
@@ -1538,9 +1576,9 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
-						"rect" : [ 615.0, 46.0, 359.0, 253.0 ],
+						"rect" : [ 615.0, 46.0, 301.0, 259.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 615.0, 46.0, 359.0, 253.0 ],
+						"defrect" : [ 615.0, 46.0, 301.0, 259.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
@@ -1558,10 +1596,24 @@
 						"boxes" : [ 							{
 								"box" : 								{
 									"maxclass" : "comment",
-									"text" : "The inlet and outlet hints can be set with inlet_assist and outlet_assist methods. Try sending these messages and then moving your mouse over the inlets/outlets while editing this patch. Typically these assist messages would be set when using a script file.",
-									"linecount" : 7,
+									"text" : "Typically these assist messages would be set when using a @file.",
+									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 34.0, 22.0, 241.0, 100.0 ],
+									"patching_rect" : [ 41.0, 216.0, 206.0, 33.0 ],
+									"numinlets" : 1,
+									"id" : "obj-2",
+									"fontname" : "Verdana",
+									"numoutlets" : 0
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"maxclass" : "comment",
+									"text" : "The inlet and outlet hints can be set with inlet_assist and outlet_assist methods.\n\nTry sending these messages and then moving your mouse over the inlets/outlets while editing this patch.",
+									"linecount" : 6,
+									"fontsize" : 11.0,
+									"patching_rect" : [ 34.0, 22.0, 241.0, 87.0 ],
 									"numinlets" : 1,
 									"id" : "obj-29",
 									"fontname" : "Verdana",
@@ -1572,9 +1624,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "eval outlet_assist 'outlet 1'\\, 'outlet 2'",
+									"text" : "eval outlet_assist('outlet 1'\\, 'outlet 2')",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 45.0, 153.0, 222.0, 18.0 ],
+									"patching_rect" : [ 49.0, 148.0, 227.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-26",
 									"fontname" : "Verdana",
@@ -1586,9 +1638,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "eval inlet_assist 'description of the inlet'",
+									"text" : "eval inlet_assist('description of the inlet')",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 129.0, 233.0, 18.0 ],
+									"patching_rect" : [ 27.0, 124.0, 239.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-25",
 									"fontname" : "Verdana",
@@ -1602,7 +1654,7 @@
 									"maxclass" : "newobj",
 									"text" : "mxj ajm.ruby 2 3",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 194.0, 107.0, 20.0 ],
+									"patching_rect" : [ 27.0, 183.0, 107.0, 20.0 ],
 									"numinlets" : 2,
 									"id" : "obj-6",
 									"fontname" : "Verdana",
@@ -1627,7 +1679,7 @@
 									"source" : [ "obj-26", 0 ],
 									"destination" : [ "obj-6", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 54.5, 182.0, 32.5, 182.0 ]
+									"midpoints" : [ 58.5, 177.0, 36.5, 177.0 ]
 								}
 
 							}
@@ -1652,7 +1704,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"using libraries\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 266.0, 108.0, 110.0, 20.0 ],
+					"patching_rect" : [ 310.0, 108.0, 110.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-24",
 					"fontname" : "Verdana",
@@ -1763,7 +1815,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "eval out0 $r.nextFloat if $r",
+									"text" : "eval out0 $r.nextFloat",
 									"fontsize" : 11.0,
 									"patching_rect" : [ 30.0, 234.0, 157.0, 18.0 ],
 									"numinlets" : 2,
@@ -1778,15 +1830,15 @@
 								"box" : 								{
 									"maxclass" : "flonum",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 13.0, 283.0, 73.0, 20.0 ],
 									"triscale" : 0.9,
+									"patching_rect" : [ 13.0, 283.0, 73.0, 20.0 ],
+									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ],
 									"numinlets" : 1,
 									"id" : "obj-6",
 									"fontname" : "Verdana",
 									"numoutlets" : 2,
 									"bgcolor" : [ 0.866667, 0.866667, 0.866667, 1.0 ],
-									"outlettype" : [ "float", "bang" ],
-									"htextcolor" : [ 0.870588, 0.870588, 0.870588, 1.0 ]
+									"outlettype" : [ "float", "bang" ]
 								}
 
 							}
@@ -1895,7 +1947,7 @@
 					"maxclass" : "newobj",
 					"text" : "p \"type conversions\"",
 					"fontsize" : 11.0,
-					"patching_rect" : [ 266.0, 47.0, 127.0, 20.0 ],
+					"patching_rect" : [ 310.0, 47.0, 127.0, 20.0 ],
 					"numinlets" : 0,
 					"id" : "obj-16",
 					"fontname" : "Verdana",
@@ -1903,9 +1955,9 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
-						"rect" : [ 596.0, 45.0, 432.0, 600.0 ],
+						"rect" : [ 596.0, 45.0, 481.0, 521.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 596.0, 45.0, 432.0, 600.0 ],
+						"defrect" : [ 596.0, 45.0, 481.0, 521.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
@@ -1922,16 +1974,29 @@
 						"devicewidth" : 0.0,
 						"boxes" : [ 							{
 								"box" : 								{
-									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @verbose true",
+									"maxclass" : "comment",
+									"text" : "Converts an array to a Max message",
+									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 5.0, 319.0, 170.0, 20.0 ],
+									"patching_rect" : [ 165.0, 369.0, 114.0, 33.0 ],
 									"numinlets" : 1,
-									"id" : "obj-32",
+									"id" : "obj-8",
 									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
+									"numoutlets" : 0
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"maxclass" : "comment",
+									"text" : "outputs each entry of the Hash as a Max list",
+									"linecount" : 2,
+									"fontsize" : 11.0,
+									"patching_rect" : [ 340.0, 331.0, 137.0, 33.0 ],
+									"numinlets" : 1,
+									"id" : "obj-7",
+									"fontname" : "Verdana",
+									"numoutlets" : 0
 								}
 
 							}
@@ -1940,7 +2005,7 @@
 									"maxclass" : "newobj",
 									"text" : "mxj ajm.ruby @verbose true",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 10.0, 500.0, 170.0, 20.0 ],
+									"patching_rect" : [ 12.0, 435.0, 170.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-31",
 									"fontname" : "Verdana",
@@ -1955,7 +2020,7 @@
 									"maxclass" : "newobj",
 									"text" : "print message",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 240.0, 561.0, 87.0, 20.0 ],
+									"patching_rect" : [ 240.0, 490.0, 87.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-1",
 									"fontname" : "Verdana",
@@ -1968,7 +2033,7 @@
 									"maxclass" : "newobj",
 									"text" : "print list",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 164.0, 559.0, 59.0, 20.0 ],
+									"patching_rect" : [ 164.0, 490.0, 59.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-2",
 									"fontname" : "Verdana",
@@ -1981,7 +2046,7 @@
 									"maxclass" : "newobj",
 									"text" : "print float",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 88.0, 559.0, 67.0, 20.0 ],
+									"patching_rect" : [ 88.0, 490.0, 67.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-3",
 									"fontname" : "Verdana",
@@ -1994,7 +2059,7 @@
 									"maxclass" : "newobj",
 									"text" : "print int",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 559.0, 56.0, 20.0 ],
+									"patching_rect" : [ 12.0, 490.0, 56.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-4",
 									"fontname" : "Verdana",
@@ -2007,7 +2072,7 @@
 									"maxclass" : "newobj",
 									"text" : "route int float list",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 536.0, 247.0, 20.0 ],
+									"patching_rect" : [ 12.0, 465.0, 247.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-5",
 									"fontname" : "Verdana",
@@ -2021,7 +2086,7 @@
 									"maxclass" : "message",
 									"text" : "out0 [1\\,2\\,3].inspect",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 27.0, 443.0, 138.0, 18.0 ],
+									"patching_rect" : [ 27.0, 373.0, 138.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-11",
 									"fontname" : "Verdana",
@@ -2033,9 +2098,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "hash={1=>2\\,3=>4}\\; hash.to_a.each{|pair| out0 pair}\\; 1",
+									"text" : "hash={1=>2\\,3=>4}\\; hash.to_a.each{|pair| out0 pair}",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 419.0, 351.0, 18.0 ],
+									"patching_rect" : [ 12.0, 334.0, 330.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-12",
 									"fontname" : "Verdana",
@@ -2078,7 +2143,7 @@
 									"text" : "verbose mode indicates when a non-string type is converted to a string.",
 									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 178.0, 316.0, 232.0, 33.0 ],
+									"patching_rect" : [ 187.0, 430.0, 232.0, 33.0 ],
 									"numinlets" : 1,
 									"id" : "obj-15",
 									"fontname" : "Verdana",
@@ -2133,7 +2198,7 @@
 									"maxclass" : "comment",
 									"text" : "Your script can force the output to be the type you want:",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 11.0, 398.0, 347.0, 20.0 ],
+									"patching_rect" : [ 11.0, 313.0, 347.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-19",
 									"fontname" : "Verdana",
@@ -2269,7 +2334,7 @@
 									"maxclass" : "newobj",
 									"text" : "prepend eval out0",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 6.0, 293.0, 111.0, 20.0 ],
+									"patching_rect" : [ 6.0, 276.0, 111.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-29",
 									"fontname" : "Verdana",
@@ -2283,7 +2348,7 @@
 									"maxclass" : "newobj",
 									"text" : "prepend eval",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 475.0, 82.0, 20.0 ],
+									"patching_rect" : [ 12.0, 404.0, 82.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-30",
 									"fontname" : "Verdana",
@@ -2370,7 +2435,7 @@
 									"source" : [ "obj-11", 0 ],
 									"destination" : [ "obj-30", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 36.5, 465.0, 21.5, 465.0 ]
+									"midpoints" : [ 36.5, 395.0, 21.5, 395.0 ]
 								}
 
 							}
@@ -2439,19 +2504,10 @@
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-32", 0 ],
-									"destination" : [ "obj-5", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 14.5, 345.0, 8.0, 345.0, 8.0, 522.0, 21.5, 522.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
 									"source" : [ "obj-29", 0 ],
-									"destination" : [ "obj-32", 0 ],
+									"destination" : [ "obj-31", 0 ],
 									"hidden" : 0,
-									"midpoints" : [  ]
+									"midpoints" : [ 15.5, 303.0, 6.0, 303.0, 6.0, 430.0, 21.5, 430.0 ]
 								}
 
 							}
@@ -3240,7 +3296,7 @@
 									"maxclass" : "message",
 									"text" : "@var",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 182.0, 122.0, 39.0, 18.0 ],
+									"patching_rect" : [ 182.0, 123.0, 39.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-14",
 									"fontname" : "Verdana",
@@ -3254,7 +3310,7 @@
 									"maxclass" : "comment",
 									"text" : "method call",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 320.0, 100.0, 83.0, 20.0 ],
+									"patching_rect" : [ 320.0, 102.0, 83.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-13",
 									"fontname" : "Verdana",
@@ -3267,7 +3323,7 @@
 									"maxclass" : "comment",
 									"text" : "attribute",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 184.0, 101.0, 60.0, 20.0 ],
+									"patching_rect" : [ 184.0, 102.0, 60.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-12",
 									"fontname" : "Verdana",
@@ -3280,7 +3336,7 @@
 									"maxclass" : "comment",
 									"text" : "local",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 256.0, 99.0, 38.0, 20.0 ],
+									"patching_rect" : [ 256.0, 102.0, 38.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-11",
 									"fontname" : "Verdana",
@@ -3308,7 +3364,7 @@
 									"maxclass" : "comment",
 									"text" : "global",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 116.0, 106.0, 48.0, 20.0 ],
+									"patching_rect" : [ 116.0, 102.0, 48.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-8",
 									"fontname" : "Verdana",
@@ -3321,7 +3377,7 @@
 									"maxclass" : "comment",
 									"text" : "constant",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 39.0, 100.0, 62.0, 20.0 ],
+									"patching_rect" : [ 39.0, 102.0, 62.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-5",
 									"fontname" : "Verdana",
@@ -3403,7 +3459,7 @@
 									"maxclass" : "message",
 									"text" : "some_method",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 315.0, 121.0, 89.0, 18.0 ],
+									"patching_rect" : [ 315.0, 123.0, 89.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-19",
 									"fontname" : "Verdana",
@@ -3417,7 +3473,7 @@
 									"maxclass" : "message",
 									"text" : "$var",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 118.0, 124.0, 37.0, 18.0 ],
+									"patching_rect" : [ 118.0, 123.0, 37.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-21",
 									"fontname" : "Verdana",
@@ -3445,7 +3501,7 @@
 									"maxclass" : "message",
 									"text" : "var",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 255.0, 120.0, 32.5, 18.0 ],
+									"patching_rect" : [ 255.0, 123.0, 32.5, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-23",
 									"fontname" : "Verdana",
@@ -3777,10 +3833,55 @@
 						"devicewidth" : 0.0,
 						"boxes" : [ 							{
 								"box" : 								{
+									"maxclass" : "newobj",
+									"text" : "mxj ajm.ruby @context ajmHelpContext2",
+									"fontsize" : 11.0,
+									"patching_rect" : [ 291.0, 545.0, 241.0, 20.0 ],
+									"numinlets" : 1,
+									"id" : "obj-46",
+									"fontname" : "Verdana",
+									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
+									"numoutlets" : 1,
+									"outlettype" : [ "" ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"maxclass" : "newobj",
+									"text" : "mxj ajm.ruby @context ajmHelpContext_2",
+									"fontsize" : 11.0,
+									"patching_rect" : [ 14.0, 250.0, 248.0, 20.0 ],
+									"numinlets" : 1,
+									"id" : "obj-45",
+									"fontname" : "Verdana",
+									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
+									"numoutlets" : 1,
+									"outlettype" : [ "" ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"maxclass" : "newobj",
+									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"fontsize" : 11.0,
+									"patching_rect" : [ 13.0, 123.0, 234.0, 20.0 ],
+									"numinlets" : 1,
+									"id" : "obj-43",
+									"fontname" : "Verdana",
+									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
+									"numoutlets" : 1,
+									"outlettype" : [ "" ]
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"maxclass" : "message",
 									"text" : "delete_global :x",
 									"fontsize" : 11.1,
-									"patching_rect" : [ 394.0, 496.0, 101.0, 18.0 ],
+									"patching_rect" : [ 394.0, 492.0, 101.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-30",
 									"fontname" : "Verdana",
@@ -3794,7 +3895,7 @@
 									"maxclass" : "message",
 									"text" : "has_global? :x",
 									"fontsize" : 11.1,
-									"patching_rect" : [ 512.0, 496.0, 92.0, 18.0 ],
+									"patching_rect" : [ 512.0, 492.0, 92.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-42",
 									"fontname" : "Verdana",
@@ -3808,7 +3909,7 @@
 									"maxclass" : "message",
 									"text" : "get_global :x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 291.0, 496.0, 84.0, 18.0 ],
+									"patching_rect" : [ 291.0, 492.0, 84.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-24",
 									"fontname" : "Verdana",
@@ -3820,9 +3921,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "get_global :x",
+									"text" : "eval out0 get_global(:x)",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 51.0, 514.0, 84.0, 18.0 ],
+									"patching_rect" : [ 51.0, 514.0, 145.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-33",
 									"fontname" : "Verdana",
@@ -3834,9 +3935,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "set_global :x\\, 'global object'",
+									"text" : "eval set_global(:x\\, 'global object')",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 32.0, 492.0, 172.0, 18.0 ],
+									"patching_rect" : [ 32.0, 492.0, 208.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-34",
 									"fontname" : "Verdana",
@@ -3850,7 +3951,7 @@
 									"maxclass" : "newobj",
 									"text" : "print",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 291.0, 561.0, 37.0, 20.0 ],
+									"patching_rect" : [ 291.0, 572.0, 37.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-35",
 									"fontname" : "Verdana",
@@ -3861,13 +3962,12 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext2",
+									"text" : "prepend eval out0",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 291.0, 538.0, 241.0, 20.0 ],
+									"patching_rect" : [ 291.0, 521.0, 117.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-36",
 									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
 									"numoutlets" : 1,
 									"outlettype" : [ "" ]
 								}
@@ -3904,7 +4004,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "comment",
-									"text" : "Conversely, the set_global() and get_global() methods define variables visible to all ajm.ruby instances.",
+									"text" : "And the set_global() and get_global() methods define variables visible to all ajm.ruby instances.",
 									"fontsize" : 11.0,
 									"patching_rect" : [ 32.0, 467.0, 611.0, 20.0 ],
 									"numinlets" : 1,
@@ -3934,7 +4034,7 @@
 									"text" : "you can change contexts at any time",
 									"linecount" : 2,
 									"fontsize" : 11.0,
-									"patching_rect" : [ 520.0, 168.0, 128.0, 33.0 ],
+									"patching_rect" : [ 526.0, 203.0, 128.0, 33.0 ],
 									"numinlets" : 1,
 									"id" : "obj-37",
 									"fontname" : "Verdana",
@@ -3947,7 +4047,7 @@
 									"maxclass" : "message",
 									"text" : "context ajmHelpContext_2",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 363.0, 185.0, 158.0, 18.0 ],
+									"patching_rect" : [ 394.0, 184.0, 158.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-32",
 									"fontname" : "Verdana",
@@ -3961,7 +4061,7 @@
 									"maxclass" : "message",
 									"text" : "context ajmHelpContext",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 341.0, 163.0, 144.0, 18.0 ],
+									"patching_rect" : [ 372.0, 162.0, 144.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-31",
 									"fontname" : "Verdana",
@@ -3973,9 +4073,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "$x",
+									"text" : "eval out0 $x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 291.0, 183.0, 32.5, 18.0 ],
+									"patching_rect" : [ 291.0, 183.0, 79.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-23",
 									"fontname" : "Verdana",
@@ -4015,9 +4115,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "$x",
+									"text" : "out0 $x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 87.0, 182.0, 32.5, 18.0 ],
+									"patching_rect" : [ 78.0, 194.0, 53.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-12",
 									"fontname" : "Verdana",
@@ -4031,7 +4131,7 @@
 									"maxclass" : "message",
 									"text" : "$x = 66",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 182.0, 55.0, 18.0 ],
+									"patching_rect" : [ 14.0, 194.0, 55.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-13",
 									"fontname" : "Verdana",
@@ -4045,7 +4145,7 @@
 									"maxclass" : "newobj",
 									"text" : "print",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 234.0, 37.0, 20.0 ],
+									"patching_rect" : [ 14.0, 276.0, 37.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-14",
 									"fontname" : "Verdana",
@@ -4056,13 +4156,12 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext_2",
+									"text" : "prepend eval",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 211.0, 248.0, 20.0 ],
+									"patching_rect" : [ 14.0, 223.0, 82.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-15",
 									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
 									"numoutlets" : 1,
 									"outlettype" : [ "" ]
 								}
@@ -4085,9 +4184,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "get_local :x",
+									"text" : "eval out0 get_local(:x)",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 290.0, 372.0, 76.0, 18.0 ],
+									"patching_rect" : [ 290.0, 372.0, 137.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-1",
 									"fontname" : "Verdana",
@@ -4099,9 +4198,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "set_local :x\\, 'second object'",
+									"text" : "eval set_local(:x\\, 'second object')",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 273.0, 350.0, 170.0, 18.0 ],
+									"patching_rect" : [ 273.0, 350.0, 202.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-2",
 									"fontname" : "Verdana",
@@ -4113,9 +4212,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "get_local :x",
+									"text" : "eval out0 get_local(:x)",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 33.0, 373.0, 76.0, 18.0 ],
+									"patching_rect" : [ 33.0, 373.0, 137.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-3",
 									"fontname" : "Verdana",
@@ -4127,9 +4226,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "set_local :x\\, 'first object'",
+									"text" : "eval set_local(:x\\, 'first object')",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 14.0, 351.0, 153.0, 18.0 ],
+									"patching_rect" : [ 14.0, 351.0, 185.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-4",
 									"fontname" : "Verdana",
@@ -4197,9 +4296,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "$x",
+									"text" : "eval out0 $x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 514.0, 71.0, 32.5, 18.0 ],
+									"patching_rect" : [ 514.0, 71.0, 80.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-9",
 									"fontname" : "Verdana",
@@ -4239,9 +4338,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "$x",
+									"text" : "eval out0 $x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 262.0, 72.0, 32.5, 18.0 ],
+									"patching_rect" : [ 262.0, 72.0, 79.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-16",
 									"fontname" : "Verdana",
@@ -4281,9 +4380,9 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "message",
-									"text" : "$x",
+									"text" : "out0 $x",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 76.0, 67.0, 32.5, 18.0 ],
+									"patching_rect" : [ 76.0, 67.0, 53.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-19",
 									"fontname" : "Verdana",
@@ -4297,7 +4396,7 @@
 									"maxclass" : "message",
 									"text" : "$x = 99",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 67.0, 55.0, 18.0 ],
+									"patching_rect" : [ 13.0, 67.0, 55.0, 18.0 ],
 									"numinlets" : 2,
 									"id" : "obj-20",
 									"fontname" : "Verdana",
@@ -4311,7 +4410,7 @@
 									"maxclass" : "newobj",
 									"text" : "print",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 119.0, 37.0, 20.0 ],
+									"patching_rect" : [ 13.0, 152.0, 37.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-21",
 									"fontname" : "Verdana",
@@ -4322,13 +4421,12 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "prepend eval",
 									"fontsize" : 11.0,
-									"patching_rect" : [ 12.0, 96.0, 234.0, 20.0 ],
+									"patching_rect" : [ 13.0, 98.0, 82.0, 20.0 ],
 									"numinlets" : 1,
 									"id" : "obj-22",
 									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
 									"numoutlets" : 1,
 									"outlettype" : [ "" ]
 								}
@@ -4363,42 +4461,6 @@
 							}
  ],
 						"lines" : [ 							{
-								"patchline" : 								{
-									"source" : [ "obj-42", 0 ],
-									"destination" : [ "obj-36", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 521.5, 527.0, 300.5, 527.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-30", 0 ],
-									"destination" : [ "obj-36", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 403.5, 527.0, 300.5, 527.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-24", 0 ],
-									"destination" : [ "obj-36", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-36", 0 ],
-									"destination" : [ "obj-35", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ]
-								}
-
-							}
-, 							{
 								"patchline" : 								{
 									"source" : [ "obj-34", 0 ],
 									"destination" : [ "obj-39", 0 ],
@@ -4438,33 +4500,6 @@
 								"patchline" : 								{
 									"source" : [ "obj-18", 0 ],
 									"destination" : [ "obj-17", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-19", 0 ],
-									"destination" : [ "obj-22", 0 ],
-									"hidden" : 0,
-									"midpoints" : [ 85.5, 89.0, 21.5, 89.0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-20", 0 ],
-									"destination" : [ "obj-22", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"source" : [ "obj-22", 0 ],
-									"destination" : [ "obj-21", 0 ],
 									"hidden" : 0,
 									"midpoints" : [  ]
 								}
@@ -4565,7 +4600,7 @@
 									"source" : [ "obj-31", 0 ],
 									"destination" : [ "obj-29", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 350.5, 207.0, 300.5, 207.0 ]
+									"midpoints" : [ 381.5, 207.0, 300.5, 207.0 ]
 								}
 
 							}
@@ -4574,16 +4609,52 @@
 									"source" : [ "obj-32", 0 ],
 									"destination" : [ "obj-29", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 372.5, 207.0, 300.5, 207.0 ]
+									"midpoints" : [ 403.5, 207.0, 300.5, 207.0 ]
 								}
 
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-15", 0 ],
-									"destination" : [ "obj-14", 0 ],
+									"source" : [ "obj-20", 0 ],
+									"destination" : [ "obj-22", 0 ],
 									"hidden" : 0,
 									"midpoints" : [  ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-19", 0 ],
+									"destination" : [ "obj-22", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 85.5, 89.0, 22.5, 89.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-22", 0 ],
+									"destination" : [ "obj-43", 0 ],
+									"hidden" : 0,
+									"midpoints" : [  ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-43", 0 ],
+									"destination" : [ "obj-21", 0 ],
+									"hidden" : 0,
+									"midpoints" : [  ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-12", 0 ],
+									"destination" : [ "obj-15", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 87.5, 216.0, 23.5, 216.0 ]
 								}
 
 							}
@@ -4598,254 +4669,16 @@
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-12", 0 ],
-									"destination" : [ "obj-15", 0 ],
+									"source" : [ "obj-15", 0 ],
+									"destination" : [ "obj-45", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 96.5, 204.0, 32.5, 204.0 ]
-								}
-
-							}
- ]
-					}
-,
-					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"default_fontface" : 0,
-						"default_fontname" : "Verdana",
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : ""
-					}
-
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"maxclass" : "newobj",
-					"text" : "p $LOAD_PATH",
-					"fontsize" : 11.0,
-					"patching_rect" : [ 23.0, 47.0, 94.0, 20.0 ],
-					"numinlets" : 0,
-					"id" : "obj-18",
-					"fontname" : "Verdana",
-					"color" : [ 0.156863, 0.8, 0.54902, 1.0 ],
-					"numoutlets" : 0,
-					"patcher" : 					{
-						"fileversion" : 1,
-						"rect" : [ 466.0, 47.0, 553.0, 279.0 ],
-						"bglocked" : 0,
-						"defrect" : [ 466.0, 47.0, 553.0, 279.0 ],
-						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
-						"openinpresentation" : 0,
-						"default_fontsize" : 11.0,
-						"default_fontface" : 0,
-						"default_fontname" : "Verdana",
-						"gridonopen" : 0,
-						"gridsize" : [ 15.0, 15.0 ],
-						"gridsnaponopen" : 0,
-						"toolbarvisible" : 1,
-						"boxanimatetime" : 200,
-						"imprint" : 0,
-						"enablehscroll" : 1,
-						"enablevscroll" : 1,
-						"devicewidth" : 0.0,
-						"boxes" : [ 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "$LOAD_PATH.unshift File.dirname($0)",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 294.0, 217.0, 227.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-27",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
+									"midpoints" : [  ]
 								}
 
 							}
 , 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "To require/load files relative to the current scriptfile, initialize your scriptfile with the following line of code:",
-									"linecount" : 3,
-									"fontsize" : 11.0,
-									"patching_rect" : [ 290.0, 169.0, 230.0, 47.0 ],
-									"numinlets" : 1,
-									"id" : "obj-25",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "Use the Options -> File Preferences menu to change your Max search path.",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 17.0, 33.0, 475.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-2",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "Any ruby scripts in a folder on the $LOAD_PATH variable can be found.",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 136.0, 72.0, 411.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-3",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "message",
-									"text" : "puts $LOAD_PATH",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 21.0, 73.0, 112.0, 18.0 ],
-									"numinlets" : 2,
-									"id" : "obj-4",
-									"fontname" : "Verdana",
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "load() expects the file extension",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 166.0, 128.0, 187.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-5",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "Any scripts on the Max search path can be dynamically loaded.",
-									"fontface" : 1,
-									"fontsize" : 12.0,
-									"patching_rect" : [ 17.0, 7.0, 482.0, 21.0 ],
-									"numinlets" : 1,
-									"id" : "obj-11",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "message",
-									"text" : "load 'ajm_scriptfile.rb'",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 129.0, 134.0, 18.0 ],
-									"numinlets" : 2,
-									"id" : "obj-12",
-									"fontname" : "Verdana",
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "message",
-									"text" : "load '/path/to/my/rubyscripts/name.rb'",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 23.0, 192.0, 241.0, 18.0 ],
-									"numinlets" : 2,
-									"id" : "obj-13",
-									"fontname" : "Verdana",
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "newobj",
-									"text" : "print =>",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 8.0, 247.0, 56.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-14",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "message",
-									"text" : "require 'ajm_scriptfile.rb'",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 22.0, 101.0, 150.0, 18.0 ],
-									"numinlets" : 2,
-									"id" : "obj-15",
-									"fontname" : "Verdana",
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @scriptfile ajm_load_require.rb",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 8.0, 224.0, 264.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-16",
-									"fontname" : "Verdana",
-									"color" : [ 1.0, 0.890196, 0.090196, 1.0 ],
-									"numoutlets" : 1,
-									"outlettype" : [ "" ]
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "require() won't load the file more than once (good for libraries)",
-									"fontsize" : 11.0,
-									"patching_rect" : [ 177.0, 101.0, 360.0, 20.0 ],
-									"numinlets" : 1,
-									"id" : "obj-17",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"maxclass" : "comment",
-									"text" : "Or you can specifiy the full path to the file if it's not on the Max search path:",
-									"linecount" : 2,
-									"fontsize" : 11.0,
-									"patching_rect" : [ 24.0, 160.0, 238.0, 33.0 ],
-									"numinlets" : 1,
-									"id" : "obj-18",
-									"fontname" : "Verdana",
-									"numoutlets" : 0
-								}
-
-							}
- ],
-						"lines" : [ 							{
 								"patchline" : 								{
-									"source" : [ "obj-16", 0 ],
+									"source" : [ "obj-45", 0 ],
 									"destination" : [ "obj-14", 0 ],
 									"hidden" : 0,
 									"midpoints" : [  ]
@@ -4854,37 +4687,46 @@
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-13", 0 ],
-									"destination" : [ "obj-16", 0 ],
+									"source" : [ "obj-46", 0 ],
+									"destination" : [ "obj-35", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 32.5, 215.0, 17.5, 215.0 ]
+									"midpoints" : [  ]
 								}
 
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-12", 0 ],
-									"destination" : [ "obj-16", 0 ],
+									"source" : [ "obj-36", 0 ],
+									"destination" : [ "obj-46", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 32.5, 151.0, 17.5, 151.0 ]
+									"midpoints" : [  ]
 								}
 
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-4", 0 ],
-									"destination" : [ "obj-16", 0 ],
+									"source" : [ "obj-24", 0 ],
+									"destination" : [ "obj-36", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 30.5, 94.0, 17.5, 94.0 ]
+									"midpoints" : [  ]
 								}
 
 							}
 , 							{
 								"patchline" : 								{
-									"source" : [ "obj-15", 0 ],
-									"destination" : [ "obj-16", 0 ],
+									"source" : [ "obj-30", 0 ],
+									"destination" : [ "obj-36", 0 ],
 									"hidden" : 0,
-									"midpoints" : [ 31.5, 122.0, 17.5, 122.0 ]
+									"midpoints" : [ 403.5, 516.0, 300.5, 516.0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"source" : [ "obj-42", 0 ],
+									"destination" : [ "obj-36", 0 ],
+									"hidden" : 0,
+									"midpoints" : [ 521.5, 516.0, 300.5, 516.0 ]
 								}
 
 							}

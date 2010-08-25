@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import org.jruby.*;
@@ -183,10 +184,18 @@ public class MaxRubyAdapter {
 			String script = Utils.getFileAsString(scriptFile);			
 			scriptFileInit.clear();
 			
-			String scriptFileFolder = scriptFile.getParent();
+			File scriptFileFolder = scriptFile.getParentFile();
 			if(scriptFileFolder != null) {
 				// include the folder containing the scriptFile, so scripts can require files relative to themselves
-				scriptFileInit.line("$: << " + quote(scriptFileFolder));
+				String scriptFileFolderPath;
+				try {
+					scriptFileFolderPath = scriptFileFolder.getCanonicalPath();
+				}
+				catch(IOException e) {
+					System.err.println(e);
+					scriptFileFolderPath =  scriptFileFolder.getAbsolutePath();
+				}
+				scriptFileInit.line("$: << " + quote(scriptFileFolderPath));
 			}			
 			
 			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned			

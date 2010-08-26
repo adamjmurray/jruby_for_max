@@ -22,39 +22,6 @@ Sequencing with good timing
 
 ------------------------------------------------------------------------------
 
-ADVANCED RUBY USAGE
-
-Enabling Ruby 1.9 Support (Experimental)
-  (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties
-  (2) Change the ruby.version option from RUBY1_8 to RUBY1_9
-  (3) Save the file and restart Max
-  (4) The ajm.ruby help file should indicate it's running in Ruby 1.9 mode
-
-Adding additional Ruby projects to the LOAD_PATH for ajm.ruby 
-  (1) Edit {Max installation}/Cycling '74/java/lib/ajm.ruby.properties
-  (2) Set the ruby.loadpaths option to a semicolon separated list of absolute
-      paths, for example:
-        ruby.loadpaths = /Users/username/projects/ruby/myproject
-  (3) Save the file and restart Max
-  (4) You should now be able to require your project in any script
-
-Installing Ruby Gems for ajm.ruby
-  (1) Download JRuby 1.3.1 from http://jruby.codehaus.org
-  (2) Add jruby/bin to your path. 
-       From the OS X terminal or the Cygwin shell on Windows, run:
-        $ export PATH=/path/to/jruby-1.3.1 /bin:$PATH
-        $ which jgem
-        /path/to/jruby-1.3.1/bin/jgem   
-  (3) Install gems as usual (see Ruby Gems documentation for details),
-      but use the 'jgem' command instead of 'gem':
-        $ jgem install midilib
-			NOTE: you must install the midilib gem for ajm.midi2coll to function!
-  (4) Replace the {Max installation}/Cycling '74/java/lib/ruby folder with
-      /path/to/jruby-1.3.1/lib/ruby
-  (5) Restart Max/MSP
-
-------------------------------------------------------------------------------
-
 SOURCE CODE
 
 ajm objects is an open source project. The source code is located at:
@@ -81,7 +48,7 @@ midilib (http://midilib.rubyforge.org/)
     
 ------------------------------------------------------------------------------    
 
-Copyright (c) 2008-2009, Adam Murray (adam@compusition.com). 
+Copyright (c) 2008-2010, Adam Murray (adam@compusition.com). 
  
 All rights reserved.
 

@@ -3,7 +3,8 @@ def custom_method
 end
 
 def bang
-  out0 'Hello from a custom handler for bang'
+  # out0 is a shortcut for:
+  outlet(0, 'Hello from a custom handler for bang')
 end
 
 def inlet(inlet_index, *args)

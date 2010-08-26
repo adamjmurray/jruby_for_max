@@ -17,6 +17,5 @@ Version 0.8.8 is the latest stable version, released on July 13, 2009.
 
 ## Future ##
 
-* ajm.cosy - an object for using Cosy (<http://github.com/adamjmurray/cosy>) in Max/MSP.
-  This object has been started and is in the repository but doesn't work yet
-  and was not included in the 0.8.6 release.
+* ajm.ruby will be split off into a separate project soon, because most people only use ajm objects
+  for this one object. It will be easier for me to maintain and support one object.

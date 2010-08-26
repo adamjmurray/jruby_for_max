@@ -39,6 +39,7 @@ import ajm.util.Utils;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
+import com.cycling74.max.MaxPatcher;
 import com.cycling74.max.MaxSystem;
 
 /**
@@ -48,6 +49,7 @@ import com.cycling74.max.MaxSystem;
  */
 public class ruby extends AbstractMaxRubyObject {
 
+	private String scriptFilePath;
   private File scriptFile;
   private Atom[] scriptFileArgs;
   
@@ -135,15 +137,27 @@ public class ruby extends AbstractMaxRubyObject {
   }
 
   public void file(Atom[] args) {
-    if (args != null && args.length > 0) {
-      scriptFile = Utils.getFile(args[0].toString(), this.getParentPatcher());
-      scriptFileArgs = Atom.removeFirst(args);
+  	if (args != null && args.length > 0) {
+  		scriptFilePath = args[0].toString();
+  		scriptFile = Utils.getFile(scriptFilePath, getParentPatcher(), true);
+  		scriptFileArgs = Atom.removeFirst(args);
+  		if(scriptFile == null) {
+  			err("File not found: " + scriptFilePath);
+  			if(Utils.isPatcherSaved(getParentPatcher())) {
+  				info("Send the \"createfile\" message to create the file \"" + getFileToBeCreated() + "\"");
+  			}
+  			else {
+  				info("Save the patcher and send the \"createfile\" message");
+  				info("...to create the file \"" +scriptFilePath + "\" in the patcher's folder.");
+  			}
+  		}
     }
     else {
+    	scriptFilePath = null;
       scriptFile = Utils.getFile(null);
       scriptFileArgs = Atom.emptyArray;
     }
-
+   
     if (scriptFile != null && initialized) {
       initFile();
     } // if not initialized initFile() will be called by the Initializer
@@ -429,5 +443,39 @@ public class ruby extends AbstractMaxRubyObject {
 		} catch(IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public void createfile() {
+		MaxPatcher patcher = getParentPatcher(); 
+		if(!Utils.isPatcherSaved(patcher)) {
+			err("patcher must be saved before creating a file");
+			return;
+		}
+		if(scriptFilePath == null) {
+			err("@file attribute must be a filename (or relative path)");
+			return;
+		}
+		File file = getFileToBeCreated();
+		if(file.exists()) {
+			err("File exists \"" + file + "\"");
+			return;
+		}
+		info("creating file: " + file, true);
+		try {
+			if(file.createNewFile()) {
+				scriptFile = file;
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}		
+	}
+	
+	private File getFileToBeCreated() {
+		MaxPatcher patcher = getParentPatcher(); 
+		if(patcher != null) {
+			File folder = new File(patcher.getPath());
+			return new File(folder, scriptFilePath);
+		}
+		return null;
 	}
 }

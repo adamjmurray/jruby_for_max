@@ -116,7 +116,10 @@ public abstract class AbstractMaxObject extends MaxObject implements Logger {
 	 *            the error message
 	 */
 	public void info(String message) {
-		if (verbose) {
+		info(message, false);
+	}
+	public void info(String message, boolean force) {
+		if (verbose || force) {
 			post(this.getClass().getName() + ": " + message);
 		}
 	}

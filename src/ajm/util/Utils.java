@@ -139,6 +139,10 @@ public class Utils {
 	 * @return a File object referencing an existing file, otherwise null
 	 */	
 	public static File getFile(String path, MaxPatcher patcher) {
+		return getFile(path, patcher, false);
+	}
+	
+	public static File getFile(String path, MaxPatcher patcher, boolean suppressError) {
 		if (path == null || path.length() == 0) {
 			path = MaxSystem.openDialog();
 			if(path == null) {
@@ -174,7 +178,9 @@ public class Utils {
 			}
 		}				
 			
-		System.err.println("File not found: " + path);
+		if(!suppressError) {
+			System.err.println("File not found: " + path);
+		}
 		return null;
 	}
 
@@ -227,9 +233,31 @@ public class Utils {
 		}
 	}
 	
+	/**
+	 * @return a String representation of the provided Throwable
+	 */
 	public static String getStackTrace(Throwable t) {
 		Writer stw = new StringWriter();
 		t.printStackTrace(new PrintWriter(stw));
 		return stw.toString();
+	}
+	
+	/**
+	 * @return true if the patcher has been saved to a file, false otherwise
+	 */
+	public static boolean isPatcherSaved(MaxPatcher patcher) {
+		if(patcher != null) {
+			String filePath = patcher.getFilePath();
+			if(filePath != null) {
+				filePath = filePath.toLowerCase();
+				if(filePath.endsWith(".maxpat") || filePath.endsWith(".maxhelp") || filePath.endsWith(".json")) {
+					return true;
+				}
+				// Otherwise this is probably something like "/" because the patcher is not saved.
+				// I'm afraid to blacklist against "/" instead of the above check, because of potential cross platform issues.
+				// Things would be so much easier if the filePath was null in this case...
+			}
+		}
+		return false;
 	}
 }

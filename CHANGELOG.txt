@@ -74,7 +74,7 @@ DOUBLE STAR (**) ITEMS AFFECT BACKWARD COMPATIBILITY
 
 * Ruby symbols now have the ':' prefix when output to Max
 
-* JRuby upgraded to version 1.5.1
+* JRuby upgraded to version 1.5.2
 
 
 ******************************************************************************

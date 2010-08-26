@@ -13,17 +13,17 @@ REQUIREMENTS
 
  * Max/MSP 5
 
- * Java 5 or higher
+ * Java 5 or higher (most computers today have this)
 
 -----------------------------------------------------------------------------
 
 FIRST TIME INSTALLATION
 
- (1) Copy everything that's inside the lib folder to:
-       {Max installation}/Cycling '74/java/lib
+ (1) Put lib/ajm.jar and lib/jruby.jar in:
+     Max5/Cycling '74/java/lib
     
- (2) Put the ajm folder somewhere on your Max search path.
-     See Options -> File Preferences under Max's Options menu.
+ (2) Put the ajm folder somewhere on your Max file search path.
+     See "Options -> File Preferences" under Max's Options menu.
        
  (3) Restart Max/MSP and open ajm/ajm.overview.pat
 
@@ -31,21 +31,17 @@ FIRST TIME INSTALLATION
 
 UPGRADING FROM A PREVIOUS VERSION
 
- (1) Delete the entire ruby directory structure
-     {Max installation}/Cycling '74/java/lib/ruby
+ (1) Delete the entire ruby directory structure:
+     Max5/Cycling '74/java/lib/ruby
 
  (2) Delete the old ajm folder (the old patches & help files) 
-     
- (3) Proceed with the first time installation instructions. 
-     The following files will be replaced: ajm.jar, ajm.ruby.properties, jruby.jar
  
------------------------------------------------------------------------------
+ (3) Delete the file:
+     Max5/Cycling '74/java/lib/ajm.ruby.properties
 
-USING WITH MAX 4
-
-I don't have the time or motivation to port all my Max 5 patches back to
-Max 4. So abstractions, bpatchers, etc, won't work. However, if you want to
-use any of the mxj objects like ajm.ruby or ajm.seq you should be able to
-install the lib files under Cycling '74/java/lib as usual. Then you won't
-have help patches, but you could use the somewhat out of date help files
-from the 0.8.1 version of ajm objects.
+ (4) Delete the file:
+     Max5/Cycling '74/java/lib/bsf.jar
+ 
+ (5) Proceed with the first time installation instructions. 
+     The following files will be replaced: ajm.jar, jruby.jar
+ 

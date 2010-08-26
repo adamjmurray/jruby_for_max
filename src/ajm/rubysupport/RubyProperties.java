@@ -93,22 +93,24 @@ public class RubyProperties {
 		try {
 			String propsPath = MaxSystem.locateFile("ajm.ruby.properties");
 			if (propsPath == null) {
-				MaxSystem.error("ajm.ruby.properties not found! Maybe ajm objects was not installed correctly?");
+				//MaxSystem.error("ajm.ruby.properties not found! Maybe ajm objects was not installed correctly?");
+				properties = new Properties();				
 			}
-			File propFile = new File(propsPath);
-			properties = new Properties();
-			try {
-				properties.load(new FileInputStream(propFile));
+			else {
+				File propFile = new File(propsPath);
+				properties = new Properties();
+				try {
+					properties.load(new FileInputStream(propFile));
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+				String jrubyHome = properties.getProperty("jruby.home");
+				if(jrubyHome != null) {
+					System.setProperty("jruby.home", jrubyHome);
+				}
 			}
-			catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			
-			String jrubyHome = properties.getProperty("jruby.home");
-			if(jrubyHome != null) {
-				System.setProperty("jruby.home", jrubyHome);
-			}
-				
 		}
 		catch (UnsatisfiedLinkError e) {
 			// we're running outside of Max, probably for unit testing

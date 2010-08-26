@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.9b4"/>
+	<property name="VERSION" value="0.9b5"/>
 	
 	<property environment="env"/>
 
@@ -97,9 +97,8 @@
 	<target name="dist" description="package up ajm objects for distribution" depends="clean, jar">
 		<mkdir dir="${dist}"/>
 		<copy todir="${dist}">
-		  	<fileset dir="${basedir}" includes="*.txt"/>
-	  	</copy>
-		<copy todir="${dist}">
+			<fileset dir="${basedir}" includes="*.txt"/>
+			<fileset dir="${basedir}" includes="*.example"/>
 			<fileset dir="${basedir}" includes="ajm/**">
 				<exclude name="**/*cosy*"/> <!-- not ready yet -->
 			</fileset>
@@ -112,23 +111,13 @@
 		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" /> <!-- So things display properly on Notepad in Windows -->
 		<zip destfile="${dist}/${dist_name}.zip">
 			<zipfileset dir="${dist}" includes="*.txt" prefix="${dist_name}"/>      		
+			<zipfileset dir="${dist}" includes="*.example" prefix="${dist_name}"/>      					
 			<zipfileset dir="${dist}" includes="ajm/**" prefix="${dist_name}"/> <!-- the Max patches -->
 			<zipfileset dir="${basedir}" includes="lib/**" prefix="${dist_name}">
 				<exclude name="**/max.jar"/>
 				<exclude name="**/*junit*.jar"/>						
 				<exclude name="**/bsf.jar"/>				
 			</zipfileset>    		   		
-			<!-- these files are no longer distributed individually because we're using jruby-complete jar:
-			<zipfileset dir="${download}/${jruby_folder}" includes="lib/ruby/**" prefix="${dist_name}">
-				<exclude name="**/doc/**"/>
-				<exclude name="**/gems/rspec*/**"/>
-				<exclude name="**/gems/rake*/**"/>
-				<exclude name="**/gems/**/html/**"/>
-				<exclude name="**/gems/**/examples/**"/>
-				<exclude name="**/gems/**/sample/**"/>    			
-				<exclude name="**/gems/**/test/**"/>    			
-			</zipfileset>
-			-->
 			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
 		</zip>
 		<delete dir="${dist}" excludes="${dist_name}.zip" includeEmptyDirs="true"/>

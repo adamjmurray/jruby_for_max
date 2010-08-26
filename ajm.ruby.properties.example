@@ -2,9 +2,10 @@
 # Options for ajm.ruby #
 ########################
 
-# This file must be placed under Cycling '74/java/lib
-
-# After making changes to this file, you will need to restart Max.
+# To use:
+# - Rename this file to ajm.ruby.properties
+# - Put it on the Max file search path
+# - Restart Max (and restart again each time you change this file)
 
 
 ruby.loadpaths =
@@ -13,7 +14,7 @@ ruby.loadpaths =
 # Default value is nothing.
 
 
-# jruby.home = /Users/adam/bin/jruby-1.5.1
+# jruby.home = /Users/adam/bin/jruby-1.5.2
 # If you want to install a lot of gems: instead of adding a loadpath for each one, 
 # you can install them into a separate jruby installation and set jruby.home to
 # run ajm.ruby against that jruby instead of the built-in one.

@@ -32,6 +32,7 @@ import org.jruby.CompatVersion;
 import com.cycling74.max.*;
 
 import ajm.rubysupport.*;
+import ajm.util.Utils;
 
 /**
  * Superclass for objects that support Ruby scripting.
@@ -87,30 +88,32 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 		}
 	}
 
-	public String getcontext() {
-		return context;
+	public Atom[] getcontext() {
+		return Atom.newAtom(new String[]{context});
 	}
 
 	public String context() {
 		return context;
 	}
 
-	public void context(String context) {
+	public void context(Atom[] params) {
+		String context = Utils.toString(params);
 		this.context = context;
 		if (ruby != null) {
 			ruby.setContext(context);
 		} // else we're still initializing and the initalizer should handle this
 	}
 
-	public String getid() {
-		return id;
+	public Atom[] getid() {
+		return Atom.newAtom(new String[]{id});
 	}
 
 	public String id() {
 		return id;
 	}
 
-	public void id(String id) {
+	public void id(Atom[] params) {
+		String id = Utils.toString(params); 
 		if (id == null || "".equals(id)) {
 			id = defaultId();
 		}

@@ -65,6 +65,22 @@ public class Utils {
 	public static String toString(Object obj) {
 		return (obj == null ? null : obj.toString());
 	}
+	
+	/**
+	 * Convert Atom[] to a space-separated String
+	 */
+	public static String toString(Atom[] atoms) {
+		String s = "";
+		if(atoms != null) {
+			for(int i=0; i< atoms.length; i++) {
+				if(i > 0) {
+					s += " ";
+				}
+				s += atoms[i].toString();
+			}			
+		}
+		return s;
+	}
 
 	public static Atom[] toAtoms(Collection<? extends Atomizer> objs) {
 		Atom[] atoms = new Atom[objs.size()];

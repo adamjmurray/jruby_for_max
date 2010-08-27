@@ -365,7 +365,9 @@ public class MaxRubyAdapter {
 		}
 	}
 
+	/*
 	public void on_context_destroyed(Object callback) {
 		ScriptEvaluatorManager.registerContextDestroyedListener(maxObject, callback.toString());
 	}
+	*/
 }

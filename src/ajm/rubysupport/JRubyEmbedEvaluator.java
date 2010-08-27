@@ -42,7 +42,8 @@ public class JRubyEmbedEvaluator extends AbstractScriptEvaluator {
   }
 
   public void exit() {
-    // TODO
+  	container.terminate();
     container = null;
+    
   }
 }

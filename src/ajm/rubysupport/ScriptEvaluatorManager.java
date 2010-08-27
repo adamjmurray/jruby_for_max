@@ -47,7 +47,7 @@ public class ScriptEvaluatorManager {
 
 	private static Map<String, ScriptEvaluator> evaluatorContexts = new HashMap<String, ScriptEvaluator>();
 	private static Map<String, Integer> evaluatorContextCounter = new HashMap<String, Integer>();
-	private static MappedSet<String, String> evaluatorContextDestroyedListeners = new MappedSet<String, String>();
+	//private static MappedSet<String, String> evaluatorContextDestroyedListeners = new MappedSet<String, String>();
 	private static MappedSet<String, Object> objectsUsingEvaluator = new MappedSet<String, Object>();
 	private static Map<String, Map<String, Object>> maxObjectMap = new HashMap<String, Map<String, Object>>();
 	private static Constructor<ScriptEvaluator> evaluatorConstructor;
@@ -179,6 +179,7 @@ public class ScriptEvaluatorManager {
 		}
 	}
 
+	/*
 	public static void registerContextDestroyedListener(Object maxObject, String callbackMethod) {
 		String[] contextAndId = objectMetadata.get(maxObject);
 		if (contextAndId != null) {
@@ -187,10 +188,12 @@ public class ScriptEvaluatorManager {
 			evaluatorContextDestroyedListeners.addValue(evaluatorContext, callbackMethod);
 		}
 	}
+	*/
 
 	public static void notifyContextDestroyedListener(String maxContext, Object maxObject) {
 		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
 		ScriptEvaluator ruby = evaluatorContexts.get(evaluatorContext);
+		/*
 		Collection<String> callbackMethods = evaluatorContextDestroyedListeners.remove(evaluatorContext);
 		if (ruby != null && callbackMethods != null) {
 			for (String callbackMethod : callbackMethods) {
@@ -203,6 +206,7 @@ public class ScriptEvaluatorManager {
 				}
 			}
 		}
+		*/
 		if (ruby != null) {
 			// The callback method behavior above should be phased out in favor of this:
 			ruby.exit();

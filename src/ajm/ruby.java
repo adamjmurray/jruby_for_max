@@ -286,6 +286,11 @@ public class ruby extends AbstractMaxRubyObject {
   	s.append(")");
   	evalRuby(s);
   }
+  
+  public void symbol(Atom[] args) {
+  	// a convenience for scenarios like attaching a 'coll' directly to this object
+  	list(args);
+  }
 
 	/** 
 	 * @param args - method methods_args

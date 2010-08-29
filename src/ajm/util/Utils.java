@@ -266,7 +266,8 @@ public class Utils {
 			String filePath = patcher.getFilePath();
 			if(filePath != null) {
 				filePath = filePath.toLowerCase();
-				if(filePath.endsWith(".maxpat") || filePath.endsWith(".maxhelp") || filePath.endsWith(".json")) {
+				if(filePath.endsWith(".maxpat") || filePath.endsWith(".maxhelp") || filePath.endsWith(".json")
+						|| filePath.endsWith(".amxd")) {
 					return true;
 				}
 				// Otherwise this is probably something like "/" because the patcher is not saved.

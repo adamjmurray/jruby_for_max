@@ -1,6 +1,6 @@
 <project name="ajm objects" default="jar">
 
-	<property name="VERSION" value="0.9b6"/>
+	<property name="VERSION" value="0.9"/>
 	
 	<property environment="env"/>
 
@@ -44,7 +44,7 @@
 
 	<target name="compile" description="compile the ajm.objects source, omitting tests" depends="clean">
 		<mkdir dir="${build}/"/>
-		<javac destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5">
+		<javac destdir="${build}" classpathref="classpath" debug="on" source="1.5" target="1.5" includeantruntime="false">
 			<src path="${src}"/>
 			<exclude name="**/*Test.java"/>
 		</javac>

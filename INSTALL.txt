@@ -25,7 +25,7 @@ FIRST TIME INSTALLATION
  (2) Put the ajm folder somewhere on your Max file search path.
      See "Options -> File Preferences" under Max's Options menu.
        
- (3) Restart Max/MSP and open ajm/ajm.overview.pat
+ (3) Restart Max/MSP and open ajm/ajm.overview.maxpat
 
 -----------------------------------------------------------------------------
 

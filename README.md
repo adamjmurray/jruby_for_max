@@ -12,11 +12,11 @@ Adam Murray (adam@compusition.com)
 
 ## Status ##
 
-Version 0.8.8 is the latest stable version, released on July 13, 2009.
+Version 0.9.1 is the latest stable version, released on November 14, 2009.
+<br/>
+<http://compusition.com/ajm-objects/ajm-objects-0.9.1.zip><br/>
 
-Version 0.9 is almost ready, you can get the latest beta here:<br/>
-<http://compusition.com/ajm-objects/ajm-objects-0.9b4.zip><br/>
-Tested on OS X Leopard, Windows XP, and with Max for Live.
+Tested on OS X Leopard & Snow Leopard, Windows XP, and with Max for Live.
 
 
 ## Future ##

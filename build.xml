@@ -19,6 +19,10 @@
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
+	
+	<tstamp>
+      <format property="BUILD_DATE" pattern="MMMM d, yyyy (HH:mm z)" timezone="GMT" locale="en"/>
+  </tstamp>
 
 	<target name="jar" description="generate ${jar_name} file" depends="compile">
 		<jar destfile="${lib}/${jar_name}" basedir="${build}">
@@ -99,6 +103,11 @@
 			<include name="**/*.maxpat"/>
 			<include name="**/*.maxhelp"/>
 		</replace>
+		<replace dir="${dist}" token="@@BUILD_DATE" value="${BUILD_DATE}">
+			<include name="**/*.txt"/>
+			<include name="**/*.maxpat"/>
+			<include name="**/*.maxhelp"/>
+		</replace>    
 		<fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" /> <!-- So things display properly on Notepad in Windows -->
 		<zip destfile="${dist}/${dist_name}.zip">
 			<zipfileset dir="${dist}" includes="*.txt" prefix="${dist_name}"/>      		

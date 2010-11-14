@@ -82,20 +82,20 @@
 					"maxclass" : "textbutton",
 					"fontsize" : 12.0,
 					"patching_rect" : [ 446.0, 167.0, 139.0, 20.0 ],
-					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
 					"presentation" : 1,
 					"border" : 1,
 					"rounded" : 20.0,
 					"numinlets" : 1,
 					"text" : "Download from CNMAT",
-					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"texton" : "Stop",
 					"id" : "obj-51",
 					"fontname" : "Arial",
 					"numoutlets" : 3,
+					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
+					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"presentation_rect" : [ 522.0, 191.0, 79.0, 17.0 ],
 					"bgcolor" : [ 0.827451, 0.827451, 0.827451, 1.0 ],
-					"outlettype" : [ "", "", "int" ],
-					"texton" : "Stop"
+					"outlettype" : [ "", "", "int" ]
 				}
 
 			}
@@ -104,20 +104,20 @@
 					"maxclass" : "textbutton",
 					"fontsize" : 12.0,
 					"patching_rect" : [ 441.0, 76.0, 134.0, 20.0 ],
-					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
 					"presentation" : 1,
 					"border" : 1,
 					"rounded" : 20.0,
 					"numinlets" : 1,
 					"text" : "http://compusition.com",
-					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"texton" : "Stop",
 					"id" : "obj-49",
 					"fontname" : "Arial",
 					"numoutlets" : 3,
+					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
+					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"presentation_rect" : [ 536.0, 88.0, 79.0, 17.0 ],
 					"bgcolor" : [ 0.827451, 0.827451, 0.827451, 1.0 ],
-					"outlettype" : [ "", "", "int" ],
-					"texton" : "Stop"
+					"outlettype" : [ "", "", "int" ]
 				}
 
 			}
@@ -126,20 +126,20 @@
 					"maxclass" : "textbutton",
 					"fontsize" : 12.0,
 					"patching_rect" : [ 482.0, 17.0, 124.0, 20.0 ],
-					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
 					"presentation" : 1,
 					"border" : 1,
 					"rounded" : 20.0,
 					"numinlets" : 1,
 					"text" : "ajm objects overview",
-					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"texton" : "Stop",
 					"id" : "obj-9",
 					"fontname" : "Arial",
 					"numoutlets" : 3,
+					"bgovercolor" : [ 0.784314, 0.909804, 0.917647, 1.0 ],
+					"bordercolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"presentation_rect" : [ 54.0, 20.0, 79.0, 17.0 ],
 					"bgcolor" : [ 0.827451, 0.827451, 0.827451, 1.0 ],
-					"outlettype" : [ "", "", "int" ],
-					"texton" : "Stop"
+					"outlettype" : [ "", "", "int" ]
 				}
 
 			}
@@ -237,11 +237,11 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "ubutton",
-					"handoff" : "",
 					"patching_rect" : [ 417.0, 78.0, 22.0, 20.0 ],
 					"numinlets" : 1,
 					"id" : "obj-7",
 					"numoutlets" : 4,
+					"handoff" : "",
 					"outlettype" : [ "bang", "bang", "", "int" ]
 				}
 
@@ -533,7 +533,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "comment",
-					"text" : "Released: November 2010",
+					"text" : "Built: @@BUILD_DATE",
 					"fontsize" : 11.0,
 					"patching_rect" : [ 106.0, 56.0, 234.0, 20.0 ],
 					"numinlets" : 1,
@@ -604,10 +604,10 @@
 					"border" : 1,
 					"rounded" : 7,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-41",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 0.729412, 0.890196, 0.815686, 1.0 ]
 				}
 
@@ -619,10 +619,10 @@
 					"border" : 1,
 					"rounded" : 7,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-42",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 0.729412, 0.811765, 0.890196, 1.0 ]
 				}
 
@@ -634,10 +634,10 @@
 					"border" : 1,
 					"rounded" : 7,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-43",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 0.729412, 0.811765, 0.890196, 1.0 ]
 				}
 
@@ -649,10 +649,10 @@
 					"border" : 1,
 					"rounded" : 12,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-44",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
 				}
 
@@ -664,10 +664,10 @@
 					"border" : 1,
 					"rounded" : 7,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-45",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 0.729412, 0.811765, 0.890196, 1.0 ]
 				}
 
@@ -679,10 +679,10 @@
 					"border" : 1,
 					"rounded" : 12,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-46",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
 				}
 
@@ -694,10 +694,10 @@
 					"border" : 1,
 					"rounded" : 12,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-47",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
 				}
 
@@ -709,10 +709,10 @@
 					"border" : 1,
 					"rounded" : 12,
 					"numinlets" : 1,
+					"shadow" : 3,
 					"id" : "obj-48",
 					"background" : 1,
 					"numoutlets" : 0,
-					"shadow" : 3,
 					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
 				}
 
@@ -720,35 +720,8 @@
  ],
 		"lines" : [ 			{
 				"patchline" : 				{
-					"source" : [ "obj-21", 0 ],
-					"destination" : [ "obj-53", 0 ],
-					"hidden" : 1,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"source" : [ "obj-34", 0 ],
-					"destination" : [ "obj-35", 0 ],
-					"hidden" : 1,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"source" : [ "obj-7", 0 ],
-					"destination" : [ "obj-34", 0 ],
-					"hidden" : 1,
-					"midpoints" : [  ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"source" : [ "obj-49", 0 ],
-					"destination" : [ "obj-34", 0 ],
+					"source" : [ "obj-9", 0 ],
+					"destination" : [ "obj-10", 0 ],
 					"hidden" : 1,
 					"midpoints" : [  ]
 				}
@@ -765,8 +738,35 @@
 			}
 , 			{
 				"patchline" : 				{
-					"source" : [ "obj-9", 0 ],
-					"destination" : [ "obj-10", 0 ],
+					"source" : [ "obj-49", 0 ],
+					"destination" : [ "obj-34", 0 ],
+					"hidden" : 1,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-7", 0 ],
+					"destination" : [ "obj-34", 0 ],
+					"hidden" : 1,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-34", 0 ],
+					"destination" : [ "obj-35", 0 ],
+					"hidden" : 1,
+					"midpoints" : [  ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"source" : [ "obj-21", 0 ],
+					"destination" : [ "obj-53", 0 ],
 					"hidden" : 1,
 					"midpoints" : [  ]
 				}

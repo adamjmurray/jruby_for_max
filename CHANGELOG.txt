@@ -5,7 +5,7 @@
 * Version 0.9.1 *
 *****************
 
-Upgraded JRuby to version 1.5.5
+Upgraded JRuby to version 1.5.5, fixed ajm.midi2coll
 
 
 ******************************************************************************

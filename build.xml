@@ -13,15 +13,6 @@
 
 	<property name="jar_name" value="ajm.jar"/>
 	<property name="dist_name" value="ajm-objects-${VERSION}"/>
-
-	<property name="jruby_distrib_folder" value="1.5.1"/>
-	<property name="jruby_distrib_file" value="jruby-bin-1.5.1.tar.gz"/>
-	<property name="jruby_folder" value="jruby-1.5.1"/>
-	
-	<condition property="gem_command" value="gem.bat">    		
-		<os family="windows"/>
-	</condition>
-	<!-- else: --><property name="gem_command" value="jgem"/>
 	
 	<path id="classpath">
 		<fileset dir="lib">
@@ -88,7 +79,7 @@
 			</fileset>
 			<doctitle><![CDATA[<h1>Test</h1>]]></doctitle>
 			<!-- TODO: put in a creative commons license -->
-			<bottom><![CDATA[<i>Copyright &#169; 2007-2009 Adam Murray. All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2007-2010 Adam Murray. All Rights Reserved.</i>]]></bottom>
 			<tag name="attribute" scope="fields" description="&lt;br/&gt;This field is a Max object attribute." />
 			<tag name="nodoc" scope="all" description="" />
 		</javadoc>
@@ -121,26 +112,6 @@
 			<zipfileset dir="${basedir}" includes="license/**" prefix="${dist_name}"/>
 		</zip>
 		<delete dir="${dist}" excludes="${dist_name}.zip" includeEmptyDirs="true"/>
-	</target>
-
-	<!-- the gems target is no longer used -->
-	<target name="gems" description="download the JRuby gems used by ajm objects">
-		<mkdir dir="${download}"/>
-		<get src="http://jruby.org.s3.amazonaws.com/downloads/${jruby_distrib_folder}/${jruby_distrib_file}" dest="${download}/${jruby_distrib_file}" 
-			verbose="true" usetimestamp="true"/>
-		<untar src="${download}/${jruby_distrib_file}" dest="${download}" overwrite="false" compression="gzip"/>
-		<chmod dir="${download}/${jruby_folder}/bin" includes="*" perm="u+x"/>
-		<exec executable="${download}/${jruby_folder}/bin/${gem_command}">
-			<env key="PATH" path="${download}/${jruby_folder}/bin:${env.PATH}"/>
-			<arg value="install"/>
-			<arg value="--no-ri"/>
-			<arg value="--no-rdoc"/>
-			<arg value="midilib"/>
-			<arg value="treetop"/>
-			<arg value="osc"/>
-			<arg value="drp"/>
-			<arg value="smf"/>		    
-		</exec>
 	</target>
 
 </project>

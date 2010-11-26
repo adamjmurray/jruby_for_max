@@ -2,10 +2,12 @@
                           ajm objects changelog 
 
 ******************************************************************************
-* Version 0.9.1 *
+* Version 0.9.2 *
 *****************
 
-Upgraded JRuby to version 1.5.5, fixed ajm.midi2coll
+* Upgraded JRuby to version 1.5.5 
+* Fixed ajm.midi2coll to work with the 0.9 version of ajm.ruby
+* Fixed a stack overflow in the ajm.makenote help file
 
 
 ******************************************************************************

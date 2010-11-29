@@ -27,7 +27,7 @@ JAR       = "#{LIB}/ajm.jar"
 ##############################################################################
 # TASK DEFINITIONS
 
-CLEAN.include BUILD, JAR, PACKAGE
+CLEAN.include BUILD, JAR, 'ajm-objects-*' # The -* takes care of deleting old PACKAGE folders when bumping the version number
 CLOBBER.include DIST
 
 

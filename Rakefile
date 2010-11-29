@@ -1,11 +1,13 @@
 require 'rake/clean'
+require 'tempfile'
 include FileUtils
 
 VERSION = '0.9.2'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
-MANIFEST_DATA = 
+MANIFEST = 
 "Library: ajm objects (MXJ) for MaxMSP
 Version: #{VERSION}
+Built-Date: #{BUILD_DATE}
 Author: Adam Murray
 URL: http://compusition.com
 "
@@ -20,7 +22,6 @@ DIST    = 'dist'
 
 SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^ajm.jar$/)
-MANIFEST  = "MANIFEST.MF"
 JAR       = "#{LIB}/ajm.jar"
 
 
@@ -41,13 +42,10 @@ end
 
 desc 'construct the jar archive of the compiled java sources'
 task :jar => [:clean, :compile] do
-  begin
-    File.open(MANIFEST, 'w') {|io| io.write MANIFEST_DATA }
-    puts "Constructing #{JAR}"
-    `jar cvfm #{JAR} #{MANIFEST} -C #{BUILD} .`
-  ensure
-    File.delete MANIFEST if File.exist? MANIFEST
-  end
+  manifest = Tempfile.new('manifest')
+  File.open(manifest, 'w') {|io| io.write MANIFEST }
+  puts "Constructing #{JAR}"
+  `jar cvfm #{JAR} #{manifest.path} -C #{BUILD} .`  
 end
 
 

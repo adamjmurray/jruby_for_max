@@ -81,9 +81,9 @@ task :dist => [:clean, :package] do
   mkdir DIST
   archive = "#{DIST}/#{PACKAGE}.zip"
   puts "Constructing distribution archive #{archive}"
-  `zip -r #{archive} #{PACKAGE}`
-  # TODO (zip option??):
-  # <fixcrlf srcdir="${dist}" includes="*.txt" eol="crlf" eof="asis" /> <!-- So things display properly on Notepad in Windows -->
+  `zip -l -r #{archive} #{PACKAGE}`
+  # The -l option converts newlines to crlf, which should display correctly on both OS X and Windows.
+  # Otherwise, since I write these txt files on OS X, newlines would disappear when viewed in Notepad on Windows.
 end 
 
 

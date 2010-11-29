@@ -50,7 +50,7 @@ end
 
 
 desc 'prepare the files for distribution'
-task :package => [:clean, :jar] do
+task :package => [:jar] do
   puts "Preparing distribution package"
   package_lib = "#{PACKAGE}/#{LIB}"  
   mkdir PACKAGE
@@ -65,7 +65,11 @@ task :package => [:clean, :jar] do
   end  
   cp_r PATCHES, PACKAGE
   cp_r LICENSE, PACKAGE
+end
 
+
+desc 'search and replace variable values in text files'
+task :replace_vars => [:package] do
   puts "Performing search and replace for the VERSION and BUILD_DATE variables"
   plaintext_filetypes = ['txt', 'maxpat', 'maxhelp']
   files = FileList[ plaintext_filetypes.map{|type| "#{PACKAGE}/**/*.#{type}" } ]
@@ -75,7 +79,7 @@ end
 
 
 desc 'construct the distribution archive'
-task :dist => [:clean, :package] do
+task :dist => [:replace_vars] do
   mkdir DIST
   archive = "#{DIST}/#{PACKAGE}.zip"
   puts "Constructing distribution archive #{archive}"

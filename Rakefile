@@ -17,8 +17,8 @@ LIB     = 'lib'
 PATCHES = 'jruby_for_max'
 LICENSE = 'license'
 BUILD   = 'build'
-PACKAGE = "jruby_for_max-#{VERSION}"
 DIST    = 'dist'
+PACKAGE = "#{DIST}/jruby_for_max-#{VERSION}"
 
 SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
@@ -28,7 +28,7 @@ JAR       = "#{LIB}/jruby_for_max.jar"
 ##############################################################################
 # TASK DEFINITIONS
 
-CLEAN.include BUILD, JAR, 'jruby_for_max-*' # The -* takes care of deleting old PACKAGE folders when bumping the version number
+CLEAN.include BUILD, JAR
 CLOBBER.include DIST
 
 
@@ -53,6 +53,7 @@ desc 'prepare the files for distribution'
 task :package => [:jar] do
   puts "Preparing distribution package"
   package_lib = "#{PACKAGE}/#{LIB}"  
+  mkdir DIST
   mkdir PACKAGE
   mkdir package_lib
   

@@ -1,5 +1,5 @@
         
-                     ajm objects for Max/MSP
+                            JRuby for Max
         
                           Version @@VERSION
                           
@@ -21,38 +21,4 @@ REQUIREMENTS
 
 FIRST TIME INSTALLATION
 
- (1) Put lib/ajm.jar and lib/jruby.jar in:
-     Max5/Cycling '74/java/lib
-    
- (2) Put the ajm folder somewhere on your Max file search path.
-     See "Options -> File Preferences" under Max's Options menu.
-       
- (3) Restart Max/MSP and open ajm/ajm.overview.maxpat
-
------------------------------------------------------------------------------
-
-UPGRADING FROM VERSION 0.9 (or newer)
-
-(1) Delete the old ajm folder (the old patches & help files) 
-
-(2) Proceed with the first time installation instructions. 
-    The following files will be replaced: ajm.jar, jruby.jar
-
------------------------------------------------------------------------------
-
-UPGRADING FROM VERSION 0.8.8 (or older)
-
- (1) Delete the entire ruby directory structure:
-     Max5/Cycling '74/java/lib/ruby
-
- (2) Delete the old ajm folder (the old patches & help files) 
- 
- (3) Delete the file:
-     Max5/Cycling '74/java/lib/ajm.ruby.properties
-
- (4) Delete the file:
-     Max5/Cycling '74/java/lib/bsf.jar
- 
- (5) Proceed with the first time installation instructions. 
-     The following files will be replaced: ajm.jar, jruby.jar
- 
+TBD

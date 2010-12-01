@@ -1,8 +1,6 @@
-# ajm objects #
+# JRuby for Max #
 
-A library of objects for Max 5 (<http://www.cycling74.com/products/max5>)
-
-<http://compusition.com/web/software/maxmsp/ajm-objects>
+Ruby support for Max 5 (<http://www.cycling74.com/products/max5>), built on top of JRuby (<http://jruby.org>)
 
   
 ## Author ##
@@ -12,14 +10,10 @@ Adam Murray (adam@compusition.com)
 
 ## Status ##
 
-Version 0.9.2 is the latest stable version, released on November 26, 2009.
+Pre-release. Not ready for prime time.
 
-<http://compusition.com/ajm-objects/ajm-objects-0.9.2.zip><br/>
+I recently split this project off of my larger collection of add-on objects for Max/MSP called "ajm objects" <http://compusition.com/web/software/maxmsp/ajm-objects>, because I want to focus on this one object instead
+of the larger collection. I simply copied my ajm objects project and am in the middle of removing the rest of
+the objects from this project.
 
-Tested on OS X Leopard & Snow Leopard, Windows XP, and with Max for Live.
-
-
-## Future ##
-
-* ajm.ruby will be split off into a separate project soon, because most people only use ajm objects
-  for this one object. It will be easier for me to maintain and support one object.
+If you want to use Ruby with Max/MSP, please use ajm objects instead for now, or check back in early 2011.

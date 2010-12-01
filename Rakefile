@@ -5,7 +5,7 @@ include FileUtils
 VERSION = '0.9.2'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
 MANIFEST = 
-"Library: ajm objects (MXJ) for MaxMSP
+"Library: JRuby for Max
 Version: #{VERSION}
 Built-Date: #{BUILD_DATE}
 Author: Adam Murray
@@ -14,21 +14,21 @@ URL: http://compusition.com
 
 SRC     = 'src'
 LIB     = 'lib'
-PATCHES = 'ajm'
+PATCHES = 'jruby_for_max'
 LICENSE = 'license'
 BUILD   = 'build'
-PACKAGE = "ajm-objects-#{VERSION}"
+PACKAGE = "jruby_for_max-#{VERSION}"
 DIST    = 'dist'
 
 SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
-CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^ajm.jar$/)
-JAR       = "#{LIB}/ajm.jar"
+CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
+JAR       = "#{LIB}/jruby_for_max.jar"
 
 
 ##############################################################################
 # TASK DEFINITIONS
 
-CLEAN.include BUILD, JAR, 'ajm-objects-*' # The -* takes care of deleting old PACKAGE folders when bumping the version number
+CLEAN.include BUILD, JAR, 'jruby_for_max-*' # The -* takes care of deleting old PACKAGE folders when bumping the version number
 CLOBBER.include DIST
 
 

@@ -486,7 +486,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "mxj ajm.ruby @file ajm_version.rb @ruby_version 1.9",
+					"text" : "mxj jruby @file ajm_version.rb @ruby_version 1.9",
 					"linecount" : 2,
 					"patching_rect" : [ 246.0, 332.0, 208.0, 33.0 ],
 					"hidden" : 1,
@@ -517,7 +517,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "mxj ajm.ruby @file ajm_version.rb",
+					"text" : "mxj jruby @file ajm_version.rb",
 					"patching_rect" : [ 20.0, 333.0, 214.0, 20.0 ],
 					"hidden" : 1,
 					"numoutlets" : 1,
@@ -885,7 +885,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "mxj ajm.ruby @file ajm_file_example.rb",
+					"text" : "mxj jruby @file ajm_file_example.rb",
 					"patching_rect" : [ 13.0, 229.0, 235.0, 20.0 ],
 					"numoutlets" : 1,
 					"id" : "obj-45",
@@ -900,7 +900,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "mxj ajm.ruby",
+					"text" : "mxj jruby",
 					"patching_rect" : [ 269.0, 230.0, 86.0, 20.0 ],
 					"numoutlets" : 1,
 					"id" : "obj-38",
@@ -1058,7 +1058,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @file ajm_autowatch.rb @autowatch 1",
+									"text" : "mxj jruby @file ajm_autowatch.rb @autowatch 1",
 									"patching_rect" : [ 314.0, 62.0, 310.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-8",
@@ -1073,7 +1073,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @file ajm_scriptfile.rb",
+									"text" : "mxj jruby @file ajm_scriptfile.rb",
 									"patching_rect" : [ 13.0, 37.0, 211.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-11",
@@ -1145,7 +1145,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @file ajm_argv.rb :mute",
+									"text" : "mxj jruby @file ajm_argv.rb :mute",
 									"patching_rect" : [ 459.0, 225.0, 225.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-6",
@@ -1335,7 +1335,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @verbose 1",
+									"text" : "mxj jruby @verbose 1",
 									"patching_rect" : [ 383.0, 320.0, 158.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-29",
@@ -1885,7 +1885,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @evalout 0",
+									"text" : "mxj jruby @evalout 0",
 									"patching_rect" : [ 18.0, 520.0, 152.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-7",
@@ -2083,7 +2083,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 2 @file ajm_call_send.rb @evalout 0",
+									"text" : "mxj jruby 2 @file ajm_call_send.rb @evalout 0",
 									"patching_rect" : [ 62.0, 170.0, 293.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-35",
@@ -2182,7 +2182,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 3 @file ajm_inlets.rb",
+									"text" : "mxj jruby 3 @file ajm_inlets.rb",
 									"linecount" : 2,
 									"patching_rect" : [ 434.0, 453.0, 119.0, 33.0 ],
 									"numoutlets" : 1,
@@ -2549,7 +2549,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 2 2 @evaloutlet 1",
+									"text" : "mxj jruby 2 2 @evaloutlet 1",
 									"patching_rect" : [ 317.0, 393.0, 187.0, 20.0 ],
 									"numoutlets" : 2,
 									"id" : "obj-30",
@@ -2648,7 +2648,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"patching_rect" : [ 7.0, 422.0, 86.0, 20.0 ],
 									"numoutlets" : 1,
 									"id" : "obj-3",
@@ -2898,7 +2898,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 1 3",
+									"text" : "mxj jruby 1 3",
 									"patching_rect" : [ 284.0, 190.0, 157.0, 20.0 ],
 									"numoutlets" : 3,
 									"id" : "obj-20",

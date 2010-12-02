@@ -401,7 +401,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 5 @file ajm_inlet_symbols_to.rb @symbols_to literal symbol string *",
+									"text" : "mxj jruby 5 @file ajm_inlet_symbols_to.rb @symbols_to literal symbol string *",
 									"fontsize" : 11.0,
 									"numinlets" : 5,
 									"numoutlets" : 1,
@@ -690,7 +690,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -1340,7 +1340,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @ruby_version 1.8",
+									"text" : "mxj jruby @ruby_version 1.8",
 									"fontsize" : 11.595187,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -1398,7 +1398,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @ruby_version 1.9",
+									"text" : "mxj jruby @ruby_version 1.9",
 									"fontsize" : 11.595187,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -1650,7 +1650,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby 2 3",
+									"text" : "mxj jruby 2 3",
 									"fontsize" : 11.0,
 									"numinlets" : 2,
 									"numoutlets" : 3,
@@ -1785,7 +1785,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -1843,7 +1843,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -2001,7 +2001,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @verbose true",
+									"text" : "mxj jruby @verbose true",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -2615,7 +2615,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects3 @id ajmHelpId3",
+									"text" : "mxj jruby @context ajmHelpObjects3 @id ajmHelpId3",
 									"linecount" : 2,
 									"fontsize" : 11.0,
 									"numinlets" : 1,
@@ -2805,7 +2805,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects3 @id ajmHelpId1",
+									"text" : "mxj jruby @context ajmHelpObjects3 @id ajmHelpId1",
 									"linecount" : 2,
 									"fontsize" : 11.0,
 									"numinlets" : 1,
@@ -2834,7 +2834,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects3 @id ajmHelpId2",
+									"text" : "mxj jruby @context ajmHelpObjects3 @id ajmHelpId2",
 									"linecount" : 2,
 									"fontsize" : 11.0,
 									"numinlets" : 1,
@@ -2876,7 +2876,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects2",
+									"text" : "mxj jruby @context ajmHelpObjects2",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -2904,7 +2904,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects2",
+									"text" : "mxj jruby @context ajmHelpObjects2",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -2932,7 +2932,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects1",
+									"text" : "mxj jruby @context ajmHelpObjects1",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -2960,7 +2960,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects1 @id my_id",
+									"text" : "mxj jruby @context ajmHelpObjects1 @id my_id",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3072,7 +3072,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpObjects1",
+									"text" : "mxj jruby @context ajmHelpObjects1",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3345,7 +3345,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @verbose true",
+									"text" : "mxj jruby @verbose true",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3766,7 +3766,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3855,7 +3855,7 @@
 						"boxes" : [ 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext2",
+									"text" : "mxj jruby @context ajmHelpContext2",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3870,7 +3870,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext_2",
+									"text" : "mxj jruby @context ajmHelpContext_2",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -3885,7 +3885,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4010,7 +4010,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4121,7 +4121,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4274,7 +4274,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4302,7 +4302,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4344,7 +4344,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby",
+									"text" : "mxj jruby",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,
@@ -4386,7 +4386,7 @@
 , 							{
 								"box" : 								{
 									"maxclass" : "newobj",
-									"text" : "mxj ajm.ruby @context ajmHelpContext",
+									"text" : "mxj jruby @context ajmHelpContext",
 									"fontsize" : 11.0,
 									"numinlets" : 1,
 									"numoutlets" : 1,

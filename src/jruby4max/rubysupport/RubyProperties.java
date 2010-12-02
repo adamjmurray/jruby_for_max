@@ -47,7 +47,7 @@ public class RubyProperties {
 
 	public static final String DEFAULT_RUBY_ENGINE = "jruby4max.rubysupport.JRubyEmbedEvaluator";
 
-	public static final String DEFAULT_INITIALIZER_FILES = "ajm_ruby_initialize.rb";
+	public static final String DEFAULT_INITIALIZER_FILES = "jruby_initialize.rb";
 
 	private static String rubyEngine;
 

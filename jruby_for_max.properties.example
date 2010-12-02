@@ -22,9 +22,7 @@ ruby.loadpaths =
 
 
 
-# TODO: rename this initialize file:
-
-ruby.initializers = ajm_ruby_initialize.rb
+ruby.initializers = jruby_initialize.rb
 # A semicolon-separated list of files. 
-# These files will be run in the order listed whenever a new ajm.ruby context is initialized.
-# Default value is ajm_ruby_initialize.rb
+# These files will be run in the order listed whenever a new jruby context is initialized.
+# Default value is jruby_initialize.rb

@@ -26,10 +26,14 @@ If you want to use Ruby with Max/MSP, please use ajm objects instead for now, or
    * or via git:
 
              git clone http://github.com/adamjmurray/jruby_for_max.git
+
+0. Go to the project folder on the command line:
+
              cd jruby_for_max
 
 0. Run the rake 'dist' task to build the project:
 
              java -jar lib/jruby.jar -S rake dist
      
-0. Take a look in dist/jruby\_for\_max-{version}/INSTALL.txt for installation instructions
+0. Take a look in dist/jruby\_for\_max-{version}/INSTALL.txt for installation instructions to start using
+   it with Max/MSP or Max for Live.

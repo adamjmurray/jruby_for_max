@@ -22,8 +22,8 @@ If you want to use Ruby with Max/MSP, please use ajm objects instead for now, or
 ## Building the project
 
 0. Download this project, either:
- * via the download link on [this project's github page](http://github.com/adamjmurray/jruby_for_max)
- * or via git:
+   * via the download link on [this project's github page](http://github.com/adamjmurray/jruby_for_max)
+   * or via git:
 
              git clone http://github.com/adamjmurray/jruby_for_max.git
              cd jruby_for_max

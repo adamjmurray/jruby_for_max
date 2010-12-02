@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import jruby4max.maxsupport.AbstractMaxRubyObject;
+import jruby4max.maxsupport.JRubyMaxObject;
 import jruby4max.rubysupport.SymbolConversionOption;
 import jruby4max.util.FileWatcher;
 import jruby4max.util.TextBlock;
@@ -45,7 +45,7 @@ import com.cycling74.max.MaxSystem;
  * 
  * @author Adam Murray (adam@compusition.com)
  */
-public class jruby extends AbstractMaxRubyObject {
+public class jruby extends JRubyMaxObject {
 
 	private String scriptFilePath;
   private File scriptFile;

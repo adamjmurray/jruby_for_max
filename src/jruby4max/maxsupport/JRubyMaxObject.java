@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import jruby4max.util.Logger;
 import org.jruby.CompatVersion;
 
 import com.cycling74.max.*;
@@ -34,12 +35,14 @@ import com.cycling74.max.*;
 import jruby4max.rubysupport.*;
 import jruby4max.util.Utils;
 
+import java.io.PrintStream;
+
 /**
  * Superclass for objects that support Ruby scripting.
  * 
  * @author Adam Murray (adam@compusition.com)
  */
-public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
+public abstract class JRubyMaxObject  extends MaxObject implements Logger {
 
 	protected String context = null;
 	protected String id = defaultId();
@@ -50,25 +53,50 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
   
 	protected MaxRubyAdapter ruby;
 
-	protected AbstractMaxRubyObject self = this;
+	protected JRubyMaxObject self = this;
 
-	public AbstractMaxRubyObject() {
-		super();
-		declareAttribute("context", "getcontext", "context");
+
+	protected boolean verbose = false;
+
+	protected boolean initialized = false;
+	protected MaxQelem initializer = getInitializerQelem();
+
+
+    public JRubyMaxObject() {
+		declareAttribute("verbose");
+		if (initializer == null) {
+            // The initializer should never be null inside Max, but needs to be null in unit tests
+			initialized = true;
+		}
+		else {
+			initializer.set();
+		}
+    	declareAttribute("context", "getcontext", "context");
 		declareAttribute("id", "getid", "id");
 		declareAttribute("autoinit");
 		declareAttribute("ruby_version", "getruby_version", "ruby_version");
 	}
 
-	@Override
-	protected Executable getInitializer() {
-		return new DefaultRubyInitializer();
+	private final MaxQelem getInitializerQelem() {
+		Executable initializer = getInitializer();
+		return initializer == null ? null : new MaxQelem(initializer);
 	}
 
-	protected class DefaultRubyInitializer extends DefaultInitializer {
-		@Override
+	/**
+	 * A subclass can override this method to return a MaxQelem that can do operations not normally available in the
+	 * constructor, such as outputting messages. See discussion at
+	 * http://www.cycling74.com/forums/index.php?t=rview&goto=114649 Note that if this method is overriden, it is the
+	 * responsibility of the initializer code to set initialized = true.
+	 *
+	 * @return an Executable that executes initialization code. Must not be null.
+	 */
+	protected Executable getInitializer() {
+	    return new DefaultRubyInitializer();
+	}
+
+	protected class DefaultRubyInitializer  implements Executable {
 		public void execute() {
-			super.execute();
+			initialized = true;
 			try {
 				ruby = new MaxRubyAdapter(self, context, id, rubyVersion);
 			}
@@ -86,6 +114,65 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
 				   The hang delay got much shorter with JRuby 1.1. */
 			}
 		}
+	}
+
+	@Override
+	protected void notifyDeleted() {
+        if (ruby != null) {
+			ruby.notifyDeleted();
+		}
+		if (initializer != null) {
+			initializer.release();
+		}
+	}
+
+	// for use with debugging unit tests, must be set from the test after instantiation
+	private PrintStream debugOut;
+
+	/**
+	 * Unit tests can set this output stream back to system.out (or a log file) for testing purposes outside of the Max
+	 * environment. Normally any MaxObject will "steal" System.out and set it to the Max output stream (which is not
+	 * actually available outside of Max).
+	 *
+	 * @param debugOut
+	 */
+	protected void setDebugOut(PrintStream debugOut) {
+		this.debugOut = debugOut;
+	}
+
+	public void debug(String message) {
+		if (debugOut != null) {
+			debugOut.println(message);
+		}
+	}
+
+	/**
+	 * Automatically prepends the object name to the beginning of error messages.
+	 *
+	 * @param message
+	 *            the error message
+	 */
+	public void info(String message) {
+		info(message, false);
+	}
+	public void info(String message, boolean force) {
+		if (verbose || force) {
+			post(this.getClass().getName() + ": " + message);
+		}
+	}
+
+	/**
+	 * Automatically prepends the object name to the beginning of error messages.
+	 *
+	 * @param message
+	 *            the error message
+	 */
+	public void err(String message) {
+		error(this.getClass().getName() + ": " + message);
+	}
+
+	public String toString() {
+		return getClass().getName() + "#<" + Integer.toHexString(hashCode()) + ">";
 	}
 
 	public Atom[] getcontext() {
@@ -163,12 +250,4 @@ public abstract class AbstractMaxRubyObject extends AbstractMaxObject {
   		this.rubyVersionValue = Atom.newAtom(new String[]{rubyVersionString});
   	}
   }
-
-	@Override
-	public void notifyDeleted() {
-		if (ruby != null) {
-			ruby.notifyDeleted();
-		}
-		super.notifyDeleted();
-	}
 }

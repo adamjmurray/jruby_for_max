@@ -22,7 +22,7 @@ PACKAGE = "#{DIST}/jruby_for_max-#{PROJECT_VERSION}"
 
 SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
-JAR       = "#{LIB}/jruby_for_max.jar"
+JAR       = "#{LIB}/jruby4max.jar"
 
 
 ##############################################################################

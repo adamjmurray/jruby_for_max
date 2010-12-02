@@ -1,7 +1,7 @@
 build
 download
 dist
-jruby_for_max.jar
+jruby4max.jar
 out
 Jruby_for_max.iml
 .idea

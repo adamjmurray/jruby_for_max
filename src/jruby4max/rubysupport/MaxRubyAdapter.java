@@ -51,7 +51,7 @@ public class MaxRubyAdapter {
 
 	public static final String NIL = "nil";
 
-	private ScriptEvaluator ruby;
+	private IScriptEvaluator ruby;
 
 	private LineBuilder code = new LineBuilder();
 

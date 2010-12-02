@@ -1,12 +1,12 @@
 package jruby4max.rubysupport;
 
 /*
-Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
+Copyright (c) 2008-2011, Adam Murray (adam@compusition.com). All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -27,26 +27,98 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**
- * Interface for all script evaluator engines.
- * 
- * @author Adam Murray (adam@compusition.com)
- */
-public interface ScriptEvaluator {
+import org.jruby.CompatVersion;
+import org.jruby.embed.ScriptingContainer;
+import org.jruby.embed.LocalContextScope;
+import org.jruby.embed.LocalVariableBehavior;
 
-	void resetContext();
+import java.util.HashMap;
+import java.util.Map;
 
-	boolean isInitialized();
+public class ScriptEvaluator implements IScriptEvaluator {
 
-	void setInitialized(boolean initialized);
+    private ScriptingContainer container;
 
-	void declareGlobal(String variableName, Object obj);
+    private CompatVersion compatVersion;
 
-	void undeclareGlobal(String variableName);
+    private boolean initialized = false;
+    private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
-	void setScriptFilename(String scriptFilename);
-	
-	Object eval(CharSequence rubyCode);
+    public ScriptEvaluator(CompatVersion rubyVersion) {
+        // if compatVersion isn't set right away, it won't work (maybe because of the global var setup?)
+        compatVersion = rubyVersion;
+        resetEngineContext();
+    }    
 
-	void exit();
+    public void resetContext() {
+        resetEngineContext();
+        try {
+            for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
+                String name = global.getKey();
+                undeclareGlobalInternal(name);
+                declareGlobalInternal(name, global.getValue());
+            }
+        }
+        catch (Exception e) {
+            throw new RubyException(e);
+        }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
+    }
+
+    public void declareGlobal(String variableName, Object obj) {
+        try {
+            declareGlobalInternal(variableName, obj);
+        }
+        catch (Exception e) {
+            throw new RubyException(e);
+        }
+        persitentGlobals.put(variableName, obj);
+    }
+
+    public void undeclareGlobal(String variableName) {
+        try {
+            undeclareGlobalInternal(variableName);
+        }
+        catch (Exception e) {
+            throw new RubyException(e);
+        }
+        persitentGlobals.remove(variableName);
+    }
+
+    protected void resetEngineContext() {
+        container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);
+        container.setCompatVersion(compatVersion);
+    }
+
+    protected void declareGlobalInternal(String variableName, Object obj) {
+        container.put("$" + variableName, obj);
+    }
+
+    protected void undeclareGlobalInternal(String variableName) {
+        container.removeAttribute("$" + variableName);
+    }
+
+    public void setScriptFilename(String scriptFilename) {
+        if (scriptFilename == null) {
+            scriptFilename = "";
+        }
+        container.setScriptFilename(scriptFilename);
+    }
+
+    public Object eval(CharSequence rubyCode) {
+        return container.runScriptlet(rubyCode.toString());
+    }
+
+    public void exit() {
+        container.terminate();
+        container = null;
+
+    }
 }

@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,12 +43,12 @@ import jruby4max.util.MappedSet;
  */
 public class ScriptEvaluatorManager {
 
-	private static Map<String, ScriptEvaluator> evaluatorContexts = new HashMap<String, ScriptEvaluator>();
+	private static Map<String, IScriptEvaluator> evaluatorContexts = new HashMap<String, IScriptEvaluator>();
 	private static Map<String, Integer> evaluatorContextCounter = new HashMap<String, Integer>();
 	//private static MappedSet<String, String> evaluatorContextDestroyedListeners = new MappedSet<String, String>();
 	private static MappedSet<String, Object> objectsUsingEvaluator = new MappedSet<String, Object>();
 	private static Map<String, Map<String, Object>> maxObjectMap = new HashMap<String, Map<String, Object>>();
-	private static Constructor<ScriptEvaluator> evaluatorConstructor;
+	private static Constructor<IScriptEvaluator> evaluatorConstructor;
 
 	/**
 	 * Stores a mapping from max objects to their context and id
@@ -65,7 +64,7 @@ public class ScriptEvaluatorManager {
 	 * 
 	 * @return
 	 */
-	public static ScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject, CompatVersion rubyVersion) {
+	public static IScriptEvaluator getRubyEvaluator(String maxContext, String id, Object maxObject, CompatVersion rubyVersion) {
 
 		Map<String, Object> idMap = maxObjectMap.get(maxContext);
 		if (idMap == null) {
@@ -81,9 +80,9 @@ public class ScriptEvaluatorManager {
 		// if maxContext is null, the evaluatorContext will be some semi-random unique context
 		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
 
-		ScriptEvaluator evaluator = evaluatorContexts.get(evaluatorContext);
+		IScriptEvaluator evaluator = evaluatorContexts.get(evaluatorContext);
 		if (evaluator == null) {
-			evaluator = newRubyEvaluatorInstance(rubyVersion);
+			evaluator = new ScriptEvaluator(rubyVersion);
 			evaluatorContexts.put(evaluatorContext, evaluator);
 			evaluatorContextCounter.put(evaluatorContext, 1);
 			Set<Object> maxObjects = objectsUsingEvaluator.addValue(evaluatorContext, maxObject);
@@ -178,66 +177,12 @@ public class ScriptEvaluatorManager {
 		}
 	}
 
-	/*
-	public static void registerContextDestroyedListener(Object maxObject, String callbackMethod) {
-		String[] contextAndId = objectMetadata.get(maxObject);
-		if (contextAndId != null) {
-			String maxContext = contextAndId[0];
-			String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
-			evaluatorContextDestroyedListeners.addValue(evaluatorContext, callbackMethod);
-		}
-	}
-	*/
-
 	public static void notifyContextDestroyedListener(String maxContext, Object maxObject) {
 		String evaluatorContext = getEvaluatorContext(maxContext, maxObject);
-		ScriptEvaluator ruby = evaluatorContexts.get(evaluatorContext);
-		/*
-		Collection<String> callbackMethods = evaluatorContextDestroyedListeners.remove(evaluatorContext);
-		if (ruby != null && callbackMethods != null) {
-			for (String callbackMethod : callbackMethods) {
-				try {
-					ruby.eval(callbackMethod);
-				}
-				catch (Exception e) {
-					System.err.println("on_context_destroyed method '" + callbackMethod + "' failed:\n"
-							+ e.getMessage());
-				}
-			}
-		}
-		*/
+		IScriptEvaluator ruby = evaluatorContexts.get(evaluatorContext);
 		if (ruby != null) {
 			// The callback method behavior above should be phased out in favor of this:
 			ruby.exit();
-		}
-	}
-
-	private static ScriptEvaluator newRubyEvaluatorInstance(CompatVersion rubyVersion) {
-		if (evaluatorConstructor == null) {
-			String evaluatorClassName = RubyProperties.getRubyEngine();
-			try {
-				@SuppressWarnings("unchecked")
-				Class<ScriptEvaluator> evaluatorClass = (Class<ScriptEvaluator>) Class.forName(evaluatorClassName);
-				evaluatorConstructor = evaluatorClass.getConstructor(CompatVersion.class);
-			}
-			catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-			catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		try {
-			return evaluatorConstructor.newInstance(rubyVersion);
-		}
-		catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		}
-		catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-		catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
 		}
 	}
 }

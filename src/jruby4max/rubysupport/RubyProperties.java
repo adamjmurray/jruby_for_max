@@ -45,53 +45,16 @@ public class RubyProperties {
 
 	public static Properties properties;
 
-	public static final String DEFAULT_RUBY_ENGINE = "jruby4max.rubysupport.JRubyEmbedEvaluator";
-
 	public static final String DEFAULT_INITIALIZER_FILES = "jruby_initialize.rb";
-
-	private static String rubyEngine;
 
 	private static String[] initializers;
 
 	private static String[] loadpaths;
 
-	public static String getRubyEngine() {
-		if (rubyEngine == null) {
-			rubyEngine = properties.getProperty("ruby.engine", DEFAULT_RUBY_ENGINE).trim();
-		}
-		return rubyEngine;
-	}
-
-	public static String[] getInitializerFiles() {
-		if (initializers == null) {
-			initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
-			for (int i = 0; i < initializers.length; i++) {
-				initializers[i] = initializers[i].trim();
-			}
-		}
-		return initializers;
-	}
-
-	public static String[] getLoadPaths() {
-		if (loadpaths == null) {
-			String loadpathsProp = properties.getProperty("ruby.loadpaths");
-			if (loadpathsProp == null || loadpathsProp.trim().equals("")) {
-				loadpaths = new String[] {};
-			}
-			else {
-				loadpaths = loadpathsProp.split(";");
-				for (int i = 0; i < loadpaths.length; i++) {
-					loadpaths[i] = loadpaths[i].trim();
-				}
-			}
-		}
-		return loadpaths;
-	}
-
 	static {
-		// Initialize JRuby system properties and load the jruby4max.ruby.properties file
+		// Initialize JRuby system properties and load the jruby_for_max.properties file
 		try {
-			String propsPath = MaxSystem.locateFile("ajm.ruby.properties");
+			String propsPath = MaxSystem.locateFile("jruby_for_max.properties");
 			if (propsPath == null) {
 				//MaxSystem.error("jruby4max.ruby.properties not found! Maybe jruby4max objects was not installed correctly?");
 				properties = new Properties();				
@@ -118,6 +81,32 @@ public class RubyProperties {
 			// System.out.println("Using hard-coded defaults for RubyProperties.");
 			properties = new Properties();
 		}
+	}
+        
+	public static String[] getInitializerFiles() {
+		if (initializers == null) {
+			initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
+			for (int i = 0; i < initializers.length; i++) {
+				initializers[i] = initializers[i].trim();
+			}
+		}
+		return initializers;
+	}
+
+	public static String[] getLoadPaths() {
+		if (loadpaths == null) {
+			String loadpathsProp = properties.getProperty("ruby.loadpaths");
+			if (loadpathsProp == null || loadpathsProp.trim().equals("")) {
+				loadpaths = new String[] {};
+			}
+			else {
+				loadpaths = loadpathsProp.split(";");
+				for (int i = 0; i < loadpaths.length; i++) {
+					loadpaths[i] = loadpaths[i].trim();
+				}
+			}
+		}
+		return loadpaths;
 	}
 	
 	public static CompatVersion getRubyVersion(String version) {

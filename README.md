@@ -55,4 +55,4 @@ You can check by typing "jar" on the command line. If it says something like "ja
 0. Go to the end of the variable value and add ";C:\Program Files\Java\jdk1.6.0_22\bin" (adjust the path as needed for your computer, and make sure you put a semicolon before this path and the preceding part of the variable value)
 
 Now if you open a command prompt and type "jar" you should see usage
-instructions for the jar command
+instructions for the jar command. That means your JDK and path are setup correctly, and you should be able to build this project.

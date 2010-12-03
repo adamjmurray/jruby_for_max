@@ -25,7 +25,7 @@ SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
 JAR       = "#{LIB}/jruby4max.jar"
 
-WINDOWS = Config::CONFIG['host_os'] =~ /win/
+WINDOWS = Config::CONFIG['host_os'] =~ /mswin/
 CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
 
 ##############################################################################

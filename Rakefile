@@ -1,5 +1,6 @@
 require 'rake/clean'
 require 'tempfile'
+require 'rbconfig'
 include FileUtils
 
 PROJECT_VERSION = '1.0_alpha1'
@@ -24,6 +25,8 @@ SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
 JAR       = "#{LIB}/jruby4max.jar"
 
+WINDOWS = Config::CONFIG['host_os'] =~ /win/
+CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
 
 ##############################################################################
 # TASK DEFINITIONS
@@ -35,7 +38,7 @@ desc 'compile the java source files'
 task :compile do
   mkdir BUILD
   puts "Building java classes"  
-  `javac -classpath #{CLASSPATH.join ':'} -d #{BUILD} -g -source 1.5 -target 1.5 #{SOURCES}`
+  `javac -classpath #{CLASSPATH.join CLASSPATH_SEPARATOR} -d #{BUILD} -g -source 1.5 -target 1.5 #{SOURCES}`
 end
 
 

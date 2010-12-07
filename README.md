@@ -1,6 +1,6 @@
 # JRuby for Max #
 
-Ruby support for Max 5 (<http://www.cycling74.com/products/max5>) and Max for Live, built on top of JRuby (<http://jruby.org>)
+Ruby support for [Max](http://cycling74.com/products/maxmspjitter/) and [Max for Live](http://www.ableton.com/products), built on top of [JRuby](http://jruby.org)
 
   
 ## Author ##

@@ -32,6 +32,7 @@ CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
 # TASK DEFINITIONS
 
 CLEAN.include BUILD, JAR, DIST
+CLOBBER.include 'out'
 
 
 desc 'compile the java source files'

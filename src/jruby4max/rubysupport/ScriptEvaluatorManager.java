@@ -45,11 +45,9 @@ public class ScriptEvaluatorManager {
 
 	private static Map<String, IScriptEvaluator> evaluatorContexts = new HashMap<String, IScriptEvaluator>();
 	private static Map<String, Integer> evaluatorContextCounter = new HashMap<String, Integer>();
-	//private static MappedSet<String, String> evaluatorContextDestroyedListeners = new MappedSet<String, String>();
 	private static MappedSet<String, Object> objectsUsingEvaluator = new MappedSet<String, Object>();
 	private static Map<String, Map<String, Object>> maxObjectMap = new HashMap<String, Map<String, Object>>();
-	private static Constructor<IScriptEvaluator> evaluatorConstructor;
-
+	
 	/**
 	 * Stores a mapping from max objects to their context and id
 	 */
@@ -111,7 +109,7 @@ public class ScriptEvaluatorManager {
 			int count = evaluatorContextCounter.get(evaluatorContext);
 			count--;
 			if (count > 0) {
-				evaluatorContextCounter.put(evaluatorContext, count++);
+				evaluatorContextCounter.put(evaluatorContext, count);
 				objectsUsingEvaluator.get(evaluatorContext).remove(maxObject);
 			}
 			else {

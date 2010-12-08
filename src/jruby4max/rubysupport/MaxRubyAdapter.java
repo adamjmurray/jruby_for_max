@@ -172,6 +172,8 @@ public class MaxRubyAdapter {
 		if (ruby.isInitialized()) {
 			ScriptEvaluatorManager.notifyContextDestroyedListener(maxContext, maxObject);
 			ruby.resetContext();
+            // TODO: this prevents using multiple objects with @file from sharing the same @context, which is not really desirable.
+            // But we need to do this for @autowatch.
 		}
 		ruby.setInitialized(true);
 		

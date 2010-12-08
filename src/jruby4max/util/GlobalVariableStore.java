@@ -38,38 +38,15 @@ import java.util.Set;
  */
 public class GlobalVariableStore {
 
-	private static GlobalVariableStore instance;
+	private static HashMap instance;
 
 	private GlobalVariableStore() {
 	}
 
-	public synchronized static GlobalVariableStore getInstance() {
+	public synchronized static Map getInstance() {
 		if (instance == null) {
-			instance = new GlobalVariableStore();
+			instance = new HashMap();
 		}
 		return instance;
-	}
-
-	private Map<String, Object> variableStore = new HashMap<String, Object>();
-
-	public synchronized Object get(String name) {
-		return variableStore.get(name);
-	}
-
-	public synchronized Object set(String name, Object value) {
-		return variableStore.put(name, value);
-	}
-
-	public synchronized boolean delete(String name) {
-		Object value = variableStore.remove(name);
-		return value != null;
-	}
-
-	public synchronized boolean defined(String name) {
-		return variableStore.containsKey(name);
-	}
-
-	public synchronized Set<String> names() {
-		return variableStore.keySet();
 	}
 }

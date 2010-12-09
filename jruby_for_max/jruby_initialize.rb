@@ -160,15 +160,20 @@ module SendReceive
 
   # Notify all receivers of a message and any additional arguments.
   def send( message, *args )
-    for callback, max_object in SendReceive.registry[message.to_s] do
-      # Now we have to swap some variable references around in order to restore the binding
-      # for $max_object that existed at the time the receive callback was registered.
-      # This ensures the outlet methods work correctly.
-      current_max_object = $max_object
-      $max_object = max_object
-      callback.call( *args )
-      $max_object = current_max_object
+    # Now we have to swap some variable references around in order to restore the binding
+    # for $max_object that existed at the time the receive callback was registered.
+     # This ensures the outlet methods work correctly.
+    current_max_object = $max_object
+    for callback, $max_object in SendReceive.registry[message.to_s] do
+      begin
+        # $max_object.getNumOutlets # this blows up after deleting receivers in a shared context
+        callback.call( *args )
+      rescue
+
+      end
     end
+  ensure
+    $max_object = current_max_object
   end
 
   at_exit do

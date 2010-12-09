@@ -1,7 +1,7 @@
 require 'java'
 
 def inlet_assist(*params)
-  $max_object.setInletAssist params.to_java(:string)  
+  $max_object.setInletAssist params.to_java(:string)
 end
 
 def outlet_assist(*params)
@@ -116,11 +116,6 @@ def max_object(namespace=nil)
   $max_object_map[context][id]    
 end
 
-# deprecated, use at_exit
-def on_context_destroyed(callback_script)
-  $max_ruby_adapter.on_context_destroyed(callback_script)
-end
-
 # for use with shared contexts:
 LOCAL_STORAGE = {}
 def set_local(name,obj)
@@ -128,12 +123,10 @@ def set_local(name,obj)
   LOCAL_STORAGE[$max_object] = storage = {} if not storage
   storage[name] = obj
 end
-alias setLocal set_local # for backward compatibility
 def get_local(name)
   storage = LOCAL_STORAGE[$max_object]
   storage[name] if storage
 end
-alias getLocal get_local # for backward compatibility
 def delete_local(name)
   storage = LOCAL_STORAGE[$max_object]
   storage.delete(name) if storage
@@ -141,59 +134,66 @@ end
 def has_local?(name)
   storage = LOCAL_STORAGE[$max_object]
   if storage
-    storage.has_key?(name) 
-  else 
+    storage.has_key?(name)
+  else
     false
   end
 end
 
-def set_global(name,obj)
-  $global_variable_store.set(name.to_s, obj) if name
-  return obj
+def set_global( name, obj )
+  $global_variable_store[name.to_s] = obj
 end
-def get_global(name)
-  $global_variable_store.get(name.to_s) if name
+def get_global( name )
+  $global_variable_store[name.to_s]
 end
-def delete_global(name)
-  $global_variable_store.delete(name.to_s) if name
+def init_global( name, initial_value )
+  $global_variable_store[name.to_s] ||= initial_value
 end
-def has_global?(name)
-  $global_variable_store.defined(name.to_s) if name
-end   
+def delete_global( name )
+  $global_variable_store.remove name.to_s
+end
+def has_global?( name )
+  $global_variable_store.contains_key? name.to_s
+end
 
 
 ###########################
 
 module SendReceive
-  
-  SEND_RECEIVE_REGISTRY ||=  # using the global variable store so any jruby instances can communicate
-    $global_variable_store['SendReceive::SEND_RECEIVE_REGISTRY'] ||=
-      Hash.new{|hash,key| hash[key] = [] } # initialize missing entries to an empty list    
+
+  def receiver_registry
+    @registry ||= init_global( 'JRuby_for_Max.SEND_RECEIVE_REGISTRY',
+      # using the global variable store so any jruby instances can communicate
+      Hash.new{|hash,key| hash[key] = [] }      # initialize missing entries to an empty list
+    )
+  end
 
   # Registers a receiver of a message by way of a callback, and records the binding for $max_object.
   def receive( message, &callback )
     # It seems that if we are going to use the global variable store, then the keys
     # need to be converted to Strings. Identical symbols are apparently not equal across Ruby evaluators.
     # (If we were doing a context-local send/receive, then we wouldn't have to worry about this.)
-    SEND_RECEIVE_REGISTRY[message.to_s] << [callback, $max_object]
+    receiver_registry[message.to_s] << [callback, $max_object]
   end
-  
+
   # Notify all receivers of a message.
   def send( message, *args )
-    for callback, max_object in SEND_RECEIVE_REGISTRY[message.to_s] do
+    for callback, max_object in receiver_registry[message.to_s] do
       # Now we have to swap some variable references around in order to restore the binding
       # for $max_object that existed at the time the receive callback was registered.
-      # This ensures the outlet methods work correctly.      
+      # This ensures the outlet methods work correctly.
       current_max_object = $max_object
       $max_object = max_object
       callback.call( *args )
       $max_object = current_max_object
     end
   end
-  
+
   at_exit do
     # cleanup max_objects which were deleted
-    for message, receivers in SEND_RECEIVE_REGISTRY
+    for message, receivers in receiver_registry
+      # when this code runs, $max_object is the current max object that's being deleted, so remove
+      # it from the registry:
       receivers.delete_if{|_,max_object| max_object == $max_object}
     end
   end

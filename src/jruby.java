@@ -68,9 +68,7 @@ public class jruby extends JRubyMaxObject {
   public jruby(Atom[] args) {
     super();
     declareAttribute("evalout", "getevalout", "evalout");
-    declareAttribute("evaloutlet", "getevalout", "evalout");  // deprecated, for backward compatibility
-    declareAttribute("file", "getfile", "file"); 
-    declareAttribute("scriptfile", "getfile", "file"); // deprecated, for backward compatibility    
+    declareAttribute("file", "getfile", "file");
     declareAttribute("autowatch", "getautowatch", "autowatch");
     declareAttribute("symbols_to", "getsymbols_to", "symbols_to");
     

@@ -135,7 +135,7 @@ public class jruby extends JRubyMaxObject {
   public void file(Atom[] args) {
   	if (args != null && args.length > 0) {
   		scriptFilePath = args[0].toString();
-  		scriptFile = Utils.getFile(scriptFilePath, getParentPatcher(), true);
+  		scriptFile = Utils.getFile(scriptFilePath, getParentPatcher(), true, ".rb");
   		scriptFileArgs = Atom.removeFirst(args);
   		if(scriptFile == null) {
   			err("File not found: " + scriptFilePath);

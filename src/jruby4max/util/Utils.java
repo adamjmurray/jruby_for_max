@@ -141,33 +141,43 @@ public class Utils {
 	public static File getFile(String path) {
 		return getFile(path, null);
 	}
-	
-	/**
+
+	public static File getFile(String path, MaxPatcher patcher) {
+		return getFile(path, patcher, false);
+	}
+
+	public static File getFile(String path, MaxPatcher patcher, boolean suppressError) {
+        return getFile(path, patcher, false, null);
+    }
+
+    /**
 	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
 	 * path will be searched to locate the file. If patcher is not null, then before searching the Max search path,
 	 * the path relative to the patcher will be searched.
-	 * 
+	 *
 	 * @param path -
 	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
 	 * @param patcher -
 	 *            the patcher relative to which the path should be searched for first, before the Max search path
-           
+     * @param suppressError  -
+	 *            if false, when no file is found an error will be printed to syserr
+     * @param optionalExtension -
+     *            if provided, and no file is found, the file is searched for again with the optionalExtension appended
+     *
 	 * @return a File object referencing an existing file, otherwise null
-	 */	
-	public static File getFile(String path, MaxPatcher patcher) {
-		return getFile(path, patcher, false);
-	}
-	
-	public static File getFile(String path, MaxPatcher patcher, boolean suppressError) {
+	 */
+    public static File getFile(String path, MaxPatcher patcher, boolean suppressError, String optionalExtension) {
+        // If no file is provided, prompt the user to select one with a file dialog
 		if (path == null || path.length() == 0) {
 			path = MaxSystem.openDialog();
 			if(path == null) {
 				return null; // user canceled the file open dialog
 			}
+            // else a file was selected and we'll proceed to handle it like any path passed into this method
 		}
 
-		File file;
-		// first see if it's an absolute path		
+        File file;
+		// first see if it's an absolute path
 		String location = MaxSystem.maxPathToNativePath(path);
 		if (location != null) {							
 			file = new File(location);
@@ -192,8 +202,18 @@ public class Utils {
 			if (file != null && file.isFile()) {
 				return file;
 			}
-		}				
-			
+		}
+        // if we make it here, NOTHING WAS FOUND
+
+        // if an optional extension was provided, then look again with that appended
+        if(optionalExtension != null && !path.endsWith(optionalExtension)) {
+            file = getFile(path+optionalExtension, patcher, true, null);
+            if(file != null) {
+                return file;
+            }
+        }
+
+        // and if that didn't work either, it's time for an error (unless suppressed):
 		if(!suppressError) {
 			System.err.println("File not found: " + path);
 		}

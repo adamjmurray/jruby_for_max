@@ -1,4 +1,9 @@
                           
                           JRuby for Max changelog
 
-First release coming soon...
+
+What's new since this project was forked from "ajm objects"
+
+* .rb extension is now optional for @file
+
+* A SendReceive module containing methods for sending and receiving data between any jruby objects in Max or Max for Live.

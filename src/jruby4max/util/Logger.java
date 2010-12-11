@@ -29,14 +29,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Simple logging interface.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public interface Logger {
 
-	void debug(String message);
+	void debug( String message );
 
-	void info(String message);
+	void info( String message );
 
-	void err(String message);
+	void err( String message );
 }

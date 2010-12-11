@@ -28,97 +28,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import org.jruby.CompatVersion;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
+import org.jruby.embed.ScriptingContainer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ScriptEvaluator implements IScriptEvaluator {
 
-    private ScriptingContainer container;
+	private ScriptingContainer container;
 
-    private CompatVersion compatVersion;
+	private CompatVersion compatVersion;
 
-    private boolean initialized = false;
-    private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
+	private boolean initialized = false;
+	private Map<String, Object> persitentGlobals = new HashMap<String, Object>();
 
-    public ScriptEvaluator(CompatVersion rubyVersion) {
-        // if compatVersion isn't set right away, it won't work (maybe because of the global var setup?)
-        compatVersion = rubyVersion;
-        resetEngineContext();
-    }    
+	public ScriptEvaluator( CompatVersion rubyVersion ) {
+		// if compatVersion isn't set right away, it won't work (maybe because of the global var setup?)
+		compatVersion = rubyVersion;
+		resetEngineContext();
+	}
 
-    public void resetContext() {
-        resetEngineContext();
-        try {
-            for (Map.Entry<String, Object> global : persitentGlobals.entrySet()) {
-                String name = global.getKey();
-                undeclareGlobalInternal(name);
-                declareGlobalInternal(name, global.getValue());
-            }
-        }
-        catch (Exception e) {
-            throw new RubyException(e);
-        }
-    }
+	public void resetContext() {
+		resetEngineContext();
+		try {
+			for( Map.Entry<String, Object> global : persitentGlobals.entrySet() ) {
+				String name = global.getKey();
+				undeclareGlobalInternal( name );
+				declareGlobalInternal( name, global.getValue() );
+			}
+		} catch(Exception e) {
+			throw new RubyException( e );
+		}
+	}
 
-    public boolean isInitialized() {
-        return initialized;
-    }
+	public boolean isInitialized() {
+		return initialized;
+	}
 
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
+	public void setInitialized( boolean initialized ) {
+		this.initialized = initialized;
+	}
 
-    public void declareGlobal(String variableName, Object obj) {
-        try {
-            declareGlobalInternal(variableName, obj);
-        }
-        catch (Exception e) {
-            throw new RubyException(e);
-        }
-        persitentGlobals.put(variableName, obj);
-    }
+	public void declareGlobal( String variableName, Object obj ) {
+		try {
+			declareGlobalInternal( variableName, obj );
+		} catch(Exception e) {
+			throw new RubyException( e );
+		}
+		persitentGlobals.put( variableName, obj );
+	}
 
-    public void undeclareGlobal(String variableName) {
-        try {
-            undeclareGlobalInternal(variableName);
-        }
-        catch (Exception e) {
-            throw new RubyException(e);
-        }
-        persitentGlobals.remove(variableName);
-    }
+	public void undeclareGlobal( String variableName ) {
+		try {
+			undeclareGlobalInternal( variableName );
+		} catch(Exception e) {
+			throw new RubyException( e );
+		}
+		persitentGlobals.remove( variableName );
+	}
 
-    protected void resetEngineContext() {
-        container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);
-        container.setCompatVersion(compatVersion);
-    }
+	protected void resetEngineContext() {
+		container = new ScriptingContainer( LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT );
+		container.setCompatVersion( compatVersion );
+	}
 
-    protected void declareGlobalInternal(String variableName, Object obj) {
-        container.put("$" + variableName, obj);
-    }
+	protected void declareGlobalInternal( String variableName, Object obj ) {
+		container.put( "$" + variableName, obj );
+	}
 
-    protected void undeclareGlobalInternal(String variableName) {
-        container.removeAttribute("$" + variableName);
-    }
+	protected void undeclareGlobalInternal( String variableName ) {
+		container.removeAttribute( "$" + variableName );
+	}
 
-    public void setScriptFilename(String scriptFilename) {
-        if (scriptFilename == null) {
-            scriptFilename = "";
-        }
-        container.setScriptFilename(scriptFilename);
-    }
+	public void setScriptFilename( String scriptFilename ) {
+		if( scriptFilename == null ) {
+			scriptFilename = "";
+		}
+		container.setScriptFilename( scriptFilename );
+	}
 
-    public Object eval(CharSequence rubyCode) {
-        return container.runScriptlet(rubyCode.toString());
-    }
+	public Object eval( CharSequence rubyCode ) {
+		return container.runScriptlet( rubyCode.toString() );
+	}
 
-    public void exit() {
-        container.terminate();
-        container = null;
+	public void exit() {
+		container.terminate();
+		container = null;
 
-    }
+	}
 }

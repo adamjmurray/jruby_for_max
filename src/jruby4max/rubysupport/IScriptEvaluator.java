@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Interface for all script evaluator engines.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public interface IScriptEvaluator {
@@ -38,15 +38,15 @@ public interface IScriptEvaluator {
 
 	boolean isInitialized();
 
-	void setInitialized(boolean initialized);
+	void setInitialized( boolean initialized );
 
-	void declareGlobal(String variableName, Object obj);
+	void declareGlobal( String variableName, Object obj );
 
-	void undeclareGlobal(String variableName);
+	void undeclareGlobal( String variableName );
 
-	void setScriptFilename(String scriptFilename);
-	
-	Object eval(CharSequence rubyCode);
+	void setScriptFilename( String scriptFilename );
+
+	Object eval( CharSequence rubyCode );
 
 	void exit();
 }

@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Wrapper for any Ruby exceptions. Helps encapsulate the underlying Ruby implementation.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")
@@ -39,15 +39,15 @@ public class RubyException extends RuntimeException {
 		super();
 	}
 
-	public RubyException(String message, Throwable cause) {
-		super(message, cause);
+	public RubyException( String message, Throwable cause ) {
+		super( message, cause );
 	}
 
-	public RubyException(String message) {
-		super(message);
+	public RubyException( String message ) {
+		super( message );
 	}
 
-	public RubyException(Throwable cause) {
-		super(cause);
+	public RubyException( Throwable cause ) {
+		super( cause );
 	}
 }

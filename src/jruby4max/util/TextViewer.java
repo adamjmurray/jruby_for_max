@@ -27,19 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A Swing-based popup window for viewing text.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class TextViewer {
@@ -50,58 +43,59 @@ public class TextViewer {
 	private int width;
 	private int height;
 	Dimension dim;
-	
-	public TextViewer(String name) {
-		frame = new JFrame(name);
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+	public TextViewer( String name ) {
+		frame = new JFrame( name );
+		frame.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
 		width = 600;
 		height = 450;
-		
+
 		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
-		
-		JScrollPane scroller = new JScrollPane(textArea);
-		scroller.setPreferredSize(new Dimension(width, height));
-		
-		frame.add(scroller, BorderLayout.CENTER);
+		textArea.setEditable( false );
+		textArea.setFont( new Font( "Monospaced", Font.PLAIN, 11 ) );
+
+		JScrollPane scroller = new JScrollPane( textArea );
+		scroller.setPreferredSize( new Dimension( width, height ) );
+
+		frame.add( scroller, BorderLayout.CENTER );
 	}
 
 	public void show() {
-		SwingUtilities.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater( new Runnable() {
 			public void run() {
-				if(!packed) {
+				if( !packed ) {
 					frame.pack();
 					packed = true;
 				}
-				frame.setVisible(true);
+				frame.setVisible( true );
 			}
-		});
+		} );
 	}
-	
+
 	public void hide() {
-		frame.setVisible(false);
+		frame.setVisible( false );
 	}
 
-	public void setText(String text) {
-		textArea.setText(text);
+	public void setText( String text ) {
+		textArea.setText( text );
 	}
-	
+
 	private int WINDOW_PADDING = 10;
-	public void setCenter(int x, int y) {
-		x -= width/2;
-		y -= height/2;
 
-		if(x < WINDOW_PADDING) x = WINDOW_PADDING;
-		if(y < WINDOW_PADDING) y = WINDOW_PADDING;
+	public void setCenter( int x, int y ) {
+		x -= width / 2;
+		y -= height / 2;
+
+		if( x < WINDOW_PADDING ) x = WINDOW_PADDING;
+		if( y < WINDOW_PADDING ) y = WINDOW_PADDING;
 
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension resolution = toolkit.getScreenSize();
 		int maxX = resolution.width - width - WINDOW_PADDING;
 		int maxY = resolution.height - height - WINDOW_PADDING;
-		if(x > maxX) x = maxX;
-		if(y > maxY) y = maxY;
-	
-		frame.setLocation(x,y);	
+		if( x > maxX ) x = maxX;
+		if( y > maxY ) y = maxY;
+
+		frame.setLocation( x, y );
 	}
 }

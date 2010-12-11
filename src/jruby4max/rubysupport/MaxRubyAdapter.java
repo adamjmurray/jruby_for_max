@@ -27,24 +27,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-
-import org.jruby.*;
-
+import com.cycling74.max.Atom;
+import com.cycling74.max.MaxObject;
 import jruby4max.maxsupport.Atomizer;
 import jruby4max.util.GlobalVariableStore;
 import jruby4max.util.LineBuilder;
 import jruby4max.util.Logger;
 import jruby4max.util.Utils;
+import org.jruby.CompatVersion;
+import org.jruby.RubyArray;
+import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
 
-import com.cycling74.max.Atom;
-import com.cycling74.max.MaxObject;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * The bridge between Max and Ruby.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class MaxRubyAdapter {
@@ -56,7 +57,7 @@ public class MaxRubyAdapter {
 	private LineBuilder code = new LineBuilder();
 
 	private LineBuilder scriptFileInit = new LineBuilder();
-	
+
 	private final MaxObject maxObject;
 
 	private Logger logger;
@@ -64,13 +65,13 @@ public class MaxRubyAdapter {
 	private String maxContext;
 
 	private String id;
-	
+
 	private CompatVersion rubyVersion;
 
-	public MaxRubyAdapter(MaxObject maxObject, String context, String id, CompatVersion rubyVersion) {
+	public MaxRubyAdapter( MaxObject maxObject, String context, String id, CompatVersion rubyVersion ) {
 		this.maxObject = maxObject;
-		if (maxObject instanceof Logger) {
-			this.logger = (Logger) maxObject;
+		if( maxObject instanceof Logger ) {
+			this.logger = (Logger)maxObject;
 		}
 		this.maxContext = context;
 		this.id = id;
@@ -79,16 +80,16 @@ public class MaxRubyAdapter {
 	}
 
 	private void getEvaluator() {
-		ruby = ScriptEvaluatorManager.getRubyEvaluator(maxContext, id, maxObject, rubyVersion);
-		ruby.declareGlobal("max_ruby_adapter", this);
-		ruby.declareGlobal("global_variable_store", GlobalVariableStore.getInstance());
+		ruby = ScriptEvaluatorManager.getRubyEvaluator( maxContext, id, maxObject, rubyVersion );
+		ruby.declareGlobal( "max_ruby_adapter", this );
+		ruby.declareGlobal( "global_variable_store", GlobalVariableStore.getInstance() );
 	}
 
 	public Logger getLogger() {
 		return logger;
 	}
 
-	public void setLogger(Logger logger) {
+	public void setLogger( Logger logger ) {
 		this.logger = logger;
 	}
 
@@ -96,10 +97,10 @@ public class MaxRubyAdapter {
 		return maxContext;
 	}
 
-	public void setContext(String context) {
-		if (!Utils.equals(this.maxContext, context)) {
+	public void setContext( String context ) {
+		if( !Utils.equals( this.maxContext, context ) ) {
 			// cleanup old context
-			ScriptEvaluatorManager.removeRubyEvaluator(maxObject);
+			ScriptEvaluatorManager.removeRubyEvaluator( maxObject );
 
 			// init new context
 			this.maxContext = context;
@@ -111,41 +112,41 @@ public class MaxRubyAdapter {
 		return id;
 	}
 
-	public void setId(String id) {
-		if (!Utils.equals(this.id, id)) {
-			ScriptEvaluatorManager.updateId(maxObject, id);
+	public void setId( String id ) {
+		if( !Utils.equals( this.id, id ) ) {
+			ScriptEvaluatorManager.updateId( maxObject, id );
 			this.id = id;
 		}
 	}
 
 	public void notifyDeleted() {
-		ScriptEvaluatorManager.removeRubyEvaluator(maxObject);
+		ScriptEvaluatorManager.removeRubyEvaluator( maxObject );
 	}
 
-	public void exec(CharSequence rubyCode) {
-		eval(rubyCode, false);
+	public void exec( CharSequence rubyCode ) {
+		eval( rubyCode, false );
 	}
 
-	public Object eval(CharSequence rubyCode) {
-		return eval(rubyCode, true);
+	public Object eval( CharSequence rubyCode ) {
+		return eval( rubyCode, true );
 	}
 
 	/**
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
-	public Object eval(CharSequence rubyCode, boolean returnResult) {
-		if (!ruby.isInitialized()) {
+	public Object eval( CharSequence rubyCode, boolean returnResult ) {
+		if( !ruby.isInitialized() ) {
 			init();
 		}
 		Object result;
-		synchronized (ruby) {
+		synchronized(ruby) {
 			// Set the $MaxObject/ID globals correctly in shared contexts:
-			ruby.undeclareGlobal("max_object");
-			ruby.declareGlobal("max_object", maxObject);
-			result = ruby.eval(rubyCode);
+			ruby.undeclareGlobal( "max_object" );
+			ruby.declareGlobal( "max_object", maxObject );
+			result = ruby.eval( rubyCode );
 		}
-		if (returnResult) {
-			return toAtoms(result, true);
+		if( returnResult ) {
+			return toAtoms( result, true );
 		}
 		else {
 			return null;
@@ -153,221 +154,214 @@ public class MaxRubyAdapter {
 	}
 
 	public void init() {
-		init(null, Atom.emptyArray);
+		init( null, Atom.emptyArray );
 	}
 
-	public void init(File scriptFile, Atom[] args) {
-		if (code.isEmpty()) {
+	public void init( File scriptFile, Atom[] args ) {
+		if( code.isEmpty() ) {
 			// setup the $LOAD_PATH
-			for (String loadPath : RubyProperties.getLoadPaths()) {
-				code.line("$: << " + quote(loadPath));				
+			for( String loadPath : RubyProperties.getLoadPaths() ) {
+				code.line( "$: << " + quote( loadPath ) );
 			}
 			// and include any initializer files:
-			for (String initializer : RubyProperties.getInitializerFiles()) {
-				String initializationCode = Utils.getFileAsString(initializer);
-				code.append(initializationCode);
+			for( String initializer : RubyProperties.getInitializerFiles() ) {
+				String initializationCode = Utils.getFileAsString( initializer );
+				code.append( initializationCode );
 			}
 		}
 
-		if (ruby.isInitialized()) {
-			ScriptEvaluatorManager.notifyContextDestroyedListener(maxContext, maxObject);
+		if( ruby.isInitialized() ) {
+			ScriptEvaluatorManager.notifyContextDestroyedListener( maxContext, maxObject );
 			ruby.resetContext();
-            // TODO: this prevents using multiple objects with @file from sharing the same @context, which is not really desirable.
-            // But we need to do this for @autowatch.
+			// TODO: this prevents using multiple objects with @file from sharing the same @context, which is not really desirable.
+			// But we need to do this for @autowatch.
 		}
-		ruby.setInitialized(true);
-		
-		ruby.setScriptFilename(scriptFile == null ? null : scriptFile.getName());
-		exec(code);
+		ruby.setInitialized( true );
 
-		if (scriptFile != null) {
-			String script = Utils.getFileAsString(scriptFile);			
+		ruby.setScriptFilename( scriptFile == null ? null : scriptFile.getName() );
+		exec( code );
+
+		if( scriptFile != null ) {
+			String script = Utils.getFileAsString( scriptFile );
 			scriptFileInit.clear();
-			
+
 			File scriptFileFolder = scriptFile.getParentFile();
-			if(scriptFileFolder != null) {
+			if( scriptFileFolder != null ) {
 				// include the folder containing the scriptFile, so scripts can require files relative to themselves
 				String scriptFileFolderPath;
 				try {
 					scriptFileFolderPath = scriptFileFolder.getCanonicalPath();
+				} catch(IOException e) {
+					System.err.println( e );
+					scriptFileFolderPath = scriptFileFolder.getAbsolutePath();
 				}
-				catch(IOException e) {
-					System.err.println(e);
-					scriptFileFolderPath =  scriptFileFolder.getAbsolutePath();
-				}
-				scriptFileInit.line("$: << " + quote(scriptFileFolderPath));
-			}			
-			
-			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned			
-			scriptFileInit.line("$0 = " + quote(scriptFile));
-			
-			// any set the arguments
-			for (Atom arg : args) {
-				scriptFileInit.line("$* << " + Utils.detokenize(arg));
+				scriptFileInit.line( "$: << " + quote( scriptFileFolderPath ) );
 			}
-			
-			exec(scriptFileInit);
-			exec(script);
+
+			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned
+			scriptFileInit.line( "$0 = " + quote( scriptFile ) );
+
+			// any set the arguments
+			for( Atom arg : args ) {
+				scriptFileInit.line( "$* << " + Utils.detokenize( arg ) );
+			}
+
+			exec( scriptFileInit );
+			exec( script );
 		}
 	}
 
-	private String quote(Object o) {
-		if (o == null) return NIL;
+	private String quote( Object o ) {
+		if( o == null ) return NIL;
 		String s = o.toString();
-		if (s == null) return NIL;
-		return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'";
+		if( s == null ) return NIL;
+		return "'" + s.replace( "\\", "\\\\" ).replace( "'", "\\'" ) + "'";
 	}
 
 	/**
 	 * Converts the result of a Ruby evaluation into Max data types (Atoms)
-	 * 
+	 *
 	 * @param obj -
 	 *            A Ruby value
 	 * @return an Atom or an Atom[]. The calling code needs to figure out what type this is and handle it appropriately
 	 */
-	public Object toAtoms(Object obj) {
-		return toAtoms(obj, logger);
+	public Object toAtoms( Object obj ) {
+		return toAtoms( obj, logger );
 	}
 
-	public Object toAtoms(Object obj, boolean logCoercions) {
-		return toAtoms(obj, (logCoercions ? logger : null));
+	public Object toAtoms( Object obj, boolean logCoercions ) {
+		return toAtoms( obj, (logCoercions ? logger : null) );
 	}
 
-	private static BigInteger MAX_BINT = new BigInteger(Integer.MAX_VALUE + "");
-	private static BigInteger MIN_BINT = new BigInteger(Integer.MIN_VALUE + "");
-	
-	private Object toAtoms(Object obj, Logger logger) {
-		if (obj == null) {
-			return Atom.newAtom("nil");
+	private static BigInteger MAX_BINT = new BigInteger( Integer.MAX_VALUE + "" );
+	private static BigInteger MIN_BINT = new BigInteger( Integer.MIN_VALUE + "" );
+
+	private Object toAtoms( Object obj, Logger logger ) {
+		if( obj == null ) {
+			return Atom.newAtom( "nil" );
 		}
-		else if (obj instanceof Atom || obj instanceof Atom[]) {
+		else if( obj instanceof Atom || obj instanceof Atom[] ) {
 			return obj;
 		}
-		else if (obj instanceof Atomizer) {
-			return ((Atomizer) obj).toAtom();
+		else if( obj instanceof Atomizer ) {
+			return ((Atomizer)obj).toAtom();
 		}
-		else if (obj instanceof Double || obj instanceof Float) {
+		else if( obj instanceof Double || obj instanceof Float ) {
 			// Not sure if there's a situation where we should coerce to a String,
 			// because Max can only handle floats and JRuby always outputs Doubles.
 			// Floating point accuracy is very different from the Long wrap-around problem,
 			// so letting it downcast seems ok:
-			return Atom.newAtom(((Number) obj).doubleValue());
+			return Atom.newAtom( ((Number)obj).doubleValue() );
 		}
-		else if (obj instanceof Long || obj instanceof Integer || obj instanceof Short || obj instanceof Byte) {
-			long val = ((Number) obj).longValue();
-			if (val > Integer.MAX_VALUE || val < Integer.MIN_VALUE) {
-				if (logger != null) {
-					logger.info("coerced type " + obj.getClass().getName() + " to String");
+		else if( obj instanceof Long || obj instanceof Integer || obj instanceof Short || obj instanceof Byte ) {
+			long val = ((Number)obj).longValue();
+			if( val > Integer.MAX_VALUE || val < Integer.MIN_VALUE ) {
+				if( logger != null ) {
+					logger.info( "coerced type " + obj.getClass().getName() + " to String" );
 				}
-				return Atom.newAtom(obj.toString());
+				return Atom.newAtom( obj.toString() );
 			}
-			else return Atom.newAtom(val);
+			else return Atom.newAtom( val );
 		}
-		else if (obj instanceof BigInteger) {
+		else if( obj instanceof BigInteger ) {
 			BigInteger bigInt = (BigInteger)obj;
-			if(bigInt.compareTo(MAX_BINT) > 0 || bigInt.compareTo(MIN_BINT) < 0) {
-				if (logger != null) {
-					logger.info("coerced type " + obj.getClass().getName() + " to String");
+			if( bigInt.compareTo( MAX_BINT ) > 0 || bigInt.compareTo( MIN_BINT ) < 0 ) {
+				if( logger != null ) {
+					logger.info( "coerced type " + obj.getClass().getName() + " to String" );
 				}
-				return Atom.newAtom(obj.toString());
+				return Atom.newAtom( obj.toString() );
 			}
-			else return Atom.newAtom(bigInt.intValue());
+			else return Atom.newAtom( bigInt.intValue() );
 		}
-
-		else if (obj instanceof CharSequence) {
-			return Atom.newAtom(obj.toString());
+		else if( obj instanceof CharSequence ) {
+			return Atom.newAtom( obj.toString() );
 		}
-
-		else if (obj instanceof RubySymbol) {
-			return Atom.newAtom(":" + obj);
+		else if( obj instanceof RubySymbol ) {
+			return Atom.newAtom( ":" + obj );
 		}
-		
-		else if (obj instanceof Boolean) {
-			return Atom.newAtom(((Boolean) obj).booleanValue());
+		else if( obj instanceof Boolean ) {
+			return Atom.newAtom( ((Boolean)obj).booleanValue() );
 		}
-
-		else if (obj instanceof RubyArray) {
-			RubyArray array = (RubyArray) obj;
+		else if( obj instanceof RubyArray ) {
+			RubyArray array = (RubyArray)obj;
 
 			Object[] atomsArray = new Object[array.size()];
 			boolean isFlatArray = true;
-			for (int i = 0; i < array.size(); i++) {
-				Object val = toAtoms(array.get(i), logger);
-				if (!(val instanceof Atom)) {
+			for( int i = 0; i < array.size(); i++ ) {
+				Object val = toAtoms( array.get( i ), logger );
+				if( !(val instanceof Atom) ) {
 					isFlatArray = false;
 				}
 				atomsArray[i] = val;
 			}
 
-			if (isFlatArray) {
+			if( isFlatArray ) {
 				Atom[] atoms = new Atom[array.size()];
-				for (int i = 0; i < atomsArray.length; i++) {
-					atoms[i] = (Atom) atomsArray[i];
+				for( int i = 0; i < atomsArray.length; i++ ) {
+					atoms[i] = (Atom)atomsArray[i];
 				}
 				return atoms;
 			}
 			else {
-				if (logger != null) {
-					logger.info("coerced a nested Array to String");
+				if( logger != null ) {
+					logger.info( "coerced a nested Array to String" );
 				}
-				return Atom.newAtom(toArrayString(atomsArray));
+				return Atom.newAtom( toArrayString( atomsArray ) );
 			}
 		}
-
-		else if (obj instanceof RubyHash) {
-			if (logger != null) {
-				logger.info("coerced a Hash to String");
+		else if( obj instanceof RubyHash ) {
+			if( logger != null ) {
+				logger.info( "coerced a Hash to String" );
 			}
-			RubyHash hash = (RubyHash) obj;
+			RubyHash hash = (RubyHash)obj;
 			StringBuilder s = new StringBuilder();
-			for (Object key : hash.keySet()) {
-				if (s.length() > 0) {
-					s.append(", ");
+			for( Object key : hash.keySet() ) {
+				if( s.length() > 0 ) {
+					s.append( ", " );
 				}
-				s.append(toArrayString(toAtoms(key)));
-				s.append("=>");
-				s.append(toArrayString(toAtoms(hash.get(key))));
+				s.append( toArrayString( toAtoms( key ) ) );
+				s.append( "=>" );
+				s.append( toArrayString( toAtoms( hash.get( key ) ) ) );
 			}
-			s.insert(0, "{");
-			s.append("}");
-			return new Atom[] { Atom.newAtom(s.toString()) };
+			s.insert( 0, "{" );
+			s.append( "}" );
+			return new Atom[]{ Atom.newAtom( s.toString() ) };
 		}
-
 		else {
-			if (logger != null) {
-				logger.info("coerced type " + obj.getClass().getName() + " to String");
+			if( logger != null ) {
+				logger.info( "coerced type " + obj.getClass().getName() + " to String" );
 			}
-			return Atom.newAtom(obj.toString());
+			return Atom.newAtom( obj.toString() );
 		}
 
 	}
 
-	private String toArrayString(Object o) {
+	private String toArrayString( Object o ) {
 		StringBuilder s = new StringBuilder();
-		buildArrayString(o, s);
+		buildArrayString( o, s );
 		return s.toString();
 	}
 
-	private void buildArrayString(Object o, StringBuilder s) {
-		if (o instanceof Object[]) {
-			s.append("[");
-			Object[] objs = (Object[]) o;
-			for (int i = 0; i < objs.length; i++) {
-				if (i > 0) {
-					s.append(",");
+	private void buildArrayString( Object o, StringBuilder s ) {
+		if( o instanceof Object[] ) {
+			s.append( "[" );
+			Object[] objs = (Object[])o;
+			for( int i = 0; i < objs.length; i++ ) {
+				if( i > 0 ) {
+					s.append( "," );
 				}
-				buildArrayString(objs[i], s);
+				buildArrayString( objs[i], s );
 			}
-			s.append("]");
+			s.append( "]" );
 		}
 		else {
-			s.append(o.toString());
+			s.append( o.toString() );
 		}
 	}
 
 	/*
-	public void on_context_destroyed(Object callback) {
-		ScriptEvaluatorManager.registerContextDestroyedListener(maxObject, callback.toString());
-	}
-	*/
+			 public void on_context_destroyed(Object callback) {
+					 ScriptEvaluatorManager.registerContextDestroyedListener(maxObject, callback.toString());
+			 }
+			 */
 }

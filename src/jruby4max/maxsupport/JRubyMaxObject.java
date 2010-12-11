@@ -27,30 +27,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import com.cycling74.max.Atom;
+import com.cycling74.max.Executable;
+import com.cycling74.max.MaxObject;
+import com.cycling74.max.MaxQelem;
+import jruby4max.rubysupport.IdInUseException;
+import jruby4max.rubysupport.MaxRubyAdapter;
+import jruby4max.rubysupport.RubyProperties;
 import jruby4max.util.Logger;
-import org.jruby.CompatVersion;
-
-import com.cycling74.max.*;
-
-import jruby4max.rubysupport.*;
 import jruby4max.util.Utils;
+import org.jruby.CompatVersion;
 
 import java.io.PrintStream;
 
 /**
  * Superclass for objects that support Ruby scripting.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
-public abstract class JRubyMaxObject  extends MaxObject implements Logger {
+public abstract class JRubyMaxObject extends MaxObject implements Logger {
 
 	protected String context = null;
 	protected String id = defaultId();
 	private boolean autoinit = false;
-	
+
 	protected Atom[] rubyVersionValue;
 	protected CompatVersion rubyVersion;
-  
+
 	protected MaxRubyAdapter ruby;
 
 	protected JRubyMaxObject self = this;
@@ -62,24 +65,24 @@ public abstract class JRubyMaxObject  extends MaxObject implements Logger {
 	protected MaxQelem initializer = getInitializerQelem();
 
 
-    public JRubyMaxObject() {
-		declareAttribute("verbose");
-		if (initializer == null) {
-            // The initializer should never be null inside Max, but needs to be null in unit tests
+	public JRubyMaxObject() {
+		declareAttribute( "verbose" );
+		if( initializer == null ) {
+			// The initializer should never be null inside Max, but needs to be null in unit tests
 			initialized = true;
 		}
 		else {
 			initializer.set();
 		}
-    	declareAttribute("context", "getcontext", "context");
-		declareAttribute("id", "getid", "id");
-		declareAttribute("autoinit");
-		declareAttribute("ruby_version", "getruby_version", "ruby_version");
+		declareAttribute( "context", "getcontext", "context" );
+		declareAttribute( "id", "getid", "id" );
+		declareAttribute( "autoinit" );
+		declareAttribute( "ruby_version", "getruby_version", "ruby_version" );
 	}
 
 	private final MaxQelem getInitializerQelem() {
 		Executable initializer = getInitializer();
-		return initializer == null ? null : new MaxQelem(initializer);
+		return initializer == null ? null : new MaxQelem( initializer );
 	}
 
 	/**
@@ -91,37 +94,36 @@ public abstract class JRubyMaxObject  extends MaxObject implements Logger {
 	 * @return an Executable that executes initialization code. Must not be null.
 	 */
 	protected Executable getInitializer() {
-	    return new DefaultRubyInitializer();
+		return new DefaultRubyInitializer();
 	}
 
-	protected class DefaultRubyInitializer  implements Executable {
+	protected class DefaultRubyInitializer implements Executable {
 		public void execute() {
 			initialized = true;
 			try {
-				ruby = new MaxRubyAdapter(self, context, id, rubyVersion);
-			}
-			catch (IdInUseException e) {
+				ruby = new MaxRubyAdapter( self, context, id, rubyVersion );
+			} catch(IdInUseException e) {
 				String availableId = e.getMessage();
-				error("id " + id + " not available. Using: " + availableId);
+				error( "id " + id + " not available. Using: " + availableId );
 				id = availableId;
-				ruby = new MaxRubyAdapter(self, context, id, rubyVersion);
+				ruby = new MaxRubyAdapter( self, context, id, rubyVersion );
 			}
-			if (autoinit) {
+			if( autoinit ) {
 				ruby.init();
 				/* Doing this at construction time causes Max to hang for a while if there are many instances of this object.
-				   Thus autoinit is false by default.
-				   The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
-				   The hang delay got much shorter with JRuby 1.1. */
+															 Thus autoinit is false by default.
+															 The downside to not init'ing here is there will be a slight delay the first time a script tries to evaluate
+															 The hang delay got much shorter with JRuby 1.1. */
 			}
 		}
 	}
 
 	@Override
 	protected void notifyDeleted() {
-        if (ruby != null) {
+		if( ruby != null ) {
 			ruby.notifyDeleted();
 		}
-		if (initializer != null) {
+		if( initializer != null ) {
 			initializer.release();
 		}
 	}
@@ -136,118 +138,117 @@ public abstract class JRubyMaxObject  extends MaxObject implements Logger {
 	 *
 	 * @param debugOut
 	 */
-	protected void setDebugOut(PrintStream debugOut) {
+	protected void setDebugOut( PrintStream debugOut ) {
 		this.debugOut = debugOut;
 	}
 
-	public void debug(String message) {
-		if (debugOut != null) {
-			debugOut.println(message);
+	public void debug( String message ) {
+		if( debugOut != null ) {
+			debugOut.println( message );
 		}
 	}
 
 	/**
 	 * Automatically prepends the object name to the beginning of error messages.
 	 *
-	 * @param message
-	 *            the error message
+	 * @param message the error message
 	 */
-	public void info(String message) {
-		info(message, false);
+	public void info( String message ) {
+		info( message, false );
 	}
-	public void info(String message, boolean force) {
-		if (verbose || force) {
-			post(this.getClass().getName() + ": " + message);
+
+	public void info( String message, boolean force ) {
+		if( verbose || force ) {
+			post( this.getClass().getName() + ": " + message );
 		}
 	}
 
 	/**
 	 * Automatically prepends the object name to the beginning of error messages.
 	 *
-	 * @param message
-	 *            the error message
+	 * @param message the error message
 	 */
-	public void err(String message) {
-		error(this.getClass().getName() + ": " + message);
+	public void err( String message ) {
+		error( this.getClass().getName() + ": " + message );
 	}
 
 	public String toString() {
-		return getClass().getName() + "#<" + Integer.toHexString(hashCode()) + ">";
+		return getClass().getName() + "#<" + Integer.toHexString( hashCode() ) + ">";
 	}
 
 	public Atom[] getcontext() {
-		return Atom.newAtom(new String[]{context});
+		return Atom.newAtom( new String[]{ context } );
 	}
 
 	public String context() {
 		return context;
 	}
 
-	public void context(Atom[] params) {
-		String context = Utils.toString(params);
+	public void context( Atom[] params ) {
+		String context = Utils.toString( params );
 		this.context = context;
-		if (ruby != null) {
-			ruby.setContext(context);
+		if( ruby != null ) {
+			ruby.setContext( context );
 		} // else we're still initializing and the initalizer should handle this
 	}
 
 	public Atom[] getid() {
-		return Atom.newAtom(new String[]{id});
+		return Atom.newAtom( new String[]{ id } );
 	}
 
 	public String id() {
 		return id;
 	}
 
-	public void id(Atom[] params) {
-		String id = Utils.toString(params); 
-		if (id == null || "".equals(id)) {
+	public void id( Atom[] params ) {
+		String id = Utils.toString( params );
+		if( id == null || "".equals( id ) ) {
 			id = defaultId();
 		}
 		this.id = id;
-		if (ruby != null) {
+		if( ruby != null ) {
 			try {
-				ruby.setId(id);
-			}
-			catch (IdInUseException e) {
+				ruby.setId( id );
+			} catch(IdInUseException e) {
 				String availableId = e.getMessage();
-				error("id " + id + " not available. Using: " + availableId);
+				error( "id " + id + " not available. Using: " + availableId );
 				id = availableId;
-				ruby.setId(id);
+				ruby.setId( id );
 			}
 		} // else we're still initializing and the initalizer should handle this
 	}
 
 	private String defaultId() {
-		return Integer.toHexString(hashCode());
+		return Integer.toHexString( hashCode() );
 	}
-	
-  public Atom[] getruby_version() {
-    return rubyVersionValue;
-  }
 
-  // Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
-  public void ruby_version(Atom[] rubyVersionValue) {
-  	if(initialized) {
-  		err("ruby_version cannot be changed. Use @ruby_version when creating the object.");
-  		return;
-  	}  	
-  	if(rubyVersionValue == null || rubyVersionValue.length < 1) return;
-  	
-  	String rubyVersionString = rubyVersionValue[0].toString();
-  	while(rubyVersionString.endsWith("0")) {
-  		// @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
-  		rubyVersionString = rubyVersionString.substring(0, rubyVersionString.length()-1);
-  	}
-  	
-  	this.rubyVersion = RubyProperties.getRubyVersion(rubyVersionString);  	  
-  	if(this.rubyVersion == null) {
-  		err("Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported. " + 
-  				"Defaulting to version " + RubyProperties.DEFAULT_RUBY_VERSION_STRING + ".");
-  		this.rubyVersionValue = Atom.newAtom(new String[]{RubyProperties.DEFAULT_RUBY_VERSION_STRING});
-  		rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
-  	} else {
-  		this.rubyVersionValue = Atom.newAtom(new String[]{rubyVersionString});
-  	}
-  }
+	public Atom[] getruby_version() {
+		return rubyVersionValue;
+	}
+
+	// Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
+	public void ruby_version( Atom[] rubyVersionValue ) {
+		if( initialized ) {
+			err( "ruby_version cannot be changed. Use @ruby_version when creating the object." );
+			return;
+		}
+		if( rubyVersionValue == null || rubyVersionValue.length < 1 ) return;
+
+		String rubyVersionString = rubyVersionValue[0].toString();
+		while( rubyVersionString.endsWith( "0" ) ) {
+			// @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
+			rubyVersionString = rubyVersionString.substring( 0, rubyVersionString.length() - 1 );
+		}
+
+		this.rubyVersion = RubyProperties.getRubyVersion( rubyVersionString );
+		if( this.rubyVersion == null ) {
+			err( "Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported. " +
+					"Defaulting to version " + RubyProperties.DEFAULT_RUBY_VERSION_STRING + "." );
+			this.rubyVersionValue = Atom.newAtom( new String[]{ RubyProperties.DEFAULT_RUBY_VERSION_STRING } );
+			rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
+		}
+		else {
+			this.rubyVersionValue = Atom.newAtom( new String[]{ rubyVersionString } );
+		}
+	}
 }

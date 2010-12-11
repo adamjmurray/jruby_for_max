@@ -1,13 +1,12 @@
 package jruby4max.util;
 
-import java.io.*;
-import java.util.Collection;
-
-import jruby4max.maxsupport.Atomizer;
-
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxPatcher;
 import com.cycling74.max.MaxSystem;
+import jruby4max.maxsupport.Atomizer;
+
+import java.io.*;
+import java.util.Collection;
 
 /*
 Copyright (c) 2008-2010, Adam Murray (adam@compusition.com). All rights reserved.
@@ -38,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Miscellaneous utility methods.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class Utils {
@@ -46,83 +45,82 @@ public class Utils {
 	private Utils() {
 	}
 
-	public static boolean equals(Object o1, Object o2) {
-		if (o1 == null) {
+	public static boolean equals( Object o1, Object o2 ) {
+		if( o1 == null ) {
 			return o2 == null;
 		}
 		else {
-			return o1.equals(o2);
+			return o1.equals( o2 );
 		}
 	}
 
 	/**
 	 * A safe toString() method that avoids NullPointerExceptions.
-	 * 
-	 * @param obj
-	 *            the object to convert to a String
+	 *
+	 * @param obj the object to convert to a String
 	 * @return the String representation of the object
 	 */
-	public static String toString(Object obj) {
+	public static String toString( Object obj ) {
 		return (obj == null ? null : obj.toString());
 	}
-	
+
 	/**
 	 * Convert Atom[] to a space-separated String
 	 */
-	public static String toString(Atom[] atoms) {
+	public static String toString( Atom[] atoms ) {
 		String s = "";
-		if(atoms != null) {
-			for(int i=0; i< atoms.length; i++) {
-				if(i > 0) {
+		if( atoms != null ) {
+			for( int i = 0; i < atoms.length; i++ ) {
+				if( i > 0 ) {
 					s += " ";
 				}
 				s += atoms[i].toString();
-			}			
+			}
 		}
 		return s;
 	}
 
-	public static Atom[] toAtoms(Collection<? extends Atomizer> objs) {
+	public static Atom[] toAtoms( Collection<? extends Atomizer> objs ) {
 		Atom[] atoms = new Atom[objs.size()];
 		int i = 0;
-		for (Atomizer obj : objs) {
+		for( Atomizer obj : objs ) {
 			atoms[i] = obj.toAtom();
 			i++;
 		}
 		return atoms;
 	}
 
-	public static boolean isNumber(Atom atom) {
+	public static boolean isNumber( Atom atom ) {
 		return atom.isInt() || atom.isFloat();
 	}
 
-	public static String detokenize(Atom[] args) {
-		return detokenize(null, args);
+	public static String detokenize( Atom[] args ) {
+		return detokenize( null, args );
 	}
 
-	public static String detokenize(String msg, Atom[] args) {
+	public static String detokenize( String msg, Atom[] args ) {
 		StringBuilder input = new StringBuilder();
-		if (msg != null) {
-			input.append(detokenize(msg)).append(" ");
+		if( msg != null ) {
+			input.append( detokenize( msg ) ).append( " " );
 		}
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0) {
-				input.append(" ");
+		for( int i = 0; i < args.length; i++ ) {
+			if( i > 0 ) {
+				input.append( " " );
 			}
-			input.append(detokenize(args[i]));
+			input.append( detokenize( args[i] ) );
 		}
 		return input.toString();
 	}
 
-	public static String detokenize(Atom atom) {
-		if (atom == null) {
+	public static String detokenize( Atom atom ) {
+		if( atom == null ) {
 			return "";
 		}
-		return detokenize(atom.toString());
+		return detokenize( atom.toString() );
 	}
 
-	public static String detokenize(String str) {
-		if (str.contains(" ")) {
+	public static String detokenize( String str ) {
+		if( str.contains( " " ) ) {
 			return '"' + str + '"';
 		}
 		else {
@@ -133,161 +131,156 @@ public class Utils {
 	/**
 	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
 	 * path will be searched to locate the file.
-	 * 
+	 *
 	 * @param path -
-	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
+	 *             a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
 	 * @return a File object referencing an existing file, otherwise null
 	 */
-	public static File getFile(String path) {
-		return getFile(path, null);
+	public static File getFile( String path ) {
+		return getFile( path, null );
 	}
 
-	public static File getFile(String path, MaxPatcher patcher) {
-		return getFile(path, patcher, false);
+	public static File getFile( String path, MaxPatcher patcher ) {
+		return getFile( path, patcher, false );
 	}
 
-	public static File getFile(String path, MaxPatcher patcher, boolean suppressError) {
-        return getFile(path, patcher, false, null);
-    }
+	public static File getFile( String path, MaxPatcher patcher, boolean suppressError ) {
+		return getFile( path, patcher, false, null );
+	}
 
-    /**
+	/**
 	 * Locate a file. If no path is passed in a file dialog will open. If the path is just a filename, the Max search
 	 * path will be searched to locate the file. If patcher is not null, then before searching the Max search path,
 	 * the path relative to the patcher will be searched.
 	 *
-	 * @param path -
-	 *            a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
-	 * @param patcher -
-	 *            the patcher relative to which the path should be searched for first, before the Max search path
-     * @param suppressError  -
-	 *            if false, when no file is found an error will be printed to syserr
-     * @param optionalExtension -
-     *            if provided, and no file is found, the file is searched for again with the optionalExtension appended
-     *
+	 * @param path              -
+	 *                          a filename of a file on the max path, or an absolute path, or null (null opens file dialog)
+	 * @param patcher           -
+	 *                          the patcher relative to which the path should be searched for first, before the Max search path
+	 * @param suppressError     -
+	 *                          if false, when no file is found an error will be printed to syserr
+	 * @param optionalExtension -
+	 *                          if provided, and no file is found, the file is searched for again with the optionalExtension appended
 	 * @return a File object referencing an existing file, otherwise null
 	 */
-    public static File getFile(String path, MaxPatcher patcher, boolean suppressError, String optionalExtension) {
-        // If no file is provided, prompt the user to select one with a file dialog
-		if (path == null || path.length() == 0) {
+	public static File getFile( String path, MaxPatcher patcher, boolean suppressError, String optionalExtension ) {
+		// If no file is provided, prompt the user to select one with a file dialog
+		if( path == null || path.length() == 0 ) {
 			path = MaxSystem.openDialog();
-			if(path == null) {
+			if( path == null ) {
 				return null; // user canceled the file open dialog
 			}
-            // else a file was selected and we'll proceed to handle it like any path passed into this method
+			// else a file was selected and we'll proceed to handle it like any path passed into this method
 		}
 
-        File file;
+		File file;
 		// first see if it's an absolute path
-		String location = MaxSystem.maxPathToNativePath(path);
-		if (location != null) {							
-			file = new File(location);
-			if (file != null && file.isFile()) {
+		String location = MaxSystem.maxPathToNativePath( path );
+		if( location != null ) {
+			file = new File( location );
+			if( file != null && file.isFile() ) {
 				return file;
 			}
-		}		
-		
+		}
+
 		// then see if we can find the file relative to the patcher
-		if (patcher != null) {
-			File patcherFolder = new File(patcher.getPath());
-			file = new File(patcherFolder, path);
-			if (file != null && file.isFile()) {
+		if( patcher != null ) {
+			File patcherFolder = new File( patcher.getPath() );
+			file = new File( patcherFolder, path );
+			if( file != null && file.isFile() ) {
 				return file;
 			}
 		}
-				
+
 		// finally just try to locate the file via the Max search path
-		location = MaxSystem.locateFile(path);
-		if(location != null) {
-			file = new File(location);
-			if (file != null && file.isFile()) {
+		location = MaxSystem.locateFile( path );
+		if( location != null ) {
+			file = new File( location );
+			if( file != null && file.isFile() ) {
 				return file;
 			}
 		}
-        // if we make it here, NOTHING WAS FOUND
+		// if we make it here, NOTHING WAS FOUND
 
-        // if an optional extension was provided, then look again with that appended
-        if(optionalExtension != null && !path.endsWith(optionalExtension)) {
-            file = getFile(path+optionalExtension, patcher, true, null);
-            if(file != null) {
-                return file;
-            }
-        }
+		// if an optional extension was provided, then look again with that appended
+		if( optionalExtension != null && !path.endsWith( optionalExtension ) ) {
+			file = getFile( path + optionalExtension, patcher, true, null );
+			if( file != null ) {
+				return file;
+			}
+		}
 
-        // and if that didn't work either, it's time for an error (unless suppressed):
-		if(!suppressError) {
-			System.err.println("File not found: " + path);
+		// and if that didn't work either, it's time for an error (unless suppressed):
+		if( !suppressError ) {
+			System.err.println( "File not found: " + path );
 		}
 		return null;
 	}
 
-	public static String getFileAsString(String path) {
-		return getFileAsString(getFile(path));
+	public static String getFileAsString( String path ) {
+		return getFileAsString( getFile( path ) );
 	}
 
-	public static String getFileAsString(File file) {
-		if (file == null || !file.exists()) {
+	public static String getFileAsString( File file ) {
+		if( file == null || !file.exists() ) {
 			return null;
 		}
 		try {
-			return getReaderAsString(new FileReader(file));
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
+			return getReaderAsString( new FileReader( file ) );
+		} catch(IOException e) {
+			System.err.println( e.getMessage() );
 			return null;
 		}
 	}
-	
-	public static String getInputStreamAsString(InputStream in) {
-		return getReaderAsString(new InputStreamReader(in));
+
+	public static String getInputStreamAsString( InputStream in ) {
+		return getReaderAsString( new InputStreamReader( in ) );
 	}
 
-	public static String getReaderAsString(Reader r) {
-		StringBuilder text = new StringBuilder(5000);
+	public static String getReaderAsString( Reader r ) {
+		StringBuilder text = new StringBuilder( 5000 );
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(r);
+			reader = new BufferedReader( r );
 			char[] buf = new char[1024];
 			int charsRead = 0;
-			while ((charsRead = reader.read(buf)) != -1) {
-				text.append(buf, 0, charsRead);
+			while( (charsRead = reader.read( buf )) != -1 ) {
+				text.append( buf, 0, charsRead );
 			}
 			return text.toString();
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
+		} catch(IOException e) {
+			System.err.println( e.getMessage() );
 			return null;
-		}
-		finally {
-			if (reader != null) {
+		} finally {
+			if( reader != null ) {
 				try {
 					reader.close();
-				}
-				catch (IOException e) {
-					System.err.println(e.getMessage());
+				} catch(IOException e) {
+					System.err.println( e.getMessage() );
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * @return a String representation of the provided Throwable
 	 */
-	public static String getStackTrace(Throwable t) {
+	public static String getStackTrace( Throwable t ) {
 		Writer stw = new StringWriter();
-		t.printStackTrace(new PrintWriter(stw));
+		t.printStackTrace( new PrintWriter( stw ) );
 		return stw.toString();
 	}
-	
+
 	/**
 	 * @return true if the patcher has been saved to a file, false otherwise
 	 */
-	public static boolean isPatcherSaved(MaxPatcher patcher) {
-		if(patcher != null) {
+	public static boolean isPatcherSaved( MaxPatcher patcher ) {
+		if( patcher != null ) {
 			String filePath = patcher.getFilePath();
-			if(filePath != null) {
+			if( filePath != null ) {
 				filePath = filePath.toLowerCase();
-				if(filePath.endsWith(".maxpat") || filePath.endsWith(".maxhelp") || filePath.endsWith(".json")
-						|| filePath.endsWith(".amxd")) {
+				if( filePath.endsWith( ".maxpat" ) || filePath.endsWith( ".maxhelp" ) || filePath.endsWith( ".json" )
+						|| filePath.endsWith( ".amxd" ) ) {
 					return true;
 				}
 				// Otherwise this is probably something like "/" because the patcher is not saved.

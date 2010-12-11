@@ -33,25 +33,25 @@ import java.util.TreeMap;
 
 /**
  * A Map where all the values are a Set. The Set maintains insertion order of its entires.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")
 public class MappedSet<K, T> extends TreeMap<K, Set<T>> {
 
-	public Set<T> addValue(K key, T value) {
-		Set<T> values = get(key);
-		if (values == null) {
+	public Set<T> addValue( K key, T value ) {
+		Set<T> values = get( key );
+		if( values == null ) {
 			// LinkedHashSet maintains insertion order
 			values = new LinkedHashSet<T>();
-			put(key, values);
+			put( key, values );
 		}
-		values.add(value);
+		values.add( value );
 		return values;
 	}
 
 	@SuppressWarnings("unchecked")
 	public MappedSet<K, T> clone() {
-		return (MappedSet<K, T>) super.clone();
+		return (MappedSet<K, T>)super.clone();
 	}
 }

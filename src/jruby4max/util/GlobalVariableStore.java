@@ -29,11 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A singleton map for sharing global variables across any object in the JVM.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class GlobalVariableStore {
@@ -44,7 +43,7 @@ public class GlobalVariableStore {
 	}
 
 	public synchronized static Map getInstance() {
-		if (instance == null) {
+		if( instance == null ) {
 			instance = new HashMap();
 		}
 		return instance;

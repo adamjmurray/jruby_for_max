@@ -29,15 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A failure to assign an ID because it was already in use.
- * 
+ * <p/>
  * The exception message will suggest an available id.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 @SuppressWarnings("serial")
 public class IdInUseException extends RuntimeException {
 
-	public IdInUseException(String availableId) {
-		super(availableId);
+	public IdInUseException( String availableId ) {
+		super( availableId );
 	}
 }

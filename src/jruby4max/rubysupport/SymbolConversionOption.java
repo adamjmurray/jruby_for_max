@@ -28,57 +28,58 @@ package jruby4max.rubysupport;
  */
 
 public enum SymbolConversionOption {
-	
-	/** 
+
+	/**
 	 * Convert incoming Max symbols to Ruby strings
 	 */
-	STRING  ("string"),
-	
-	/** 
+	STRING( "string" ),
+
+	/**
 	 * Convert incoming Max symbols to Ruby symbols
-	 */	
-  SYMBOL  ("symbol"),
-  
-  /** 
+	 */
+	SYMBOL( "symbol" ),
+
+	/**
 	 * Don't modify incoming Max symbols (so they can be interpreted as literal numbers, reference method names, etc)
-	 */	  
-  LITERAL ("literal"),
-  
-  /** 
+	 */
+	LITERAL( "literal" ),
+
+	/**
 	 * Apply the previous setting to the remaining inlets
-	 */	    
-  REMAINING_INLETS ("*");
-	
+	 */
+	REMAINING_INLETS( "*" );
+
 	public static SymbolConversionOption DEFAULT = LITERAL;
-	
-  SymbolConversionOption(String stringValue) {
-  	this.stringValue = stringValue;
-  }
-    
-  /**
+
+	SymbolConversionOption( String stringValue ) {
+		this.stringValue = stringValue;
+	}
+
+	/**
 	 * The string value of this enumerated value.
 	 */
-  public String toString() {
-  	return stringValue;
-  }
-  private final String stringValue;
-  
-  public static SymbolConversionOption fromString(String stringValue) {
-  	if(STRING.stringValue.equals(stringValue)) {
-  		return STRING;
-  	}
-  	else if(SYMBOL.stringValue.equals(stringValue)) {
-  		return SYMBOL;
-  	}
-  	else if(LITERAL.stringValue.equals(stringValue)) {
-  		return LITERAL;
-  	}
-  	else if(REMAINING_INLETS.stringValue.equals(stringValue)) {
-  		return REMAINING_INLETS;
-  	}
-  	else {
-  		return null;
-  	}
-  }
+	public String toString() {
+		return stringValue;
+	}
+
+	private final String stringValue;
+
+	public static SymbolConversionOption fromString( String stringValue ) {
+		if( STRING.stringValue.equals( stringValue ) ) {
+			return STRING;
+		}
+		else if( SYMBOL.stringValue.equals( stringValue ) ) {
+			return SYMBOL;
+		}
+		else if( LITERAL.stringValue.equals( stringValue ) ) {
+			return LITERAL;
+		}
+		else if( REMAINING_INLETS.stringValue.equals( stringValue ) ) {
+			return REMAINING_INLETS;
+		}
+		else {
+			return null;
+		}
+	}
 
 }

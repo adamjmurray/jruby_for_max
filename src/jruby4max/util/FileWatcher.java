@@ -27,119 +27,119 @@ package jruby4max.util;
 
  */
 
-import java.io.File;
-
 import com.cycling74.max.Executable;
+
+import java.io.File;
 
 /**
  * File watch mechanism for Max objects. Executes a callback when the file modified date changes.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 
 public class FileWatcher extends Thread {
 
-  public final static long DEFAULT_WATCH_PERIOD = 2500; // 2.5 seconds, for no particular reason
+	public final static long DEFAULT_WATCH_PERIOD = 2500; // 2.5 seconds, for no particular reason
 
-  private File file;
+	private File file;
 
-  private long prevLastModified;
+	private long prevLastModified;
 
-  private long watchPeriod;
+	private long watchPeriod;
 
-  private Executable callback;
+	private Executable callback;
 
-  private volatile boolean threadPaused = false;
+	private volatile boolean threadPaused = false;
 
-  private Thread thisThread;
+	private Thread thisThread;
 
-  public FileWatcher(File file, Executable callback) {
-    this(file, callback, DEFAULT_WATCH_PERIOD);
-  }
+	public FileWatcher( File file, Executable callback ) {
+		this( file, callback, DEFAULT_WATCH_PERIOD );
+	}
 
-  public FileWatcher(File file, Executable callback, long watchPeriod) {
-    setFile(file);
-    setCallback(callback);
-    setWatchPeriod(watchPeriod);
-  }
+	public FileWatcher( File file, Executable callback, long watchPeriod ) {
+		setFile( file );
+		setCallback( callback );
+		setWatchPeriod( watchPeriod );
+	}
 
-  public void setFile(File file) {
-    this.file = file;
-    if (file == null) {
-      prevLastModified = -1;
-    }
-    else {
-      prevLastModified = file.lastModified();
-    }
-  }
+	public void setFile( File file ) {
+		this.file = file;
+		if( file == null ) {
+			prevLastModified = -1;
+		}
+		else {
+			prevLastModified = file.lastModified();
+		}
+	}
 
-  public File getFile() {
-    return file;
-  }
+	public File getFile() {
+		return file;
+	}
 
-  public long getWatchPeriod() {
-    return watchPeriod;
-  }
+	public long getWatchPeriod() {
+		return watchPeriod;
+	}
 
-  public void setWatchPeriod(long watchPeriod) {
-    this.watchPeriod = watchPeriod;
-  }
+	public void setWatchPeriod( long watchPeriod ) {
+		this.watchPeriod = watchPeriod;
+	}
 
-  public Executable getCallback() {
-    return callback;
-  }
+	public Executable getCallback() {
+		return callback;
+	}
 
-  public void setCallback(Executable callback) {
-    this.callback = callback;
-  }
+	public void setCallback( Executable callback ) {
+		this.callback = callback;
+	}
 
-  public void run() {
-    thisThread = Thread.currentThread();
-    while (true) {
-      if (file != null) {
-        long currLastMod = file.lastModified();
-        // System.out.println("Last modified = " + currLastMod);
-        if (currLastMod > prevLastModified) {
-          try {
-            callback.execute();
-          } catch (Exception e) {
-            if (e.getMessage() != null) {
-              // not sure why the message would be null, but I've seen it happen occasionally
-              System.err.println(e.getMessage());
-            }
-          }
-          prevLastModified = currLastMod;
-        }
-        try {
-          Thread.sleep(watchPeriod);
-          if (threadPaused) {
-            synchronized (this) {
-              while (threadPaused)
-                wait(); // until notify();
-            }
-          }
-        } catch (InterruptedException e) {
-          // System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
-          // e.printStackTrace();
-        }
-      }
-    }
-  }
+	public void run() {
+		thisThread = Thread.currentThread();
+		while( true ) {
+			if( file != null ) {
+				long currLastMod = file.lastModified();
+				// System.out.println("Last modified = " + currLastMod);
+				if( currLastMod > prevLastModified ) {
+					try {
+						callback.execute();
+					} catch(Exception e) {
+						if( e.getMessage() != null ) {
+							// not sure why the message would be null, but I've seen it happen occasionally
+							System.err.println( e.getMessage() );
+						}
+					}
+					prevLastModified = currLastMod;
+				}
+				try {
+					Thread.sleep( watchPeriod );
+					if( threadPaused ) {
+						synchronized(this) {
+							while( threadPaused )
+								wait(); // until notify();
+						}
+					}
+				} catch(InterruptedException e) {
+					// System.err.println("FileWatcher interrupted (harmless, but probably shouldn't have happened)");
+					// e.printStackTrace();
+				}
+			}
+		}
+	}
 
-  public synchronized void stopWatching() {
-    pauseWatching();
-  }
+	public synchronized void stopWatching() {
+		pauseWatching();
+	}
 
-  public synchronized void pauseWatching() {
-    threadPaused = true;
-  }
+	public synchronized void pauseWatching() {
+		threadPaused = true;
+	}
 
-  public synchronized void resumeWatching() {
-    threadPaused = false;
-    thisThread.notify(); // resume from wait();
-  }
+	public synchronized void resumeWatching() {
+		threadPaused = false;
+		thisThread.notify(); // resume from wait();
+	}
 
-  public synchronized boolean isPaused() {
-    return threadPaused;
-  }
+	public synchronized boolean isPaused() {
+		return threadPaused;
+	}
 }

@@ -29,19 +29,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Builds text one line at a time.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class LineBuilder implements CharSequence {
 
 	private StringBuilder lines = new StringBuilder();
 
-	public void line(String s) {
-		lines.append(s).append("\n");
+	public void line( String s ) {
+		lines.append( s ).append( "\n" );
 	}
 
-	public void append(String s) {
-		lines.append(s);
+	public void append( String s ) {
+		lines.append( s );
 	}
 
 	public String toString() {
@@ -57,15 +57,15 @@ public class LineBuilder implements CharSequence {
 	}
 
 	public void clear() {
-		lines.setLength(0);
+		lines.setLength( 0 );
 	}
 
-	public char charAt(int index) {
-		return lines.charAt(index);
+	public char charAt( int index ) {
+		return lines.charAt( index );
 	}
 
-	public CharSequence subSequence(int start, int end) {
-		return lines.subSequence(start, end);
+	public CharSequence subSequence( int start, int end ) {
+		return lines.subSequence( start, end );
 	}
 
 }

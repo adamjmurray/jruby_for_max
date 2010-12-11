@@ -27,18 +27,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import com.cycling74.max.MaxSystem;
+import org.jruby.CompatVersion;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.jruby.CompatVersion;
-
-import com.cycling74.max.MaxSystem;
-
 /**
  * Manages all global settings for Ruby evaluation.
- * 
+ *
  * @author Adam Murray (adam@compusition.com)
  */
 public class RubyProperties {
@@ -54,39 +53,37 @@ public class RubyProperties {
 	static {
 		// Initialize JRuby system properties and load the jruby_for_max.properties file
 		try {
-			String propsPath = MaxSystem.locateFile("jruby_for_max.properties");
-			if (propsPath == null) {
+			String propsPath = MaxSystem.locateFile( "jruby_for_max.properties" );
+			if( propsPath == null ) {
 				//MaxSystem.error("jruby4max.ruby.properties not found! Maybe jruby4max objects was not installed correctly?");
-				properties = new Properties();				
+				properties = new Properties();
 			}
 			else {
-				File propFile = new File(propsPath);
+				File propFile = new File( propsPath );
 				properties = new Properties();
 				try {
-					properties.load(new FileInputStream(propFile));
-				}
-				catch (IOException e) {
-					throw new RuntimeException(e);
+					properties.load( new FileInputStream( propFile ) );
+				} catch(IOException e) {
+					throw new RuntimeException( e );
 				}
 
-				String jrubyHome = properties.getProperty("jruby.home");
-				if(jrubyHome != null) {
-					System.setProperty("jruby.home", jrubyHome);
+				String jrubyHome = properties.getProperty( "jruby.home" );
+				if( jrubyHome != null ) {
+					System.setProperty( "jruby.home", jrubyHome );
 				}
 			}
-		}
-		catch (UnsatisfiedLinkError e) {
+		} catch(UnsatisfiedLinkError e) {
 			// we're running outside of Max, probably for unit testing
 			// can't call System.out here, Max stole it and it will just cause another UnsatisfiedLinkError
 			// System.out.println("Using hard-coded defaults for RubyProperties.");
 			properties = new Properties();
 		}
 	}
-        
+
 	public static String[] getInitializerFiles() {
-		if (initializers == null) {
-			initializers = properties.getProperty("ruby.initializers", DEFAULT_INITIALIZER_FILES).split(";");
-			for (int i = 0; i < initializers.length; i++) {
+		if( initializers == null ) {
+			initializers = properties.getProperty( "ruby.initializers", DEFAULT_INITIALIZER_FILES ).split( ";" );
+			for( int i = 0; i < initializers.length; i++ ) {
 				initializers[i] = initializers[i].trim();
 			}
 		}
@@ -94,31 +91,31 @@ public class RubyProperties {
 	}
 
 	public static String[] getLoadPaths() {
-		if (loadpaths == null) {
-			String loadpathsProp = properties.getProperty("ruby.loadpaths");
-			if (loadpathsProp == null || loadpathsProp.trim().equals("")) {
-				loadpaths = new String[] {};
+		if( loadpaths == null ) {
+			String loadpathsProp = properties.getProperty( "ruby.loadpaths" );
+			if( loadpathsProp == null || loadpathsProp.trim().equals( "" ) ) {
+				loadpaths = new String[]{ };
 			}
 			else {
-				loadpaths = loadpathsProp.split(";");
-				for (int i = 0; i < loadpaths.length; i++) {
+				loadpaths = loadpathsProp.split( ";" );
+				for( int i = 0; i < loadpaths.length; i++ ) {
 					loadpaths[i] = loadpaths[i].trim();
 				}
 			}
 		}
 		return loadpaths;
 	}
-	
-	public static CompatVersion getRubyVersion(String version) {
-		if("1.9".equals(version)) {
-  		return CompatVersion.RUBY1_9;
-  	}
-  	else if("1.8".equals(version)) {
-  		return CompatVersion.RUBY1_8;
-  	}
-  	else return null;
+
+	public static CompatVersion getRubyVersion( String version ) {
+		if( "1.9".equals( version ) ) {
+			return CompatVersion.RUBY1_9;
+		}
+		else if( "1.8".equals( version ) ) {
+			return CompatVersion.RUBY1_8;
+		}
+		else return null;
 	}
-	
+
 	public static String DEFAULT_RUBY_VERSION_STRING = "1.8";
 	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_8;
 }

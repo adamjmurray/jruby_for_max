@@ -82,6 +82,16 @@ def bang
   'bang'
 end
 
+# Sets the tooltips for the inlets of this [mxj jruby] object
+def inlet_assist(*params)
+  $max_object.setInletAssist params.to_java(:string)  
+end
+
+# Sets the tooltips for the outlets of this [mxj jruby] object
+def outlet_assist(*params)
+  $max_object.setOutletAssist params.to_java(:string)
+end
+
 
 ###############################################################################
 # Object registries and storage

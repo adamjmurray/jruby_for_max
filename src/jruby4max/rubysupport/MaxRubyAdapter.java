@@ -56,7 +56,7 @@ public class MaxRubyAdapter {
 
 	private LineBuilder code = new LineBuilder();
 
-	private LineBuilder scriptFileInit = new LineBuilder();
+	private LineBuilder fileInit = new LineBuilder();
 
 	private final MaxObject maxObject;
 
@@ -157,7 +157,7 @@ public class MaxRubyAdapter {
 		init( null, Atom.emptyArray );
 	}
 
-	public void init( File scriptFile, Atom[] args ) {
+	public void init( File file, Atom[] args ) {
 		if( code.isEmpty() ) {
 			// setup the $LOAD_PATH
 			for( String loadPath : RubyProperties.getLoadPaths() ) {
@@ -165,7 +165,10 @@ public class MaxRubyAdapter {
 			}
 			// and include any initializer files:
 			for( String initializer : RubyProperties.getInitializerFiles() ) {
-				String initializationCode = Utils.getFileAsString( initializer );
+				File initFile = Utils.getFile( initializer );
+				String initFileFolderPath = pathToContainerFolder( initFile );
+				code.line( "$: << " + quote( initFileFolderPath ) );
+				String initializationCode = Utils.getFileAsString( initFile );
 				code.append( initializationCode );
 			}
 		}
@@ -178,37 +181,43 @@ public class MaxRubyAdapter {
 		}
 		ruby.setInitialized( true );
 
-		ruby.setScriptFilename( scriptFile == null ? null : scriptFile.getName() );
+		ruby.setScriptFilename( file == null ? null : file.getName() );
 		exec( code );
 
-		if( scriptFile != null ) {
-			String script = Utils.getFileAsString( scriptFile );
-			scriptFileInit.clear();
+		if( file != null ) {
+			String script = Utils.getFileAsString( file );
+			fileInit.clear();
 
-			File scriptFileFolder = scriptFile.getParentFile();
-			if( scriptFileFolder != null ) {
-				// include the folder containing the scriptFile, so scripts can require files relative to themselves
-				String scriptFileFolderPath;
-				try {
-					scriptFileFolderPath = scriptFileFolder.getCanonicalPath();
-				} catch(IOException e) {
-					System.err.println( e );
-					scriptFileFolderPath = scriptFileFolder.getAbsolutePath();
-				}
-				scriptFileInit.line( "$: << " + quote( scriptFileFolderPath ) );
-			}
+			// include the folder containing the @file, so scripts can require files relative to themselves
+			String fileFolderPath = pathToContainerFolder( file );
+			fileInit.line( "$: << " + quote( fileFolderPath ) );
 
 			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned
-			scriptFileInit.line( "$0 = " + quote( scriptFile ) );
+			fileInit.line( "$0 = " + quote( file ) );
 
 			// any set the arguments
 			for( Atom arg : args ) {
-				scriptFileInit.line( "$* << " + Utils.detokenize( arg ) );
+				fileInit.line( "$* << " + Utils.detokenize( arg ) );
 			}
 
-			exec( scriptFileInit );
+			exec( fileInit );
 			exec( script );
 		}
+	}
+
+	private String pathToContainerFolder( File file ) {
+		File folder = file.getParentFile();
+		if( folder != null ) {
+			String folderPath;
+			try {
+				folderPath = folder.getCanonicalPath();
+			} catch(IOException e) {
+				System.err.println( e );
+				folderPath = folder.getAbsolutePath();
+			}
+			return folderPath;
+		}
+		return null;
 	}
 
 	private String quote( Object o ) {

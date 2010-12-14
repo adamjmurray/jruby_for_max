@@ -58,6 +58,8 @@ public class jruby extends JRubyMaxObject {
 	private String[] symbolsTo;
 	private SymbolConversionOption[] symbolConversionOptions;
 
+	private static final String DEFAULT_EXTENSION = ".rb";
+
 	/**
 	 * The Constructor
 	 *
@@ -134,7 +136,7 @@ public class jruby extends JRubyMaxObject {
 	public void file( Atom[] args ) {
 		if( args != null && args.length > 0 ) {
 			filePath = args[0].toString();
-			file = Utils.getFile( filePath, getParentPatcher(), true, ".rb" );
+			file = Utils.getFile( filePath, getParentPatcher(), true, DEFAULT_EXTENSION );
 			fileArgs = Atom.removeFirst( args );
 			if( file == null ) {
 				err( "File not found: " + filePath );
@@ -473,7 +475,11 @@ public class jruby extends JRubyMaxObject {
 		MaxPatcher patcher = getParentPatcher();
 		if( patcher != null ) {
 			File folder = new File( patcher.getPath() );
-			return new File( folder, filePath );
+			String path = filePath;
+			if( !path.endsWith( DEFAULT_EXTENSION ) ) {
+				path += DEFAULT_EXTENSION;
+			}
+			return new File( folder, path );
 		}
 		return null;
 	}

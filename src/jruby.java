@@ -46,9 +46,9 @@ import java.util.Date;
  */
 public class jruby extends JRubyMaxObject {
 
-	private String scriptFilePath;
-	private File scriptFile;
-	private Atom[] scriptFileArgs;
+	private String filePath;
+	private File file;
+	private Atom[] fileArgs;
 
 	private int evalOutlet = -1;
 
@@ -97,7 +97,7 @@ public class jruby extends JRubyMaxObject {
 		@Override
 		public void execute() {
 			super.execute();
-			if( scriptFile != null ) {
+			if( file != null ) {
 				initFile();
 			}
 		}
@@ -123,8 +123,8 @@ public class jruby extends JRubyMaxObject {
 	}
 
 	public String getfile() {
-		if( scriptFile != null ) {
-			return scriptFile.getAbsolutePath();
+		if( file != null ) {
+			return file.getAbsolutePath();
 		}
 		else {
 			return null;
@@ -133,27 +133,27 @@ public class jruby extends JRubyMaxObject {
 
 	public void file( Atom[] args ) {
 		if( args != null && args.length > 0 ) {
-			scriptFilePath = args[0].toString();
-			scriptFile = Utils.getFile( scriptFilePath, getParentPatcher(), true, ".rb" );
-			scriptFileArgs = Atom.removeFirst( args );
-			if( scriptFile == null ) {
-				err( "File not found: " + scriptFilePath );
+			filePath = args[0].toString();
+			file = Utils.getFile( filePath, getParentPatcher(), true, ".rb" );
+			fileArgs = Atom.removeFirst( args );
+			if( file == null ) {
+				err( "File not found: " + filePath );
 				if( Utils.isPatcherSaved( getParentPatcher() ) ) {
 					info( "Send the \"createfile\" message to create the file \"" + getFileToBeCreated() + "\"" );
 				}
 				else {
 					info( "Save the patcher and send the \"createfile\" message" );
-					info( "...to create the file \"" + scriptFilePath + "\" in the patcher's folder." );
+					info( "...to create the file \"" + filePath + "\" in the patcher's folder." );
 				}
 			}
 		}
 		else {
-			scriptFilePath = null;
-			scriptFile = Utils.getFile( null );
-			scriptFileArgs = Atom.emptyArray;
+			filePath = null;
+			file = Utils.getFile( null );
+			fileArgs = Atom.emptyArray;
 		}
 
-		if( scriptFile != null && initialized ) {
+		if( file != null && initialized ) {
 			initFile();
 		} // if not initialized initFile() will be called by the Initializer
 	}
@@ -221,13 +221,13 @@ public class jruby extends JRubyMaxObject {
 
 	private void startFileWatcher() {
 		if( fileWatcher == null ) {
-			if( scriptFile != null && autowatch ) {
-				fileWatcher = new FileWatcher( scriptFile, fileWatcherCallback );
+			if( file != null && autowatch ) {
+				fileWatcher = new FileWatcher( file, fileWatcherCallback );
 				fileWatcher.start();
 			}
 		}
 		else {
-			fileWatcher.setFile( scriptFile ); // in case a new file was loaded - see scriptfile() / initFile()
+			fileWatcher.setFile( file ); // in case a new file was loaded - see scriptfile() / initFile()
 			fileWatcher.resumeWatching();
 		}
 	}
@@ -251,11 +251,11 @@ public class jruby extends JRubyMaxObject {
 	}
 
 	private synchronized void loadFile() {
-		info( "loading script '" + scriptFile + "' on " + new Date() );
+		info( "loading script '" + file + "' on " + new Date() );
 		try {
-			ruby.init( scriptFile, scriptFileArgs );
+			ruby.init( file, fileArgs );
 		} catch(Exception e) {
-			err( "Error evaluating script file: " + scriptFile.getPath() );
+			err( "Error evaluating script file: " + file.getPath() );
 			// It seems that System.err.flush() takes care of printing out the error message.
 //      if(verbose) {
 //      	printRubyException(e);
@@ -418,8 +418,8 @@ public class jruby extends JRubyMaxObject {
 	@Override
 	protected void dblclick() {
 		try {
-			if( scriptFile != null ) {
-				String filePath = scriptFile.getAbsolutePath();
+			if( file != null ) {
+				String filePath = file.getAbsolutePath();
 				info( "Attempting to open file '" + filePath + "'" );
 				Process p;
 				if( MaxSystem.isOsWindows() ) {
@@ -450,7 +450,7 @@ public class jruby extends JRubyMaxObject {
 			err( "patcher must be saved before creating a file" );
 			return;
 		}
-		if( scriptFilePath == null ) {
+		if( filePath == null ) {
 			err( "@file attribute must be a filename (or relative path)" );
 			return;
 		}
@@ -462,7 +462,7 @@ public class jruby extends JRubyMaxObject {
 		info( "creating file: " + file, true );
 		try {
 			if( file.createNewFile() ) {
-				scriptFile = file;
+				this.file = file;
 			}
 		} catch(IOException e) {
 			throw new RuntimeException( e );
@@ -473,7 +473,7 @@ public class jruby extends JRubyMaxObject {
 		MaxPatcher patcher = getParentPatcher();
 		if( patcher != null ) {
 			File folder = new File( patcher.getPath() );
-			return new File( folder, scriptFilePath );
+			return new File( folder, filePath );
 		}
 		return null;
 	}

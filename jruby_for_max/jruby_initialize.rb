@@ -167,6 +167,7 @@ module SendReceive
     # needs to be converted to a String (identical symbols are apparently not equal across Ruby evaluators.)
     SendReceive.registry[message.to_s] << [callback, $max_object] # and records the binding for the current $max_object.
   end
+  module_function :receive
 
   # Notify all receivers of a message and any additional arguments.
   def send( message, *args )
@@ -185,6 +186,7 @@ module SendReceive
   ensure
     $max_object = current_max_object
   end
+  module_function :send
 
   at_exit do
     # cleanup max_objects which were deleted

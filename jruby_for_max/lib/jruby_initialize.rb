@@ -1,8 +1,6 @@
 require 'java'
 require 'jruby_for_max/data_storage'
-require 'jruby_for_max/send_receive'
-include JRubyForMax
-include DataStorage
+include JRubyForMax::DataStorage
 
 #
 # Core interface for JRuby for Max

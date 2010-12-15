@@ -22,6 +22,17 @@ module JRubyForMax
 
     module_function :receive
 
+    # Unregister to receive a message.
+    # If no message is provided, then unregister all receivers for this max object.
+    def unreceive(message=nil)
+      for msg, receivers in SendReceive.registry
+        next if message and message.to_s != msg
+        receivers.delete_if { |_, max_object| max_object == $max_object } # $max_object is the current max object
+      end
+    end
+
+    module_function :unreceive
+
 
     # Notify all receivers of a message and any additional arguments.
     def send(message, *args)
@@ -44,14 +55,8 @@ module JRubyForMax
     module_function :send
 
 
-    # remove receivers from the registry when they are removed from the Max environment
     at_exit do
-      # cleanup max_objects which were deleted
-      for message, receivers in SendReceive.registry
-        # when this code runs, $max_object is the current max object that's being deleted, so remove
-        # it from the registry:
-        receivers.delete_if { |_, max_object| max_object == $max_object }
-      end
+      unreceive # cleanup max_objects which were deleted
     end
 
 

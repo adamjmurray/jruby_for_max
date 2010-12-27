@@ -2,10 +2,17 @@
 
 Ruby support for [Max](http://cycling74.com/products/maxmspjitter/) and [Max for Live](http://www.ableton.com/products), built on top of [JRuby](http://jruby.org)
 
-  
+
 ## Author ##
 
 Adam Murray (adam@compusition.com)
+
+
+## More Info ##
+
+[FAQ](http://github.com/adamjmurray/jruby_for_max/wiki/FAQ)
+
+[Examples](http://github.com/adamjmurray/jruby_for_max-examples)
 
 
 ## Status ##

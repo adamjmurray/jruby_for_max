@@ -63,14 +63,3 @@ module JRubyForMax
   end
 
 end
-
-
-# The following few lines enhance Hash and Array to be threadsafe.
-# When using the SendReceive module, you may be entering a multi-threaded environment (esp. in Max for Live and poly~)
-require 'jruby/synchronized'
-class Hash
-  include JRuby::Synchronized
-end
-class Array
-  include JRuby::Synchronized
-end

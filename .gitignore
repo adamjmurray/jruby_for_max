@@ -4,5 +4,5 @@ dist
 jruby4max.jar
 .DS_Store
 out
-Jruby_for_max.iml
+*.iml
 .idea

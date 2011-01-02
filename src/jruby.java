@@ -50,6 +50,11 @@ public class jruby extends JRubyMaxObject {
 	private File file;
 	private Atom[] fileArgs;
 
+    // Any info outlet messages that need to be sent immediately after initialization, because
+    // outlet calls during initialization will be ignored
+    private String[] infoOutletMessageOnInit;
+
+    private boolean hasInfoOutlet = false;
 	private int evalOutlet = -1;
 
 	private boolean autowatch = false;
@@ -80,8 +85,15 @@ public class jruby extends JRubyMaxObject {
 		if( args.length > 1 && args[1].isInt() && args[1].getInt() > 1 ) {
 			outlets = args[1].getInt();
 		}
+
+        if( args.length > 2 && (args[2].isInt() || args[2].isString())) {
+            String infoOutletArg = args[2].toString().toLowerCase();
+            if(infoOutletArg.equals("1") || infoOutletArg.equals("true")) {
+                hasInfoOutlet = true;
+            }
+        }
 		declareIO( inlets, outlets );
-		createInfoOutlet( false );
+		createInfoOutlet( hasInfoOutlet );
 
 		symbolConversionOptions = new SymbolConversionOption[inlets];
 		for( int i = 0; i < symbolConversionOptions.length; i++ ) {
@@ -102,6 +114,13 @@ public class jruby extends JRubyMaxObject {
 			if( file != null ) {
 				initFile();
 			}
+            if(hasInfoOutlet) {
+                if(infoOutletMessageOnInit != null) {
+                    outlet(getInfoIdx(), infoOutletMessageOnInit);
+                    infoOutletMessageOnInit = null;
+                }
+                outlet(getInfoIdx(), "initialized", "bang");
+            }
 		}
 	}
 
@@ -147,6 +166,15 @@ public class jruby extends JRubyMaxObject {
 					info( "Save the patcher and send the \"createfile\" message" );
 					info( "...to create the file \"" + filePath + "\" in the patcher's folder." );
 				}
+
+                if(hasInfoOutlet) {
+                    if(initialized) {
+                        outlet(getInfoIdx(), "filenotfound", filePath);
+                    }
+                    else {
+                       infoOutletMessageOnInit = new String[]{ "filenotfound", filePath };
+                    }
+                }
 			}
 		}
 		else {
@@ -256,8 +284,14 @@ public class jruby extends JRubyMaxObject {
 		info( "loading script '" + file + "' on " + new Date() );
 		try {
 			ruby.init( file, fileArgs );
+            if(hasInfoOutlet) {
+                outlet(getInfoIdx(), "fileloaded", "bang");
+            }
 		} catch(Exception e) {
 			err( "Error evaluating script file: " + file.getPath() );
+            if(hasInfoOutlet) {
+                outlet(getInfoIdx(), "error", e.getMessage());
+            }
 			// It seems that System.err.flush() takes care of printing out the error message.
 //      if(verbose) {
 //      	printRubyException(e);
@@ -385,6 +419,9 @@ public class jruby extends JRubyMaxObject {
 
 		} catch(Exception e) {
 			err( "could not evaluate: " + input );
+            if(hasInfoOutlet) {
+                outlet(getInfoIdx(), "error", e.getMessage());
+            }
 			// It seems that System.err.flush() takes care of printing out the error message.
 //      if(verbose) {
 //      	printRubyException(e);

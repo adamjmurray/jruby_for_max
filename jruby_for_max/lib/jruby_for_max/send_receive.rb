@@ -15,9 +15,16 @@ module JRubyForMax
 
     # Registers to receive a message by way of a callback
     def receive(message, &callback)
+      lock = $_LOCK_ # get a reference to the receiver's lock
+      # and use it to synchronize the callback with any other input that may be happening at that receiver
+      synchronized_callback = lambda do |*args|
+        lock.synchronize do
+          callback.call(*args)
+        end
+      end
       # It seems that if we are going to use the global variable store, then the key (the message)
       # needs to be converted to a String (identical symbols are apparently not equal across Ruby evaluators.)
-      SendReceive.registry[message.to_s] << [callback, $max_object] # and records the binding for the current $max_object.
+      SendReceive.registry[message.to_s] << [synchronized_callback, $max_object] # and records the binding for the current $max_object.
     end
 
     module_function :receive

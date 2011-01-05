@@ -406,7 +406,9 @@ public class jruby extends JRubyMaxObject {
 						+ ". If you are loadbanging a script, try using a deferlow." );
 				return;
 			}
-			Object val = ruby.eval( input, evalOutlet >= 0 );
+            // automatically synchronize all evaluations:
+            String code = "$_LOCK_.synchronize do\n" + input + "\nend";
+			Object val = ruby.eval( code, evalOutlet >= 0 );
 			if( evalOutlet >= 0 ) {
 				if( val instanceof Atom[] ) {
 					outlet( evalOutlet, (Atom[])val );

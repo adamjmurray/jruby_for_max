@@ -1,6 +1,8 @@
 require 'java'
 require 'jruby_for_max/data_storage'
 include JRubyForMax::DataStorage
+require 'thread'
+$_LOCK_ = Mutex.new  # used to synchronize evaluation across multiple threads (with poly~ or Max for Live)
 
 #
 # Core interface for JRuby for Max

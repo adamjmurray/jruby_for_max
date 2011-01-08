@@ -50,11 +50,11 @@ public class jruby extends JRubyMaxObject {
 	private File file;
 	private Atom[] fileArgs;
 
-    // Any info outlet messages that need to be sent immediately after initialization, because
-    // outlet calls during initialization will be ignored
-    private String[] infoOutletMessageOnInit;
+	// Any info outlet messages that need to be sent immediately after initialization, because
+	// outlet calls during initialization will be ignored
+	private String[] infoOutletMessageOnInit;
 
-    private boolean hasInfoOutlet = false;
+	private boolean hasInfoOutlet = false;
 	private int evalOutlet = -1;
 
 	private boolean autowatch = false;
@@ -86,12 +86,12 @@ public class jruby extends JRubyMaxObject {
 			outlets = args[1].getInt();
 		}
 
-        if( args.length > 2 && (args[2].isInt() || args[2].isString())) {
-            String infoOutletArg = args[2].toString().toLowerCase();
-            if(infoOutletArg.equals("1") || infoOutletArg.equals("true")) {
-                hasInfoOutlet = true;
-            }
-        }
+		if( args.length > 2 && (args[2].isInt() || args[2].isString()) ) {
+			String infoOutletArg = args[2].toString().toLowerCase();
+			if( infoOutletArg.equals( "1" ) || infoOutletArg.equals( "true" ) ) {
+				hasInfoOutlet = true;
+			}
+		}
 		declareIO( inlets, outlets );
 		createInfoOutlet( hasInfoOutlet );
 
@@ -114,13 +114,13 @@ public class jruby extends JRubyMaxObject {
 			if( file != null ) {
 				initFile();
 			}
-            if(hasInfoOutlet) {
-                if(infoOutletMessageOnInit != null) {
-                    outlet(getInfoIdx(), infoOutletMessageOnInit);
-                    infoOutletMessageOnInit = null;
-                }
-                outlet(getInfoIdx(), "initialized", "bang");
-            }
+			if( hasInfoOutlet ) {
+				if( infoOutletMessageOnInit != null ) {
+					outlet( getInfoIdx(), infoOutletMessageOnInit );
+					infoOutletMessageOnInit = null;
+				}
+				outlet( getInfoIdx(), "initialized", "bang" );
+			}
 		}
 	}
 
@@ -167,14 +167,14 @@ public class jruby extends JRubyMaxObject {
 					info( "...to create the file \"" + filePath + "\" in the patcher's folder." );
 				}
 
-                if(hasInfoOutlet) {
-                    if(initialized) {
-                        outlet(getInfoIdx(), "filenotfound", filePath);
-                    }
-                    else {
-                       infoOutletMessageOnInit = new String[]{ "filenotfound", filePath };
-                    }
-                }
+				if( hasInfoOutlet ) {
+					if( initialized ) {
+						outlet( getInfoIdx(), "filenotfound", filePath );
+					}
+					else {
+						infoOutletMessageOnInit = new String[]{"filenotfound", filePath};
+					}
+				}
 			}
 		}
 		else {
@@ -284,14 +284,14 @@ public class jruby extends JRubyMaxObject {
 		info( "loading script '" + file + "' on " + new Date() );
 		try {
 			ruby.init( file, fileArgs );
-            if(hasInfoOutlet) {
-                outlet(getInfoIdx(), "fileloaded", "bang");
-            }
-		} catch(Exception e) {
+			if( hasInfoOutlet ) {
+				outlet( getInfoIdx(), "fileloaded", "bang" );
+			}
+		} catch( Exception e ) {
 			err( "Error evaluating script file: " + file.getPath() );
-            if(hasInfoOutlet) {
-                outlet(getInfoIdx(), "error", e.getMessage());
-            }
+			if( hasInfoOutlet ) {
+				outlet( getInfoIdx(), "error", e.getMessage() );
+			}
 			// It seems that System.err.flush() takes care of printing out the error message.
 //      if(verbose) {
 //      	printRubyException(e);
@@ -406,24 +406,24 @@ public class jruby extends JRubyMaxObject {
 						+ ". If you are loadbanging a script, try using a deferlow." );
 				return;
 			}
-            // automatically synchronize all evaluations:
-            String code = "$_LOCK_.synchronize do\n" + input + "\nend";
+			// automatically synchronize all evaluations:
+			String code = "$_LOCK_.synchronize do\n" + input + "\nend";
 			Object val = ruby.eval( code, evalOutlet >= 0 );
 			if( evalOutlet >= 0 ) {
 				if( val instanceof Atom[] ) {
-					outlet( evalOutlet, (Atom[])val );
+					outlet( evalOutlet, (Atom[]) val );
 				}
 				else {
-					outlet( evalOutlet, (Atom)val );
+					outlet( evalOutlet, (Atom) val );
 				}
 			}
 			// else negative numbers to suppress eval output
 
-		} catch(Exception e) {
+		} catch( Exception e ) {
 			err( "could not evaluate: " + input );
-            if(hasInfoOutlet) {
-                outlet(getInfoIdx(), "error", e.getMessage());
-            }
+			if( hasInfoOutlet ) {
+				outlet( getInfoIdx(), "error", e.getMessage() );
+			}
 			// It seems that System.err.flush() takes care of printing out the error message.
 //      if(verbose) {
 //      	printRubyException(e);
@@ -433,23 +433,23 @@ public class jruby extends JRubyMaxObject {
 	}
 
 	/*
-			private void printRubyException(Exception e) {
-					Throwable t = e;
-					if(t instanceof RubyException && t.getCause() != null) {
-							t = t.getCause();
-					}
-					if (t.getCause() instanceof RaiseException) {
-							t = t.getCause();
-				}
-					String st = Utils.getStackTrace(t);
-				for (String s : st.split("\n")) {
-						// strip out some generic jruby error strings that aren't useful:
-						if (!s.equals("	...internal jruby stack elided...") && !s.startsWith("	from (unknown).(unknown)(:")) {
-								error(s);
-						}
-				}
-			}
-			*/
+				 private void printRubyException(Exception e) {
+						 Throwable t = e;
+						 if(t instanceof RubyException && t.getCause() != null) {
+								 t = t.getCause();
+						 }
+						 if (t.getCause() instanceof RaiseException) {
+								 t = t.getCause();
+					 }
+						 String st = Utils.getStackTrace(t);
+					 for (String s : st.split("\n")) {
+							 // strip out some generic jruby error strings that aren't useful:
+							 if (!s.equals("	...internal jruby stack elided...") && !s.startsWith("	from (unknown).(unknown)(:")) {
+									 error(s);
+							 }
+					 }
+				 }
+				 */
 
 	private void flush() {
 		System.out.flush();
@@ -466,21 +466,21 @@ public class jruby extends JRubyMaxObject {
 				if( MaxSystem.isOsWindows() ) {
 					// "file editor" is a dummy argument, I guess it controls the window title if a command prompt is opened.
 					// This dummy argument has to contain spaces or be explicitly wrapped in double quotes.
-					p = Runtime.getRuntime().exec( new String[]{ "cmd", "/c", "start", "file editor", filePath } );
+					p = Runtime.getRuntime().exec( new String[]{"cmd", "/c", "start", "file editor", filePath} );
 				}
 				else {
-					p = Runtime.getRuntime().exec( new String[]{ "open", filePath } );
+					p = Runtime.getRuntime().exec( new String[]{"open", filePath} );
 				}
 				try {
 					p.waitFor();
 					if( p.exitValue() != 0 ) {
 						err( Utils.getInputStreamAsString( p.getErrorStream() ) );
 					}
-				} catch(InterruptedException e) {
+				} catch( InterruptedException e ) {
 					err( e.getMessage() );
 				}
 			}
-		} catch(IOException e) {
+		} catch( IOException e ) {
 			throw new RuntimeException( e );
 		}
 	}
@@ -505,7 +505,7 @@ public class jruby extends JRubyMaxObject {
 			if( file.createNewFile() ) {
 				this.file = file;
 			}
-		} catch(IOException e) {
+		} catch( IOException e ) {
 			throw new RuntimeException( e );
 		}
 	}

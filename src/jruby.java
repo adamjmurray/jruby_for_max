@@ -377,13 +377,18 @@ public class jruby extends JRubyMaxObject {
 			if( arg.isString() ) {
 				switch( inputConversionOptions[getInlet()] ) {
 					case STRING:
+						if( value.startsWith( "\"" ) && value.endsWith( "\"" ) ) {
+							value = value.substring( 1, value.length()-2 );
+						}
 						value = "'" + value.replaceAll( "'", "\\\\'" ) + "'";
 						break;
 
 					case INTERPOLATED:
-						// This might not work well with evaluated strings #{} if the double quotes is part of the evaluated expression.
-						// In that case a workaround could be to try to refer to the quote with the unicode escape code?
-						value = '"' + value.replaceAll( "\"", "\\\\\"" ) + '"';
+						if( !(value.startsWith( "\"" ) && value.endsWith( "\"" )) ) {
+							// This might not work well with evaluated strings #{} if the double quotes is part of the evaluated expression.
+							// In that case a workaround could be to try to refer to the quote with the unicode escape code?
+							value = '"' + value.replaceAll( "\"", "\\\\\"" ) + '"';
+						}
 						break;
 
 					case SYMBOL:

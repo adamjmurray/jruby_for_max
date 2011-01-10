@@ -29,9 +29,9 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
-						"rect" : [ 253.0, 68.0, 695.0, 423.0 ],
+						"rect" : [ 253.0, 68.0, 702.0, 423.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 253.0, 68.0, 695.0, 423.0 ],
+						"defrect" : [ 253.0, 68.0, 702.0, 423.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
@@ -55,7 +55,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 293.0, 119.0, 227.0, 18.0 ],
+									"patching_rect" : [ 256.0, 125.0, 227.0, 18.0 ],
 									"text" : "list a b c 1+2=#{1+2} #{inlet_index}"
 								}
 
@@ -83,8 +83,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 34.0, 379.0, 50.0, 18.0 ],
-									"text" : ":abc"
+									"patching_rect" : [ 34.0, 379.0, 50.0, 18.0 ]
 								}
 
 							}
@@ -112,8 +111,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 158.0, 382.0, 50.0, 18.0 ],
-									"text" : ":abc"
+									"patching_rect" : [ 158.0, 382.0, 50.0, 18.0 ]
 								}
 
 							}
@@ -169,8 +167,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 18.0, 318.0, 50.0, 18.0 ],
-									"text" : "'abc'"
+									"patching_rect" : [ 18.0, 318.0, 50.0, 18.0 ]
 								}
 
 							}
@@ -198,8 +195,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 193.0, 320.0, 50.0, 18.0 ],
-									"text" : "'abc'"
+									"patching_rect" : [ 193.0, 320.0, 50.0, 18.0 ]
 								}
 
 							}
@@ -282,7 +278,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 598.0, 143.0, 89.0, 18.0 ],
+									"patching_rect" : [ 602.0, 143.0, 89.0, 18.0 ],
 									"text" : "list a b \"c d e\""
 								}
 
@@ -296,7 +292,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 488.0, 143.0, 103.0, 18.0 ],
+									"patching_rect" : [ 487.0, 144.0, 103.0, 18.0 ],
 									"text" : "1 2 inlet_index()"
 								}
 
@@ -338,7 +334,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 209.0, 142.0, 89.0, 18.0 ],
+									"patching_rect" : [ 140.0, 142.0, 89.0, 18.0 ],
 									"text" : "list a b \"c d e\""
 								}
 
@@ -352,7 +348,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 391.0, 142.0, 48.0, 18.0 ],
+									"patching_rect" : [ 371.0, 146.0, 48.0, 18.0 ],
 									"text" : "1 a b c"
 								}
 
@@ -366,7 +362,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 99.0, 142.0, 103.0, 18.0 ],
+									"patching_rect" : [ 25.0, 142.0, 103.0, 18.0 ],
 									"text" : "1 2 inlet_index()"
 								}
 
@@ -410,8 +406,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 29.0, 204.0, 176.0, 18.0 ],
-									"text" : "1 2 0"
+									"patching_rect" : [ 29.0, 204.0, 176.0, 18.0 ]
 								}
 
 							}
@@ -425,8 +420,8 @@
 									"numinlets" : 6,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 99.0, 172.0, 505.0, 20.0 ],
-									"text" : "mxj jruby 6 @file jruby_inlet_symbols_to.rb @text_to literal symbol interpolated string *"
+									"patching_rect" : [ 25.0, 168.0, 596.0, 20.0 ],
+									"text" : "mxj jruby 6 @file jruby_text_to.rb @text_to literal symbol interpolated string *"
 								}
 
 							}
@@ -439,7 +434,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 14.0, 81.0, 346.0, 47.0 ],
+									"patching_rect" : [ 14.0, 81.0, 349.0, 47.0 ],
 									"text" : "either 'string' (single quoted), 'interpolated' (double quoted with #{} eval), 'symbol', or 'literal' can be set for each inlet. Use * to set all remaining inlets"
 								}
 
@@ -612,7 +607,7 @@
 								"patchline" : 								{
 									"destination" : [ "obj-41", 1 ],
 									"hidden" : 0,
-									"midpoints" : [ 108.5, 198.0, 195.5, 198.0 ],
+									"midpoints" : [ 34.5, 198.0, 195.5, 198.0 ],
 									"source" : [ "obj-4", 0 ]
 								}
 

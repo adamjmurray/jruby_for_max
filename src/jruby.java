@@ -30,7 +30,7 @@ import com.cycling74.max.Executable;
 import com.cycling74.max.MaxPatcher;
 import com.cycling74.max.MaxSystem;
 import jruby4max.maxsupport.JRubyMaxObject;
-import jruby4max.rubysupport.SymbolConversionOption;
+import jruby4max.rubysupport.InputConversionOption;
 import jruby4max.util.FileWatcher;
 import jruby4max.util.TextBlock;
 import jruby4max.util.Utils;
@@ -60,8 +60,8 @@ public class jruby extends JRubyMaxObject {
 	private boolean autowatch = false;
 	private FileWatcher fileWatcher;
 
-	private String[] symbolsTo;
-	private SymbolConversionOption[] symbolConversionOptions;
+	private String[] textTo;
+	private InputConversionOption[] inputConversionOptions;
 
 	private static final String DEFAULT_EXTENSION = ".rb";
 
@@ -75,7 +75,9 @@ public class jruby extends JRubyMaxObject {
 		declareAttribute( "evalout", "getevalout", "evalout" );
 		declareAttribute( "file", "getfile", "file" );
 		declareAttribute( "autowatch", "getautowatch", "autowatch" );
-		declareAttribute( "symbols_to", "getsymbols_to", "symbols_to" );
+
+		declareAttribute( "text_to", "gettext_to", "text_to" );
+		declareAttribute( "symbols_to", "gettext_to", "text_to" );  // deprecated, use @text_to instead
 
 		int inlets = 1;
 		if( args.length > 0 && args[0].isInt() && args[0].getInt() > 1 ) {
@@ -95,10 +97,10 @@ public class jruby extends JRubyMaxObject {
 		declareIO( inlets, outlets );
 		createInfoOutlet( hasInfoOutlet );
 
-		symbolConversionOptions = new SymbolConversionOption[inlets];
-		for( int i = 0; i < symbolConversionOptions.length; i++ ) {
+		inputConversionOptions = new InputConversionOption[inlets];
+		for( int i = 0; i < inputConversionOptions.length; i++ ) {
 			// the default behavior is to treat input literally
-			symbolConversionOptions[i] = SymbolConversionOption.DEFAULT;
+			inputConversionOptions[i] = InputConversionOption.DEFAULT;
 		}
 	}
 
@@ -204,48 +206,48 @@ public class jruby extends JRubyMaxObject {
 		}
 	}
 
-	public String[] getsymbols_to() {
-		return symbolsTo;
+	public String[] gettext_to() {
+		return textTo;
 	}
 
-	public void symbols_to( String[] params ) {
+	public void text_to( String[] params ) {
 		for( int i = 0; i < params.length; i++ ) {
 			String param = params[i];
 
-			if( i >= symbolConversionOptions.length ) {
-				err( "More @symbols_to arguments than inlets, ignoring extra arguments." );
+			if( i >= inputConversionOptions.length ) {
+				err( "More @text_to arguments than inlets, ignoring extra arguments." );
 				break;
 			}
 
-			SymbolConversionOption option = SymbolConversionOption.fromString( param );
+			InputConversionOption option = InputConversionOption.fromString( param );
 			if( option == null ) {
-				err( "Invalid @symbols_to argument '" + param + "'. Defaulting to " + SymbolConversionOption.DEFAULT );
+				err( "Invalid @text_to argument '" + param + "'. Defaulting to " + InputConversionOption.DEFAULT );
 				// it was already initialized to the default in the constructor so there's nothing to do
 				continue;
 			}
-			else if( option == SymbolConversionOption.REMAINING_INLETS ) {
+			else if( option == InputConversionOption.REMAINING_INLETS ) {
 				if( i > 0 ) {
-					SymbolConversionOption previousOption = symbolConversionOptions[i - 1];
-					for( int j = i; j < symbolConversionOptions.length; j++ ) {
-						symbolConversionOptions[j] = previousOption;
+					InputConversionOption previousOption = inputConversionOptions[i - 1];
+					for( int j = i; j < inputConversionOptions.length; j++ ) {
+						inputConversionOptions[j] = previousOption;
 					}
 				}
 				// else the first arg is a '*' in which case there's nothing to do (everything remains the default)
 
 				if( i < params.length - 1 ) {
-					err( "Ignoring @symbols_to argument(s) after the " + SymbolConversionOption.REMAINING_INLETS );
+					err( "Ignoring @symbols_to argument(s) after the " + InputConversionOption.REMAINING_INLETS );
 				}
 				// and we're done:
 				break;
 			}
 			else {
 				// handle all non-REMAINING_INLETS options:
-				symbolConversionOptions[i] = option;
+				inputConversionOptions[i] = option;
 			}
 		}
-		symbolsTo = new String[symbolConversionOptions.length];
-		for( int i = 0; i < symbolsTo.length; i++ ) {
-			symbolsTo[i] = symbolConversionOptions[i].toString();
+		textTo = new String[inputConversionOptions.length];
+		for( int i = 0; i < textTo.length; i++ ) {
+			textTo[i] = inputConversionOptions[i].toString();
 		}
 	}
 
@@ -367,20 +369,28 @@ public class jruby extends JRubyMaxObject {
 				continue;
 			}
 			String value = arg.toString();
-			switch( symbolConversionOptions[getInlet()] ) {
-				case STRING:
-					// This might not work well with evaluated strings #{} if the double quotes is part of the evaluated expression.
-					// In that case a workaround could be to try to refer to the quote with the unicode escape code?
-					value = '"' + value.replaceAll( "\"", "\\\\\"" ) + '"';
-					break;
 
-				case SYMBOL:
-					value = ':' + value.replaceAll( " ", "_" );
-					break;
+			if( arg.isString() ) {
+				switch( inputConversionOptions[getInlet()] ) {
+					case STRING:
+						value = "'" + value.replaceAll( "'", "\\\\'" ) + "'";
+						break;
 
-				default:
-					value = Utils.detokenize( value );
+					case INTERPOLATED:
+						// This might not work well with evaluated strings #{} if the double quotes is part of the evaluated expression.
+						// In that case a workaround could be to try to refer to the quote with the unicode escape code?
+						value = '"' + value.replaceAll( "\"", "\\\\\"" ) + '"';
+						break;
+
+					case SYMBOL:
+						value = ':' + value.replaceAll( " ", "_" );
+						break;
+
+					default:
+						value = Utils.detokenize( value );
+				}
 			}
+
 			s.append( value );
 		}
 	}

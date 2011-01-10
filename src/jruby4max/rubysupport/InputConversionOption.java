@@ -27,12 +27,17 @@ package jruby4max.rubysupport;
 
  */
 
-public enum SymbolConversionOption {
+public enum InputConversionOption {
 
 	/**
-	 * Convert incoming Max symbols to Ruby strings
+	 * Convert incoming Max symbols to Ruby single-quoted strings
 	 */
 	STRING( "string" ),
+
+	/**
+	 * Convert to Ruby double-quoted strings
+	 */
+	INTERPOLATED( "interpolated" ),
 
 	/**
 	 * Convert incoming Max symbols to Ruby symbols
@@ -49,9 +54,9 @@ public enum SymbolConversionOption {
 	 */
 	REMAINING_INLETS( "*" );
 
-	public static SymbolConversionOption DEFAULT = LITERAL;
+	public static InputConversionOption DEFAULT = LITERAL;
 
-	SymbolConversionOption( String stringValue ) {
+	InputConversionOption( String stringValue ) {
 		this.stringValue = stringValue;
 	}
 
@@ -64,9 +69,12 @@ public enum SymbolConversionOption {
 
 	private final String stringValue;
 
-	public static SymbolConversionOption fromString( String stringValue ) {
+	public static InputConversionOption fromString( String stringValue ) {
 		if( STRING.stringValue.equals( stringValue ) ) {
 			return STRING;
+		}
+		else if ( INTERPOLATED.stringValue.equals( stringValue ) ) {
+			return INTERPOLATED;
 		}
 		else if( SYMBOL.stringValue.equals( stringValue ) ) {
 			return SYMBOL;

@@ -63,6 +63,8 @@ public class jruby extends JRubyMaxObject {
 	private String[] textTo;
 	private InputConversionOption[] inputConversionOptions;
 
+	private boolean synchronize = false;
+
 	private static final String DEFAULT_EXTENSION = ".rb";
 
 	/**
@@ -78,6 +80,8 @@ public class jruby extends JRubyMaxObject {
 
 		declareAttribute( "text_to", "gettext_to", "text_to" );
 		declareAttribute( "symbols_to", "gettext_to", "text_to" );  // deprecated, use @text_to instead
+
+		declareAttribute( "synchronize" );
 
 		int inlets = 1;
 		if( args.length > 0 && args[0].isInt() && args[0].getInt() > 1 ) {
@@ -413,11 +417,15 @@ public class jruby extends JRubyMaxObject {
 		try {
 			if( ruby == null ) {
 				err( "not initialized yet. Did not evaluate: " + input
-						+ ". If you are loadbanging a script, try using a deferlow." );
+						+ ". If you are loadbanging a script, try using the 'info outlet', or a deferlow object." );
 				return;
 			}
-			// automatically synchronize all evaluations:
-			String code = "$_LOCK_.synchronize do\n" + input + "\nend";
+			CharSequence code = input;
+			if( synchronize ) {
+				// automatically synchronize all evaluations:
+				code = "$_LOCK_.synchronize do\n" + input + "\nend";
+			}
+
 			Object val = ruby.eval( code, evalOutlet >= 0 );
 			if( evalOutlet >= 0 ) {
 				if( val instanceof Atom[] ) {

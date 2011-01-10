@@ -378,7 +378,7 @@ public class jruby extends JRubyMaxObject {
 				switch( inputConversionOptions[getInlet()] ) {
 					case STRING:
 						if( value.startsWith( "\"" ) && value.endsWith( "\"" ) ) {
-							value = value.substring( 1, value.length()-2 );
+							value = value.substring( 1, value.length()-1 );
 						}
 						value = "'" + value.replaceAll( "'", "\\\\'" ) + "'";
 						break;

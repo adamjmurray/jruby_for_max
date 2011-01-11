@@ -31,7 +31,7 @@ end
 # Sends output to an outlet
 def outlet(outlet_index, *params)
   if (outlet_index >= $max_object.numOutlets)
-    error("Invalid outlet index #{outletIdx}")
+    error("Invalid outlet index #{outlet_index}")
   else
     begin
       if params.length == 1

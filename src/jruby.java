@@ -37,7 +37,9 @@ import jruby4max.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The jruby4max.ruby MaxObject
@@ -66,6 +68,9 @@ public class jruby extends JRubyMaxObject {
 	private boolean synchronize = false;
 
 	private static final String DEFAULT_EXTENSION = ".rb";
+
+	// Used to buffer any input that needs to be evaluated after initialization completes
+	private List<CharSequence> deferredEvals;
 
 	/**
 	 * The Constructor
@@ -126,6 +131,12 @@ public class jruby extends JRubyMaxObject {
 					infoOutletMessageOnInit = null;
 				}
 				outlet( getInfoIdx(), "initialized", "bang" );
+			}
+			if( deferredEvals != null) {
+				for(CharSequence input : deferredEvals ) {
+					evalRuby( input );
+				}
+				deferredEvals = null;
 			}
 		}
 	}
@@ -421,8 +432,10 @@ public class jruby extends JRubyMaxObject {
 	protected void evalRuby( CharSequence input ) {
 		try {
 			if( ruby == null ) {
-				err( "not initialized yet. Did not evaluate: " + input
-						+ ". If you are loadbanging a script, try using the 'info outlet', or a deferlow object." );
+				if( deferredEvals == null) deferredEvals = new ArrayList<CharSequence>();
+				deferredEvals.add( input );
+//				err( "not initialized yet. Did not evaluate: " + input
+//						+ ". If you are loadbanging a script, try using the 'info outlet', or a deferlow object." );
 				return;
 			}
 			CharSequence code = input;

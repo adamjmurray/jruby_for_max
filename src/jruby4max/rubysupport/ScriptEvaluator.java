@@ -93,6 +93,7 @@ public class ScriptEvaluator implements IScriptEvaluator {
 	protected void resetEngineContext() {
 		container = new ScriptingContainer( LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT );
 		container.setCompatVersion( compatVersion );
+		container.setCurrentDirectory( System.getProperty( "user.home" ) );
 	}
 
 	protected void declareGlobalInternal( String variableName, Object obj ) {

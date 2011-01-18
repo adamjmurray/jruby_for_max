@@ -19,7 +19,8 @@ PATCHES = 'jruby_for_max'
 LICENSE = 'license'
 BUILD   = 'build'
 DIST    = 'dist'
-PACKAGE = "#{DIST}/jruby_for_max-#{PROJECT_VERSION}"
+PROJ    =   "jruby_for_max-#{PROJECT_VERSION}"
+PACKAGE = "#{DIST}/#{PROJ}"
 
 SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
@@ -85,9 +86,9 @@ end
 desc 'construct the distribution archive'
 task :dist => [:replace_vars] do
   mkdir DIST
-  archive = "#{PACKAGE}.zip"
-  puts "Archiving distribution: #{archive}"
-  `zip -l -r #{archive} #{PACKAGE}`
+  archive = "#{PROJ}.zip"
+  puts "Archiving distribution: #{DIST}/#{archive}"
+  `cd #{DIST} && zip -l -m -r #{archive} #{PROJ}`
   # The -l option converts newlines to crlf, which should display correctly on both OS X and Windows.
   # Otherwise, since I write these txt files on OS X, newlines would disappear when viewed in Notepad on Windows.
 end 

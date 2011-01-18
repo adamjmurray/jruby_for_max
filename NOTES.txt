@@ -24,10 +24,9 @@ Just mind my copyright and give credit where credit is due.
 DEPENDENCIES
 
 JRuby (http://jruby.org/)
-  The 100% Java implementation of Ruby. 
-  JRuby in turn depends on other libraries. I included the license info
-  for bsf.jar under the license folder. You can find license info for
-  the Ruby language at:
+  The 100% Java implementation of Ruby.
+  JRuby license info is under the license/jruby folder.
+  You can find license info for the Ruby language at:
     http://www.ruby-lang.org/en/LICENSE.txt
     http://www.ruby-lang.org/en/COPYING.txt
     

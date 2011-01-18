@@ -3,7 +3,7 @@ require 'tempfile'
 require 'rbconfig'
 include FileUtils
 
-PROJECT_VERSION = '1.0_alpha1'
+PROJECT_VERSION = '1.0_beta1'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
 MANIFEST = 
 "Library: JRuby for Max

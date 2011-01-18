@@ -28,9 +28,9 @@ module JRubyForMax::LiveAPI
       outlet @live_path_outlet, object_path.map { |subpath| subpath.to_s }.unshift('goto')
     end
 
-    def call function, &block
+    def call function, *args, &block
       @callbacks[function] = block
-      outlet @live_object_outlet, 'call', function.to_s
+      outlet @live_object_outlet, 'call', function.to_s, *args
     end
 
     def get property, &block
@@ -67,7 +67,7 @@ module JRubyForMax::LiveAPI
       if not instance_variables.include? variable
         # if we're defining a property for the first time, create an accessor method
         self.class.instance_eval do
-          attr_reader attribute # get rid of '@' at beginning, attr_reader doesn't expect this
+          attr_reader attribute
         end
       end
       instance_variable_set variable, nil

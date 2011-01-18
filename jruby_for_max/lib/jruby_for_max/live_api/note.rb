@@ -10,6 +10,14 @@ module JRubyForMax::LiveAPI
     def active?
       @deactivated == 0
     end
+
+    def length
+      @duration
+    end
+
+    def to_message
+      [@pitch, @start, @duration, @velocity, @deactivated]
+    end
   end
 end
 

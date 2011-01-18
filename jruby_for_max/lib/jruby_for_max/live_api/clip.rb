@@ -17,8 +17,8 @@ module JRubyForMax::LiveAPI
       return if not exists?
       # along with the notes, we'll need the clip length and loop_start point to
       # be able to figure out where in the clips the notes are, so we get those first:
-      get :length do
-        get :loop_start do
+      get :loop_start do
+        get :loop_end do
           call :select_all_notes do
             call :get_selected_notes do |*data|
               case data.shift # first data element is note property
@@ -27,12 +27,24 @@ module JRubyForMax::LiveAPI
                 when :note
                   @notes << Note.new(*data)
                 when :done
-                  block.call() if block
+                  block.call(@notes) if block
               end
             end
           end
         end
       end
+    end
+
+    def set_notes(notes=nil)
+      notes ||= @notes
+      call :replace_selected_notes
+      call :notes, notes.size
+      notes.each {|note| call :note, *note.to_message }
+      call :done
+    end
+
+    def length
+      @loop_end - @loop_start
     end
 
   end

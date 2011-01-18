@@ -205,13 +205,13 @@
 ,
 					"patching_rect" : [ 310.0, 16.149414, 115.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Arial",
-						"default_fontsize" : 12.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 12.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Arial"
+						"default_fontname" : "Arial",
+						"fontname" : "Arial",
+						"default_fontsize" : 12.0
 					}
 ,
 					"text" : "p \"handling errors\""
@@ -422,7 +422,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 32.0, 454.0, 214.0, 18.0 ],
-									"text" : "loaded file @ 2011-01-10_21:49:47"
+									"text" : "loaded file @ 2011-01-18_00:05:40"
 								}
 
 							}
@@ -680,13 +680,13 @@
 ,
 									"patching_rect" : [ 152.0, 389.0, 77.0, 20.0 ],
 									"saved_object_attributes" : 									{
-										"fontname" : "Arial",
-										"default_fontsize" : 11.595187,
-										"globalpatchername" : "",
 										"fontface" : 0,
 										"fontsize" : 11.595187,
+										"globalpatchername" : "",
 										"default_fontface" : 0,
-										"default_fontname" : "Arial"
+										"default_fontname" : "Arial",
+										"fontname" : "Arial",
+										"default_fontsize" : 11.595187
 									}
 ,
 									"text" : "p timestamp"
@@ -969,13 +969,13 @@
 ,
 					"patching_rect" : [ 22.0, 16.149414, 88.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"info outlet\""
@@ -1617,13 +1617,13 @@
 ,
 					"patching_rect" : [ 22.0, 47.0, 231.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"@text_to (input conversion options)\""
@@ -2129,13 +2129,13 @@
 ,
 					"patching_rect" : [ 310.0, 77.287369, 151.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"message and textedit\""
@@ -2180,21 +2180,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 89.0, 9.0, 312.0, 33.0 ],
-									"text" : "Ruby 1.8 is the default Ruby version. You can enable 1.9 support with the @ruby_versiona ttribute"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Verdana",
-									"fontsize" : 11.0,
-									"id" : "obj-11",
-									"maxclass" : "message",
-									"numinlets" : 2,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 383.0, 219.0, 54.0, 18.0 ],
-									"text" : "eval 1+"
+									"text" : "Ruby 1.8 is the default Ruby version. You can enable 1.9 support with the @ruby_version attribute"
 								}
 
 							}
@@ -2319,7 +2305,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 239.0, 295.0, 50.0, 18.0 ]
+									"patching_rect" : [ 239.0, 295.0, 50.0, 18.0 ],
+									"text" : "71"
 								}
 
 							}
@@ -2332,7 +2319,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 54.0, 290.0, 70.0, 18.0 ]
+									"patching_rect" : [ 54.0, 290.0, 70.0, 18.0 ],
+									"text" : "G"
 								}
 
 							}
@@ -2433,15 +2421,6 @@
 									"hidden" : 0,
 									"midpoints" : [  ],
 									"source" : [ "obj-10", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-15", 0 ],
-									"hidden" : 0,
-									"midpoints" : [  ],
-									"source" : [ "obj-11", 0 ]
 								}
 
 							}
@@ -2549,13 +2528,13 @@
 ,
 					"patching_rect" : [ 310.0, 168.149414, 81.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"Ruby 1.9\""
@@ -2685,13 +2664,13 @@
 ,
 					"patching_rect" : [ 310.0, 137.574722, 138.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"inlet & outlet assist\""
@@ -2928,13 +2907,13 @@
 ,
 					"patching_rect" : [ 310.0, 108.0, 110.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"using libraries\""
@@ -3513,13 +3492,13 @@
 ,
 					"patching_rect" : [ 310.0, 47.0, 127.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"type conversions\""
@@ -3717,13 +3696,13 @@
 ,
 									"patching_rect" : [ 21.0, 614.011475, 202.0, 20.0 ],
 									"saved_object_attributes" : 									{
-										"fontname" : "Verdana",
-										"default_fontsize" : 11.0,
-										"globalpatchername" : "",
 										"fontface" : 0,
 										"fontsize" : 11.0,
+										"globalpatchername" : "",
 										"default_fontface" : 0,
-										"default_fontname" : "Verdana"
+										"default_fontname" : "Verdana",
+										"fontname" : "Verdana",
+										"default_fontsize" : 11.0
 									}
 ,
 									"text" : "p \"notes about the empty context\""
@@ -4247,13 +4226,13 @@
 ,
 					"patching_rect" : [ 22.0, 108.0, 185.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"inter-object communcation\""
@@ -4623,13 +4602,13 @@
 ,
 					"patching_rect" : [ 22.0, 168.149414, 112.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"variable scope\""
@@ -4810,13 +4789,13 @@
 ,
 					"patching_rect" : [ 22.0, 137.574722, 60.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p at_exit"
@@ -5755,13 +5734,13 @@
 ,
 					"patching_rect" : [ 22.0, 77.287369, 194.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontname" : "Verdana",
-						"default_fontsize" : 11.0,
-						"globalpatchername" : "",
 						"fontface" : 0,
 						"fontsize" : 11.0,
+						"globalpatchername" : "",
 						"default_fontface" : 0,
-						"default_fontname" : "Verdana"
+						"default_fontname" : "Verdana",
+						"fontname" : "Verdana",
+						"default_fontsize" : 11.0
 					}
 ,
 					"text" : "p \"shared context and variables\""

@@ -181,7 +181,7 @@ public class MaxRubyAdapter {
 		}
 		ruby.setInitialized( true );
 
-		ruby.setScriptFilename( file == null ? null : file.getName() );
+		ruby.setScriptFile( file );
 		exec( code );
 
 		if( file != null ) {
@@ -193,7 +193,7 @@ public class MaxRubyAdapter {
 			fileInit.line( "$: << " + quote( fileFolderPath ) );
 
 			// set $0. I'd like to set __FILE__ here too, but that variable cannot be assigned
-			fileInit.line( "$0 = " + quote( file ) );
+			//fileInit.line( "$0 = " + quote( file.getAbsolutePath() ) );
 
 			// any set the arguments
 			for( Atom arg : args ) {

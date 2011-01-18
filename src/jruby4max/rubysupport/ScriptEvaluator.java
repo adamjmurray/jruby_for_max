@@ -32,6 +32,7 @@ import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,11 +103,13 @@ public class ScriptEvaluator implements IScriptEvaluator {
 		container.removeAttribute( "$" + variableName );
 	}
 
-	public void setScriptFilename( String scriptFilename ) {
-		if( scriptFilename == null ) {
-			scriptFilename = "";
+	public void setScriptFile( File file ) {
+		if( file == null ) {
+			container.setScriptFilename( "" );
 		}
-		container.setScriptFilename( scriptFilename );
+		else {
+			container.setScriptFilename( file.getAbsolutePath() );
+		}
 	}
 
 	public Object eval( CharSequence rubyCode ) {

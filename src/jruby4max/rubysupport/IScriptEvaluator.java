@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+import java.io.File;
+
 /**
  * Interface for all script evaluator engines.
  *
@@ -44,7 +46,7 @@ public interface IScriptEvaluator {
 
 	void undeclareGlobal( String variableName );
 
-	void setScriptFilename( String scriptFilename );
+	void setScriptFile( File scriptFile );
 
 	Object eval( CharSequence rubyCode );
 

@@ -39,8 +39,30 @@ module JRubyForMax::LiveAPI
       notes ||= @notes
       call :replace_selected_notes
       call :notes, notes.size
-      notes.each {|note| call :note, *note.to_message }
+      notes.each { |note| call :note, *note.to_message }
       call :done
+    end
+
+    def transform_notes &block
+      return if not block
+      get_notes do
+        if not @notes.empty?
+          block.call(@notes)
+          set_notes
+        end
+      end
+    end
+
+    def transform_selected_clip &block
+      goto_selected_clip do
+        transform_notes &block
+      end
+    end
+
+    def transform_clip track_index, scene_index, &block
+      goto_clip track_index, scene_index do
+        transform_notes &block
+      end
     end
 
     def length

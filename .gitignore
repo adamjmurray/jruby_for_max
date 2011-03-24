@@ -1,4 +1,5 @@
 build
+build_test
 download
 dist
 jruby4max.jar

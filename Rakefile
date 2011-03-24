@@ -12,19 +12,22 @@ Built-Date: #{BUILD_DATE}
 Author: Adam Murray
 URL: http://compusition.com
 "
-
-SRC     = 'src'
 LIB     = 'lib'
 PATCHES = 'jruby_for_max'
 LICENSE = 'license'
 BUILD   = 'build'
+TESTS_BUILD = 'build_test'
 DIST    = 'dist'
-PROJ    =   "jruby_for_max-#{PROJECT_VERSION}"
+PROJ    =  "jruby_for_max-#{PROJECT_VERSION}"
 PACKAGE = "#{DIST}/#{PROJ}"
 
-SOURCES   = FileList["#{SRC}/**/*.java"].exclude(/Test\.java$/)
-CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^jruby_for_max.jar$/)
-JAR       = "#{LIB}/jruby4max.jar"
+JAR      = "jruby4max.jar"
+JAR_FILE = "#{LIB}/#{JAR}"
+
+SOURCES   = FileList['src/**/*.java']
+TESTS     = FileList['test/**/*.java']
+CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^#{JAR}$/)
+TESTS_CLASSPATH = CLASSPATH.clone.add(BUILD)
 
 WINDOWS = Config::CONFIG['host_os'] =~ /mswin/
 CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
@@ -32,28 +35,25 @@ CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
 ##############################################################################
 # TASK DEFINITIONS
 
-CLEAN.include BUILD, JAR, DIST
-CLOBBER.include 'out'
+CLEAN.include BUILD, TESTS_BUILD, JAR_FILE, DIST
+CLOBBER.include 'out' # default IntelliJ build folder
 
 
-desc 'compile the java source files'
+desc 'Compile java source files'
 task :compile do
-  mkdir BUILD
-  puts "Building java classes"  
-  `javac -classpath #{CLASSPATH.join CLASSPATH_SEPARATOR} -d #{BUILD} -g -source 1.5 -target 1.5 #{SOURCES}`
+  puts "Compiling java source files"
+  javac CLASSPATH, SOURCES, BUILD
 end
 
 
-desc 'construct the jar archive of the compiled java sources'
 task :jar => [:clean, :compile] do
   manifest = Tempfile.new('manifest')
-  File.open(manifest.path, 'w') {|io| io.write MANIFEST }
-  puts "Archiving build: #{JAR}"
-  `jar cvfm #{JAR} #{manifest.path} -C #{BUILD} .`  
+  write_file manifest, MANIFEST
+  puts "Archiving build: #{JAR_FILE}"
+  jar JAR_FILE, manifest, BUILD
 end
 
 
-desc 'prepare the files for distribution'
 task :package => [:jar] do
   puts "Preparing distribution"
   package_lib = "#{PACKAGE}/#{LIB}"  
@@ -65,7 +65,7 @@ task :package => [:jar] do
   FileList['*.txt', '*.example'].each do |filename|
     cp filename, PACKAGE
   end
-  FileList["#{LIB}/jruby.jar", JAR].each do |filename|
+  FileList["#{LIB}/jruby.jar", JAR_FILE].each do |filename|
     cp filename, package_lib
   end  
   cp_r PATCHES, PACKAGE
@@ -73,7 +73,6 @@ task :package => [:jar] do
 end
 
 
-desc 'search and replace variable values in text files'
 task :replace_vars => [:package] do
   puts "Performing search and replace for the VERSION and BUILD_DATE variables"
   plaintext_filetypes = ['txt', 'maxpat', 'maxhelp']
@@ -83,19 +82,54 @@ task :replace_vars => [:package] do
 end
 
 
-desc 'construct the distribution archive'
+desc 'Build distribution archive'
 task :dist => [:replace_vars] do
   mkdir DIST
   archive = "#{PROJ}.zip"
   puts "Archiving distribution: #{DIST}/#{archive}"
+
+  # NOTE: this only works on OS X. It might work with the correct Cygwin setup on Windows but I never tested this.
   `cd #{DIST} && zip -l -m -r #{archive} #{PROJ}`
   # The -l option converts newlines to crlf, which should display correctly on both OS X and Windows.
   # Otherwise, since I write these txt files on OS X, newlines would disappear when viewed in Notepad on Windows.
-end 
+end
+
+
+task :compile_tests => [:compile] do
+  puts 'Compiling java test files'
+  javac TESTS_CLASSPATH, TESTS, TESTS_BUILD
+end
+
+desc 'Run unit tests'
+task :test => [:compile_tests] do
+  puts 'Running tests'
+  junit_class_path = TESTS_CLASSPATH.clone.add(TESTS_BUILD)
+  test_classes = FileList["#{TESTS_BUILD}/**/*.class"]
+  test_classnames = test_classes.map{|path| path.sub("#{TESTS_BUILD}/", '').sub(".class", '').gsub('/', '.') }
+  puts java junit_class_path, 'org.junit.runner.JUnitCore', test_classnames
+end
+
 
 
 ##############################################################################
 # SUPPORT CODE:
+
+def write_file file, contents
+  File.open(file.path, 'w') {|io| io.write contents }
+end
+
+def java classpath, main_class, args
+  `java -classpath #{classpath.join CLASSPATH_SEPARATOR} #{main_class} #{args}`
+end
+
+def javac classpath, src_files, dst_folder
+  mkdir dst_folder
+  `javac -classpath #{classpath.join CLASSPATH_SEPARATOR} -d #{dst_folder} -g -source 1.5 -target 1.5 #{src_files}`
+end
+
+def jar filename, manifest, dst_folder
+  `jar cvfm #{filename} #{manifest.path} -C #{dst_folder} .`
+end
 
 # I find it annoying that I always have to check if a directory exists
 # before creating it, so I monkey patch mkdir() to handle it automatically:
@@ -120,3 +154,4 @@ class FileList
     end
   end
 end
+

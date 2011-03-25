@@ -1,4 +1,4 @@
-         
+
                              JRuby for Max
          
                            Version @@VERSION

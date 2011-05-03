@@ -17,14 +17,7 @@ Adam Murray (adam@compusition.com)
 
 ## Status ##
 
-Pre-release, 1.0 alpha. Not quite ready for prime time.
-
-Most of these features are also in the "ajm.ruby" object from my larger collection
-of Max/MSP add-ons called "ajm objects" <http://compusition.com/web/software/maxmsp/ajm-objects>.
-The "ajm.ruby" object is being phased out in favor of this project. But if you require a stable way to run Ruby code inside Max, I recommend using "ajm.ruby" at least until an official 1.0
-version of this project is released. 
-
-If you don't mind getting your hands dirty and doing some beta testing, you can follow the instructions below...
+1.0 beta. Ready for general use.
 
 
 ## Building the project

@@ -31,8 +31,7 @@ What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects
 
 * Current directory (Dir.pwd) is now set to the user's home directory instead of "/"
 
-* Upgraded to JRuby 1.6  [PENDING - currently testing with a post-RC1 build from source @github]
-
+* Upgraded JRuby to version 1.5.6
 
 
 ******************************************************************************

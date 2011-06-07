@@ -9,6 +9,11 @@
 
 
 See INSTALL.txt for installation instructions
+
+FAQ: https://github.com/adamjmurray/jruby_for_max/wiki/FAQ
+
+Examples: https://github.com/adamjmurray/jruby_for_max-examples
+
 ------------------------------------------------------------------------------
 
 SOURCE CODE

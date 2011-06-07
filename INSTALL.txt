@@ -31,3 +31,13 @@ INSTALLATION
 
  (4) To get started, open jruby_for_max/jruby.maxhelp
      or add the object [mxj jruby] to a patcher and right click it -> Help
+
+-----------------------------------------------------------------------------
+
+PROBLEMS?
+
+Check out the FAQ: https://github.com/adamjmurray/jruby_for_max/wiki/FAQ
+
+Log an issue: https://github.com/adamjmurray/jruby_for_max/issues
+
+Email me: adam@compusition.com

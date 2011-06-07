@@ -4,24 +4,12 @@
 
 What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects")
 
+* Upgraded JRuby to version 1.6.2
+
 * .rb extension is now optional for @file
-
-* Added a JRubyForMax::SendReceive module containing methods for sending and receiving data between
-  any jruby objects in Max or Max for Live.
-
-* Added info outlet support. The info outlet also sends messages indicating various status changes,
-  like "fileloaded".
-
-* @symbols_to was changed to @text_to and the behavior changed as follows:
-  - @text_to conversions only applies to text input (not numbers)
-  - the "string" conversion type now single-quotes the string
-  - a new "interpolated" conversion type double-quotes the string
 
 * A jruby.error_window patch has been provided to make it easy to display errors.
   This is especially useful in Max for Live where the Max window is often not visible.
-
-* Added a JRubyForMax::LiveAPI module to ease interacting with the Live API.
-  The main use case so far is reading and writing MIDI clips.
 
 * Ruby evaluation is automatically deferred until the object has initialized, so you don't have
   to put a [deferlow] object after your [loadbang]s anymore
@@ -31,7 +19,19 @@ What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects
 
 * Current directory (Dir.pwd) is now set to the user's home directory instead of "/"
 
-* Upgraded JRuby to version 1.5.6
+* Added info outlet support. The info outlet also sends messages indicating various status changes,
+  like "fileloaded".
+
+* @symbols_to was changed to @text_to and the behavior changed as follows:
+  - @text_to conversions only applies to text input (not numbers)
+  - the "string" conversion type now single-quotes the string
+  - a new "interpolated" conversion type double-quotes the string
+
+* Added a JRubyForMax::SendReceive module containing methods for sending and receiving data between
+  any jruby objects in Max or Max for Live.
+
+* Added a JRubyForMax::LiveAPI module to ease interacting with the Live API.
+  The main use case so far is reading and writing MIDI clips.
 
 
 ******************************************************************************

@@ -76,7 +76,6 @@ public class MaxRubyAdapter {
 		this.maxContext = context;
 		this.id = id;
 		this.rubyVersion = rubyVersion;
-		getEvaluator();
 	}
 
 	private void getEvaluator() {
@@ -135,7 +134,7 @@ public class MaxRubyAdapter {
 	 * @return an Atom or Atom[], it's up to the calling code to check the type
 	 */
 	public Object eval( CharSequence rubyCode, boolean returnResult ) {
-		if( !ruby.isInitialized() ) {
+		if( ruby == null || !ruby.isInitialized() ) {
 			init();
 		}
 		Object result;
@@ -158,6 +157,9 @@ public class MaxRubyAdapter {
 	}
 
 	public void init( File file, Atom[] args ) {
+		if (ruby == null) {
+			getEvaluator();
+		}
 		if( code.isEmpty() ) {
 			// setup the $LOAD_PATH
 			for( String loadPath : RubyProperties.getLoadPaths() ) {

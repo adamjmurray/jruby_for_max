@@ -11,14 +11,17 @@ Built-Date: #{BUILD_DATE}
 Author: Adam Murray
 URL: http://compusition.com
 "
-LIB     = 'lib'
-PATCHES = 'jruby_for_max'
-LICENSE = 'license'
-BUILD   = 'build'
-TESTS_BUILD = 'build_test'
-DIST    = 'dist'
+BASEDIR = File.dirname(__FILE__)
+def path_to path; File.join BASEDIR,path end
+
+LIB     = path_to 'lib'
+PATCHES = path_to 'jruby_for_max'
+LICENSE = path_to 'license'
+BUILD   = path_to 'build'
+TESTS_BUILD = path_to 'build_test'
+DIST    = path_to 'dist'
 PROJ    =  "jruby_for_max-#{PROJECT_VERSION}"
-PACKAGE = "#{DIST}/#{PROJ}"
+PACKAGE = File.join DIST,PROJ
 
 JAR      = "jruby4max.jar"
 JAR_FILE = "#{LIB}/#{JAR}"
@@ -55,8 +58,7 @@ end
 
 task :package => [:jar] do
   puts "Preparing distribution"
-  package_lib = "#{PACKAGE}/#{LIB}"  
-  mkdir_p DIST
+  package_lib = File.join PACKAGE,'lib'
   mkdir_p package_lib
   
   # Collect the files
@@ -90,6 +92,7 @@ task :dist => [:replace_vars] do
   `cd #{DIST} && zip -l -m -r #{archive} #{PROJ} -x "*.DS_Store"`
   # The -l option converts newlines to crlf, which should display correctly on both OS X and Windows.
   # Otherwise, since I write these txt files on OS X, newlines would disappear when viewed in Notepad on Windows.
+  rm_rf PACKAGE
 end
 
 

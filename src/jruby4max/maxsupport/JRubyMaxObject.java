@@ -51,8 +51,8 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 	protected String id = defaultId();
 	private boolean autoinit = false;
 
-	protected Atom[] rubyVersionValue;
-	protected CompatVersion rubyVersion;
+	protected Atom[] rubyVersionValue = Atom.newAtom( new String[]{ RubyProperties.DEFAULT_RUBY_VERSION_STRING } );
+	protected CompatVersion rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
 
 	protected MaxRubyAdapter ruby;
 
@@ -226,29 +226,22 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 		return rubyVersionValue;
 	}
 
-	// Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
-	public void ruby_version( Atom[] rubyVersionValue ) {
-		if( initialized ) {
-			err( "ruby_version cannot be changed. Use @ruby_version when creating the object." );
-			return;
-		}
-		if( rubyVersionValue == null || rubyVersionValue.length < 1 ) return;
+  // Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
+  public void ruby_version(Atom[] rubyVersionValue) {
+    if (initialized) {
+      err("ruby_version cannot be changed. Use @ruby_version when creating the object.");
+      return;
+    }
+    if (rubyVersionValue == null || rubyVersionValue.length < 1) return;
 
-		String rubyVersionString = rubyVersionValue[0].toString();
-		while( rubyVersionString.endsWith( "0" ) ) {
-			// @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
-			rubyVersionString = rubyVersionString.substring( 0, rubyVersionString.length() - 1 );
-		}
+    String rubyVersionString = rubyVersionValue[0].toString();
+    // @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
+    rubyVersionString = rubyVersionString.replaceFirst("(.*?)0+", "$1");
 
-		this.rubyVersion = RubyProperties.getRubyVersion( rubyVersionString );
-		if( this.rubyVersion == null ) {
-			err( "Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported. " +
-					"Defaulting to version " + RubyProperties.DEFAULT_RUBY_VERSION_STRING + "." );
-			this.rubyVersionValue = Atom.newAtom( new String[]{ RubyProperties.DEFAULT_RUBY_VERSION_STRING } );
-			rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
-		}
-		else {
-			this.rubyVersionValue = Atom.newAtom( new String[]{ rubyVersionString } );
-		}
-	}
+    CompatVersion rubyVersion = RubyProperties.getRubyVersion(rubyVersionString);
+    if (rubyVersion != null) {
+      this.rubyVersion = rubyVersion;
+      this.rubyVersionValue = Atom.newAtom(new String[]{rubyVersionString});
+    } else err("Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported.");
+  }
 }

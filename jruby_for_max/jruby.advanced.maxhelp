@@ -1,9 +1,15 @@
 {
 	"patcher" : 	{
 		"fileversion" : 1,
-		"rect" : [ 245.0, 115.0, 487.0, 218.0 ],
+		"appversion" : 		{
+			"major" : 5,
+			"minor" : 1,
+			"revision" : 9
+		}
+,
+		"rect" : [ 649.0, 94.0, 487.0, 218.0 ],
 		"bglocked" : 0,
-		"defrect" : [ 245.0, 115.0, 487.0, 218.0 ],
+		"defrect" : [ 649.0, 94.0, 487.0, 218.0 ],
 		"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 		"openinpresentation" : 0,
 		"default_fontsize" : 11.0,
@@ -20,6 +26,20 @@
 		"devicewidth" : 0.0,
 		"boxes" : [ 			{
 				"box" : 				{
+					"fontname" : "Verdana",
+					"fontsize" : 11.0,
+					"id" : "obj-10",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 190.0, 4.0, 96.0, 33.0 ],
+					"text" : "double click to view examples"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"color" : [ 0.156863, 0.8, 0.54902, 1.0 ],
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
@@ -29,6 +49,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 600.0, 73.0, 462.0, 267.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 600.0, 73.0, 462.0, 267.0 ],
@@ -205,13 +231,13 @@
 ,
 					"patching_rect" : [ 310.0, 16.149414, 115.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 12.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Arial",
+						"default_fontsize" : 12.0,
 						"fontname" : "Arial",
-						"default_fontsize" : 12.0
+						"fontface" : 0,
+						"fontsize" : 12.0
 					}
 ,
 					"text" : "p \"handling errors\""
@@ -229,6 +255,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 357.0, 69.0, 768.0, 534.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 357.0, 69.0, 768.0, 534.0 ],
@@ -422,7 +454,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 32.0, 454.0, 214.0, 18.0 ],
-									"text" : "loaded file @ 2011-01-18_00:05:40"
+									"text" : "loaded file @ 2011-10-12_22:13:42"
 								}
 
 							}
@@ -451,6 +483,12 @@
 									"outlettype" : [ "" ],
 									"patcher" : 									{
 										"fileversion" : 1,
+										"appversion" : 										{
+											"major" : 5,
+											"minor" : 1,
+											"revision" : 9
+										}
+,
 										"rect" : [ 50.0, 94.0, 593.0, 335.0 ],
 										"bglocked" : 0,
 										"defrect" : [ 50.0, 94.0, 593.0, 335.0 ],
@@ -680,13 +718,13 @@
 ,
 									"patching_rect" : [ 152.0, 389.0, 77.0, 20.0 ],
 									"saved_object_attributes" : 									{
-										"fontface" : 0,
-										"fontsize" : 11.595187,
-										"globalpatchername" : "",
 										"default_fontface" : 0,
+										"globalpatchername" : "",
 										"default_fontname" : "Arial",
+										"default_fontsize" : 11.595187,
 										"fontname" : "Arial",
-										"default_fontsize" : 11.595187
+										"fontface" : 0,
+										"fontsize" : 11.595187
 									}
 ,
 									"text" : "p timestamp"
@@ -969,13 +1007,13 @@
 ,
 					"patching_rect" : [ 22.0, 16.149414, 88.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"info outlet\""
@@ -993,6 +1031,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 253.0, 68.0, 702.0, 423.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 253.0, 68.0, 702.0, 423.0 ],
@@ -1617,13 +1661,13 @@
 ,
 					"patching_rect" : [ 22.0, 47.0, 231.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"@text_to (input conversion options)\""
@@ -1641,6 +1685,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 432.0, 45.0, 607.0, 411.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 432.0, 45.0, 607.0, 411.0 ],
@@ -2129,13 +2179,13 @@
 ,
 					"patching_rect" : [ 310.0, 77.287369, 151.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"message and textedit\""
@@ -2153,6 +2203,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 615.0, 46.0, 534.0, 350.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 615.0, 46.0, 534.0, 350.0 ],
@@ -2180,7 +2236,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 89.0, 9.0, 312.0, 33.0 ],
-									"text" : "Ruby 1.8 is the default Ruby version. You can enable 1.9 support with the @ruby_version attribute"
+									"text" : "Ruby 1.9 is the default Ruby version. You can enable 1.8 support with the @ruby_version attribute"
 								}
 
 							}
@@ -2305,8 +2361,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 239.0, 295.0, 50.0, 18.0 ],
-									"text" : "71"
+									"patching_rect" : [ 239.0, 295.0, 50.0, 18.0 ]
 								}
 
 							}
@@ -2319,8 +2374,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 54.0, 290.0, 70.0, 18.0 ],
-									"text" : "G"
+									"patching_rect" : [ 54.0, 290.0, 70.0, 18.0 ]
 								}
 
 							}
@@ -2528,13 +2582,13 @@
 ,
 					"patching_rect" : [ 310.0, 168.149414, 81.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"Ruby 1.9\""
@@ -2552,6 +2606,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 615.0, 46.0, 301.0, 259.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 615.0, 46.0, 301.0, 259.0 ],
@@ -2664,13 +2724,13 @@
 ,
 					"patching_rect" : [ 310.0, 137.574722, 138.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"inlet & outlet assist\""
@@ -2688,6 +2748,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 686.0, 73.0, 322.0, 318.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 686.0, 73.0, 322.0, 318.0 ],
@@ -2907,13 +2973,13 @@
 ,
 					"patching_rect" : [ 310.0, 108.0, 110.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"using libraries\""
@@ -2931,6 +2997,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 596.0, 45.0, 481.0, 521.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 596.0, 45.0, 481.0, 521.0 ],
@@ -3492,13 +3564,13 @@
 ,
 					"patching_rect" : [ 310.0, 47.0, 127.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"type conversions\""
@@ -3516,6 +3588,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 286.0, 44.0, 717.0, 655.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 286.0, 44.0, 717.0, 655.0 ],
@@ -3631,6 +3709,12 @@
 									"numoutlets" : 0,
 									"patcher" : 									{
 										"fileversion" : 1,
+										"appversion" : 										{
+											"major" : 5,
+											"minor" : 1,
+											"revision" : 9
+										}
+,
 										"rect" : [ 236.0, 469.0, 461.0, 213.0 ],
 										"bglocked" : 0,
 										"defrect" : [ 236.0, 469.0, 461.0, 213.0 ],
@@ -3696,13 +3780,13 @@
 ,
 									"patching_rect" : [ 21.0, 614.011475, 202.0, 20.0 ],
 									"saved_object_attributes" : 									{
-										"fontface" : 0,
-										"fontsize" : 11.0,
-										"globalpatchername" : "",
 										"default_fontface" : 0,
+										"globalpatchername" : "",
 										"default_fontname" : "Verdana",
+										"default_fontsize" : 11.0,
 										"fontname" : "Verdana",
-										"default_fontsize" : 11.0
+										"fontface" : 0,
+										"fontsize" : 11.0
 									}
 ,
 									"text" : "p \"notes about the empty context\""
@@ -4226,13 +4310,13 @@
 ,
 					"patching_rect" : [ 22.0, 108.0, 185.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"inter-object communcation\""
@@ -4250,6 +4334,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 539.0, 46.0, 444.0, 275.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 539.0, 46.0, 444.0, 275.0 ],
@@ -4602,13 +4692,13 @@
 ,
 					"patching_rect" : [ 22.0, 168.149414, 112.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"variable scope\""
@@ -4626,6 +4716,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 560.0, 46.0, 458.0, 293.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 560.0, 46.0, 458.0, 293.0 ],
@@ -4789,13 +4885,13 @@
 ,
 					"patching_rect" : [ 22.0, 137.574722, 60.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p at_exit"
@@ -4813,6 +4909,12 @@
 					"numoutlets" : 0,
 					"patcher" : 					{
 						"fileversion" : 1,
+						"appversion" : 						{
+							"major" : 5,
+							"minor" : 1,
+							"revision" : 9
+						}
+,
 						"rect" : [ 419.0, 46.0, 658.0, 594.0 ],
 						"bglocked" : 0,
 						"defrect" : [ 419.0, 46.0, 658.0, 594.0 ],
@@ -5734,13 +5836,13 @@
 ,
 					"patching_rect" : [ 22.0, 77.287369, 194.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontface" : 0,
-						"fontsize" : 11.0,
-						"globalpatchername" : "",
 						"default_fontface" : 0,
+						"globalpatchername" : "",
 						"default_fontname" : "Verdana",
+						"default_fontsize" : 11.0,
 						"fontname" : "Verdana",
-						"default_fontsize" : 11.0
+						"fontface" : 0,
+						"fontsize" : 11.0
 					}
 ,
 					"text" : "p \"shared context and variables\""

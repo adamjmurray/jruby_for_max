@@ -12,7 +12,7 @@
 ------------------------------------------------------------------------------
 
 REQUIREMENTS
- * Max/MSP 5
+ * Max/MSP 5 or higher
  * Java 5 or higher (most computers today have this)
 
 -----------------------------------------------------------------------------
@@ -25,12 +25,12 @@ INSTALLATION
  (2) Put the jruby_for_max folder somewhere on your Max file search path.
      You can either:
 	 (a) Copy the folder to Max5/patches
-	 (b) or add the folder to the search path via Max's Options menu -> File Preferences
+	 (b) or add the folder to the search path via Max's Options menu => File Preferences
        
  (3) Restart Max/MSP
 
  (4) To get started, open jruby_for_max/jruby.maxhelp
-     or add the object [mxj jruby] to a patcher and right click it -> Help
+     or add the object [mxj jruby] to a patcher and right click it => Help
 
 -----------------------------------------------------------------------------
 

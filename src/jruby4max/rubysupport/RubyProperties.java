@@ -116,6 +116,6 @@ public class RubyProperties {
 		else return null;
 	}
 
-	public static String DEFAULT_RUBY_VERSION_STRING = "1.8";
-	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_8;
+	public static String DEFAULT_RUBY_VERSION_STRING = "1.9";
+	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_9;
 }

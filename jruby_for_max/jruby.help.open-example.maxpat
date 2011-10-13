@@ -26,17 +26,25 @@
 		"devicewidth" : 0.0,
 		"boxes" : [ 			{
 				"box" : 				{
-					"fontname" : "Verdana",
-					"fontsize" : 11.1,
+					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+					"bgovercolor" : [ 0.752941, 0.976471, 1.0, 1.0 ],
+					"border" : 3,
+					"bordercolor" : [ 0.156863, 0.8, 0.54902, 1.0 ],
+					"borderoncolor" : [ 0.156863, 0.8, 0.54902, 1.0 ],
+					"fontname" : "Arial",
+					"fontsize" : 12.0,
 					"id" : "obj-1",
 					"maxclass" : "textbutton",
 					"numinlets" : 1,
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
-					"patching_rect" : [ 18.0, 64.0, 100.0, 20.0 ],
+					"patching_rect" : [ 18.0, 64.0, 104.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 0.0, 0.0, 100.0, 20.0 ],
-					"text" : "#1"
+					"presentation_rect" : [ 0.0, 0.0, 103.0, 22.0 ],
+					"prototypename" : "help-green-more-info-button",
+					"rounded" : 8.0,
+					"text" : "#1",
+					"texton" : "Stop"
 				}
 
 			}

@@ -4,6 +4,8 @@
 
 What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects")
 
+* Ruby 1.9 is now the default interpreter mode (use @ruby_version 1.8 to change back to 1.8 if needed)
+
 * Upgraded JRuby to version 1.6.4
 
 * .rb extension is now optional for @file

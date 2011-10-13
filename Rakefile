@@ -1,9 +1,8 @@
 require 'rake/clean'
 require 'tempfile'
 require 'rbconfig'
-include FileUtils
 
-PROJECT_VERSION = '1.0_beta2'
+PROJECT_VERSION = '1.0'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
 MANIFEST = 
 "Library: JRuby for Max
@@ -57,9 +56,8 @@ end
 task :package => [:jar] do
   puts "Preparing distribution"
   package_lib = "#{PACKAGE}/#{LIB}"  
-  mkdir DIST
-  mkdir PACKAGE
-  mkdir package_lib
+  mkdir_p DIST
+  mkdir_p package_lib
   
   # Collect the files
   FileList['*.txt', '*.example'].each do |filename|
@@ -84,12 +82,12 @@ end
 
 desc 'Build distribution archive'
 task :dist => [:replace_vars] do
-  mkdir DIST
+  mkdir_p DIST
   archive = "#{PROJ}.zip"
   puts "Archiving distribution: #{DIST}/#{archive}"
 
   # NOTE: this only works on OS X. It might work with the correct Cygwin setup on Windows but I never tested this.
-  `cd #{DIST} && zip -l -m -r #{archive} #{PROJ}`
+  `cd #{DIST} && zip -l -m -r #{archive} #{PROJ} -x "*.DS_Store"`
   # The -l option converts newlines to crlf, which should display correctly on both OS X and Windows.
   # Otherwise, since I write these txt files on OS X, newlines would disappear when viewed in Notepad on Windows.
 end
@@ -123,19 +121,12 @@ def java classpath, main_class, args
 end
 
 def javac classpath, src_files, dst_folder
-  mkdir dst_folder
+  mkdir_p dst_folder
   `javac -classpath #{classpath.join CLASSPATH_SEPARATOR} -d #{dst_folder} -g -source 1.5 -target 1.5 #{src_files}`
 end
 
 def jar filename, manifest, dst_folder
   `jar cvfm #{filename} #{manifest.path} -C #{dst_folder} .`
-end
-
-# I find it annoying that I always have to check if a directory exists
-# before creating it, so I monkey patch mkdir() to handle it automatically:
-alias original_mkdir mkdir 
-def mkdir(dir)
-  original_mkdir dir if not File.exist? dir
 end
 
 

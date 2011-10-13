@@ -4,7 +4,7 @@
 
 What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects")
 
-* Upgraded JRuby to version 1.6.2
+* Upgraded JRuby to version 1.6.4
 
 * .rb extension is now optional for @file
 

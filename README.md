@@ -3,6 +3,15 @@
 Ruby support for [Max](http://cycling74.com/products/maxmspjitter/) and [Max for Live](http://www.ableton.com/products), built on top of [JRuby](http://jruby.org)
 
 
+## Status ##
+
+1.0 version. Ready for general use.
+
+[DOWNLOAD IT HERE](http://compusition.com/software/jruby_for_max/jruby_for_max-1.0.zip)
+
+Note that downloads are available on this site, but they are development versions and should not be downloaded for general usage.
+
+
 ## Author ##
 
 Adam Murray (adam@compusition.com)
@@ -10,20 +19,13 @@ Adam Murray (adam@compusition.com)
 
 ## More Info ##
 
-[Project Page](http://cycling74.com/toolbox/jruby-for-max/)
+[Home Page](http://compusition.com/web/software/maxmsp/jruby_for_max)
+
+[Project Page on Cycling '74](http://cycling74.com/toolbox/jruby-for-max/)
 
 [FAQ](http://github.com/adamjmurray/jruby_for_max/wiki/FAQ)
 
 [Examples](http://github.com/adamjmurray/jruby_for_max-examples)
-
-
-## Status ##
-
-1.0 version. Ready for general use.
-
-You can find the links to download release versions on the [Project Page](http://cycling74.com/toolbox/jruby-for-max/).
-
-Note that downloads are available on this site, but they are development versions and should not be downloaded for general usage.
 
 
 ## Questions / Problems? ##

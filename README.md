@@ -10,6 +10,8 @@ Adam Murray (adam@compusition.com)
 
 ## More Info ##
 
+[Project Page](http://cycling74.com/toolbox/jruby-for-max/)
+
 [FAQ](http://github.com/adamjmurray/jruby_for_max/wiki/FAQ)
 
 [Examples](http://github.com/adamjmurray/jruby_for_max-examples)
@@ -17,10 +19,19 @@ Adam Murray (adam@compusition.com)
 
 ## Status ##
 
-1.0 beta. Ready for general use.
+1.0 version. Ready for general use.
+
+You can find the links to download release versions on the [Project Page](http://cycling74.com/toolbox/jruby-for-max/).
+
+Note that downloads are available on this site, but they are development versions and should not be downloaded for general usage.
 
 
-## Building the project
+## Questions / Problems? ##
+
+File an issue @ https://github.com/adamjmurray/jruby_for_max/issues or email me @ adam@compusition.com
+
+
+## Building the project (for developers)
 
 0. Download this project, either:
    * via the download link on [this project's github page](http://github.com/adamjmurray/jruby_for_max)

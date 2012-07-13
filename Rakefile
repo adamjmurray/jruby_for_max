@@ -2,7 +2,7 @@ require 'rake/clean'
 require 'tempfile'
 require 'rbconfig'
 
-PROJECT_VERSION = '1.0'
+PROJECT_VERSION = '1.0.1'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
 MANIFEST = 
 "Library: JRuby for Max

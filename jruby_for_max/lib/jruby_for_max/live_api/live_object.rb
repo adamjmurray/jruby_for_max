@@ -47,7 +47,7 @@ module JRubyForMax::LiveAPI
 
       # We rely on get() initializing an instance variable to determine
       # if we're actually setting a property or just handling the results of a call()
-      if instance_variables.include? variable
+      if instance_variables.include? variable.to_sym
         instance_variable_set variable, value
       end
 

@@ -1,8 +1,18 @@
                           
                           JRuby for Max changelog
 
+******************************************************************************
+* Version 1.0.1 (since this project was forked from "ajm objects")           *
+******************************************************************************
 
-What's new in JRuby for Max 1.0 (since this project was forked from "ajm objects")
+* Upgrade JRuby to version 1.6.7.2
+
+* Fixed a bug in JRubyForMax::LiveAPI::LiveObject that preventing receiving
+  data from the Max patcher.
+
+******************************************************************************
+* Version 1.0 (since this project was forked from "ajm objects")             *
+******************************************************************************
 
 * Ruby 1.9 is now the default interpreter mode (use @ruby_version 1.8 to change back to 1.8 if needed)
 

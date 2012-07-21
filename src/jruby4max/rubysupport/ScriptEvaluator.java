@@ -94,6 +94,13 @@ public class ScriptEvaluator implements IScriptEvaluator {
 		container = new ScriptingContainer( LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT );
 		container.setCompatVersion( compatVersion );
 		container.setCurrentDirectory( System.getProperty( "user.home" ) );
+
+        // It seems we can't directly modify the current environment, so we need to make a copy first.
+        @SuppressWarnings("unchecked")
+        Map<Object, Object> env = new HashMap<Object, Object>(container.getEnvironment());
+        env.put("GEM_HOME", RubyProperties.getGemHome());
+        env.put("GEM_PATH", RubyProperties.getGemPath());
+        container.setEnvironment(env);
 	}
 
 	protected void declareGlobalInternal( String variableName, Object obj ) {

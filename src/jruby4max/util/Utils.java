@@ -290,4 +290,24 @@ public class Utils {
 		}
 		return false;
 	}
+
+
+    public static String pathToContainingFolder(String filepath) {
+        return pathToContainingFolder(new File(filepath));
+    }
+
+    public static String pathToContainingFolder(File file) {
+        File folder = file.getParentFile();
+        if (folder != null) {
+            String folderPath;
+            try {
+                folderPath = folder.getCanonicalPath();
+            } catch (IOException e) {
+                System.err.println(e);
+                folderPath = folder.getAbsolutePath();
+            }
+            return folderPath;
+        }
+        return null;
+    }
 }

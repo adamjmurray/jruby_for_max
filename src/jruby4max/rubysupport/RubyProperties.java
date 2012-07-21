@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import com.cycling74.max.MaxSystem;
+import jruby4max.util.Utils;
 import org.jruby.CompatVersion;
 
 import java.io.File;
@@ -78,6 +79,15 @@ public class RubyProperties {
 			// System.out.println("Using hard-coded defaults for RubyProperties.");
 			properties = new Properties();
 		}
+
+        String gemHome = properties.getProperty("gem.home");
+        if (gemHome == null) {
+            properties.setProperty("gem.home", defaultGemHome());
+        }
+        String gemPath = properties.getProperty("gem.path");
+        if (gemPath == null) {
+            properties.setProperty("gem.path", defaultGemHome());
+        }
 	}
 
 	public static String[] getInitializerFiles() {
@@ -118,4 +128,16 @@ public class RubyProperties {
 
 	public static String DEFAULT_RUBY_VERSION_STRING = "1.9";
 	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_9;
+
+    public static String defaultGemHome() {
+        return Utils.pathToContainingFolder(MaxSystem.locateFile("jruby.jar")) + File.separatorChar + "jruby_gems";
+    }
+
+    public static String getGemHome() {
+        return properties.getProperty("gem.home");
+    }
+
+    public static String getGemPath() {
+        return properties.getProperty("gem.path");
+    }
 }

@@ -270,7 +270,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 33.0, 565.0, 242.0, 18.0 ],
-					"text" : ":a :b :c"
+					"text" : ":c :b :a"
 				}
 
 			}
@@ -324,10 +324,9 @@
 					"numoutlets" : 4,
 					"outlettype" : [ "", "int", "", "" ],
 					"outputmode" : 1,
-					"patching_rect" : [ 214.0, 360.0, 173.0, 113.0 ],
-					"readonly" : 1,
+					"patching_rect" : [ 214.0, 360.0, 178.0, 117.0 ],
 					"tabmode" : 0,
-					"text" : "def bang \r  out0 \"bang\".reverse\rend\r\rdef inlet(inlet_index, *params)    \r  out0 params.reverse\rend"
+					"text" : "def bang \n  out0 \"bang\".reverse\nend\n\ndef inlet(inlet_index, *params)    \n  out0 params.reverse\nend"
 				}
 
 			}
@@ -550,8 +549,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 77.0, 219.0, 358.0, 18.0 ],
-					"text" : "\"arg0=123, arg1=, arg2=text\""
+					"patching_rect" : [ 77.0, 219.0, 358.0, 18.0 ]
 				}
 
 			}

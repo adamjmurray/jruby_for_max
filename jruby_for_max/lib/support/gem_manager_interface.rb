@@ -18,5 +18,39 @@ def list
 end
 
 def install *args
-  name,version = *args
+  manage_gem_in_background :install, *args
+end
+
+def uninstall *args
+  manage_gem_in_background :uninstall, *args
+end
+
+def manage_gem_in_background operation, name, version
+  if name=='_NO_GEM_NAME_'
+    out1 'status', 'ERROR: enter a gem name'
+    return
+  end
+  if version=='_NO_GEM_VERSION_'
+    version = nil
+  end
+
+  if @bg_thread
+    error "Ignored attempt to #{operation} a gem, because another gem is currently being installed or uninstalled."
+    return
+  end
+
+  @bg_thread = Thread.new do
+    out1 'status', "#{operation}ing #{name} #{version} ..."
+    out1 'spinner', 1
+    begin
+      Gems.send operation, name, version
+      out1 'status', ''
+    rescue Exception => e
+      out1 'status', "ERROR: #{e.message}"
+    ensure
+      list
+      out1 'spinner', 0
+      @bg_thread = nil
+    end
+  end
 end

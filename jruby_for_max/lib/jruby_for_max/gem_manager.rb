@@ -23,7 +23,7 @@ module JRubyForMax
       rescue Gem::SystemExitException => e
         # Not sure why the install command raises SystemExitException in successful cases, but it does.
         # So we just check for a success exit code 0.
-        raise unless e.exit_code != 0
+        raise unless e.exit_code == 0
       end
 
       # Uninstall all versions of a gem, or a specific version if a version number is given

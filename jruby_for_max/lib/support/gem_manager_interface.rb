@@ -45,8 +45,8 @@ def manage_gem_in_background operation, name, version
     begin
       Gems.send operation, name, version
       out1 'status', ''
-    rescue Exception => e
-      out1 'status', "ERROR: #{e.message}"
+    rescue Exception
+      out1 'status', "ERROR: see Max console for details"
     ensure
       list
       out1 'spinner', 0

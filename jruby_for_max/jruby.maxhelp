@@ -2,15 +2,14 @@
 	"patcher" : 	{
 		"fileversion" : 1,
 		"appversion" : 		{
-			"major" : 5,
+			"major" : 6,
 			"minor" : 1,
-			"revision" : 9
+			"revision" : 2,
+			"architecture" : "x64"
 		}
 ,
-		"rect" : [ 9.0, 63.0, 671.0, 348.0 ],
+		"rect" : [ 202.0, 539.0, 671.0, 348.0 ],
 		"bglocked" : 0,
-		"defrect" : [ 9.0, 63.0, 671.0, 348.0 ],
-		"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 		"openinpresentation" : 0,
 		"default_fontsize" : 11.0,
 		"default_fontface" : 0,
@@ -18,13 +17,46 @@
 		"gridonopen" : 0,
 		"gridsize" : [ 15.0, 15.0 ],
 		"gridsnaponopen" : 0,
+		"statusbarvisible" : 2,
 		"toolbarvisible" : 1,
 		"boxanimatetime" : 200,
 		"imprint" : 0,
 		"enablehscroll" : 1,
 		"enablevscroll" : 1,
 		"devicewidth" : 0.0,
+		"description" : "",
+		"digest" : "",
+		"tags" : "",
 		"boxes" : [ 			{
+				"box" : 				{
+					"fontname" : "Verdana",
+					"fontsize" : 11.0,
+					"frgb" : 0.0,
+					"id" : "obj-18",
+					"linecount" : 2,
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 303.5, 10.0, 180.0, 33.0 ],
+					"presentation_rect" : [ 365.0, 16.0, 0.0, 0.0 ],
+					"text" : "Install & manage Ruby Gems\nwith the:"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"args" : [ "Gem Manager", "jruby.gem_manager" ],
+					"id" : "obj-16",
+					"maxclass" : "bpatcher",
+					"name" : "jruby.help.open-example.maxpat",
+					"numinlets" : 0,
+					"numoutlets" : 0,
+					"patching_rect" : [ 362.0, 28.0, 109.0, 22.0 ],
+					"presentation_rect" : [ 337.0, 17.0, 0.0, 0.0 ]
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 					"bgovercolor" : [ 0.752941, 0.976471, 1.0, 1.0 ],
@@ -38,6 +70,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
+					"parameter_enable" : 0,
 					"patching_rect" : [ 516.0, 235.0, 120.0, 24.0 ],
 					"prototypename" : "help-green-more-info-button",
 					"rounded" : 8.0,
@@ -60,6 +93,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
+					"parameter_enable" : 0,
 					"patching_rect" : [ 524.0, 10.0, 104.0, 23.0 ],
 					"prototypename" : "help-green-more-info-button",
 					"rounded" : 8.0,
@@ -117,16 +151,15 @@
 					"patcher" : 					{
 						"fileversion" : 1,
 						"appversion" : 						{
-							"major" : 5,
+							"major" : 6,
 							"minor" : 1,
-							"revision" : 9
+							"revision" : 2,
+							"architecture" : "x64"
 						}
 ,
-						"rect" : [ 682.0, 63.0, 734.0, 431.0 ],
+						"rect" : [ 866.0, 66.0, 734.0, 431.0 ],
 						"bgcolor" : [ 0.45098, 0.556863, 0.607843, 1.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 682.0, 63.0, 734.0, 431.0 ],
-						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
 						"default_fontface" : 0,
@@ -134,12 +167,16 @@
 						"gridonopen" : 0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"gridsnaponopen" : 0,
+						"statusbarvisible" : 2,
 						"toolbarvisible" : 1,
 						"boxanimatetime" : 200,
 						"imprint" : 0,
 						"enablehscroll" : 1,
 						"enablevscroll" : 1,
 						"devicewidth" : 0.0,
+						"description" : "",
+						"digest" : "",
+						"tags" : "",
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Verdana",
@@ -198,6 +235,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
+									"parameter_enable" : 0,
 									"patching_rect" : [ 433.0, 85.0, 138.0, 22.0 ],
 									"presentation" : 1,
 									"presentation_rect" : [ 551.0, 103.0, 104.0, 23.0 ],
@@ -212,6 +250,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-13",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -226,6 +265,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-14",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -254,6 +294,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-16",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -268,12 +309,13 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-17",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 37.0, 150.0, 518.0, 20.0 ],
-									"text" : "Copyright (c) 2008-2011, Adam Murray (adam@compusition.com). All rights reserved."
+									"text" : "Copyright (c) 2008-2013, Adam Murray (adam@compusition.com). All rights reserved."
 								}
 
 							}
@@ -281,6 +323,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-29",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -294,6 +337,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-32",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -338,6 +382,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-36",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -351,6 +396,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-37",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -364,12 +410,13 @@
 								"box" : 								{
 									"fontname" : "Arial",
 									"fontsize" : 18.0,
+									"frgb" : 0.0,
 									"id" : "obj-38",
 									"linecount" : 3,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 35.0, 32.0, 83.0, 69.0 ],
+									"patching_rect" : [ 35.0, 32.0, 83.0, 67.0 ],
 									"text" : "about JRuby for Max"
 								}
 
@@ -378,6 +425,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-39",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -391,6 +439,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-40",
 									"linecount" : 8,
 									"maxclass" : "comment",
@@ -465,8 +514,8 @@
 						"lines" : [ 							{
 								"patchline" : 								{
 									"destination" : [ "obj-5", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-1", 0 ]
 								}
 
@@ -474,8 +523,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-35", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-34", 0 ]
 								}
 
@@ -483,8 +532,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-34", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-49", 0 ]
 								}
 
@@ -492,8 +541,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-4", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-5", 0 ]
 								}
 
@@ -503,13 +552,16 @@
 ,
 					"patching_rect" : [ 524.0, 37.574722, 146.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontsize" : 11.0,
 						"default_fontface" : 0,
-						"fontname" : "Verdana",
 						"default_fontname" : "Verdana",
-						"globalpatchername" : "",
 						"default_fontsize" : 11.0,
-						"fontface" : 0
+						"description" : "",
+						"digest" : "",
+						"fontface" : 0,
+						"fontname" : "Verdana",
+						"fontsize" : 11.0,
+						"globalpatchername" : "",
+						"tags" : ""
 					}
 ,
 					"text" : "p \"about JRuby for Max\""
@@ -530,6 +582,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
+					"parameter_enable" : 0,
 					"patching_rect" : [ 521.0, 204.0, 104.0, 23.0 ],
 					"prototypename" : "help-green-more-info-button",
 					"rounded" : 8.0,
@@ -572,6 +625,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-4",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -585,6 +639,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-3",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -659,12 +714,13 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-34",
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 18.0, 309.0, 407.0, 20.0 ],
-					"text" : "Powered by JRuby 1.6.4, a pure-Java interpreter for Ruby 1.8.7"
+					"text" : "Powered by JRuby 1.7.4, a pure-Java interpreter for Ruby 1.9.3"
 				}
 
 			}
@@ -681,15 +737,14 @@
 					"patcher" : 					{
 						"fileversion" : 1,
 						"appversion" : 						{
-							"major" : 5,
+							"major" : 6,
 							"minor" : 1,
-							"revision" : 9
+							"revision" : 2,
+							"architecture" : "x64"
 						}
 ,
 						"rect" : [ 681.0, 63.0, 649.0, 277.0 ],
 						"bglocked" : 0,
-						"defrect" : [ 681.0, 63.0, 649.0, 277.0 ],
-						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 11.0,
 						"default_fontface" : 0,
@@ -697,12 +752,16 @@
 						"gridonopen" : 0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"gridsnaponopen" : 0,
+						"statusbarvisible" : 2,
 						"toolbarvisible" : 1,
 						"boxanimatetime" : 200,
 						"imprint" : 0,
 						"enablehscroll" : 1,
 						"enablevscroll" : 1,
 						"devicewidth" : 0.0,
+						"description" : "",
+						"digest" : "",
+						"tags" : "",
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Verdana",
@@ -765,6 +824,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-10",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -793,6 +853,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-4",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -806,6 +867,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-2",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -834,6 +896,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-5",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -891,6 +954,7 @@
 								"box" : 								{
 									"fontname" : "Verdana",
 									"fontsize" : 11.0,
+									"frgb" : 0.0,
 									"id" : "obj-35",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -904,8 +968,8 @@
 						"lines" : [ 							{
 								"patchline" : 								{
 									"destination" : [ "obj-7", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-1", 0 ]
 								}
 
@@ -913,8 +977,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-7", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-11", 0 ]
 								}
 
@@ -922,8 +986,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-7", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-12", 0 ]
 								}
 
@@ -931,8 +995,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-3", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-13", 0 ]
 								}
 
@@ -940,8 +1004,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-6", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-3", 0 ]
 								}
 
@@ -949,8 +1013,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-7", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-8", 0 ]
 								}
 
@@ -958,8 +1022,8 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-7", 0 ],
+									"disabled" : 0,
 									"hidden" : 1,
-									"midpoints" : [  ],
 									"source" : [ "obj-9", 0 ]
 								}
 
@@ -969,13 +1033,16 @@
 ,
 					"patching_rect" : [ 516.0, 264.574707, 133.0, 20.0 ],
 					"saved_object_attributes" : 					{
-						"fontsize" : 11.0,
 						"default_fontface" : 0,
-						"fontname" : "Verdana",
 						"default_fontname" : "Verdana",
-						"globalpatchername" : "",
 						"default_fontsize" : 11.0,
-						"fontface" : 0
+						"description" : "",
+						"digest" : "",
+						"fontface" : 0,
+						"fontname" : "Verdana",
+						"fontsize" : 11.0,
+						"globalpatchername" : "",
+						"tags" : ""
 					}
 ,
 					"text" : "p \"learning resources\""
@@ -986,6 +1053,7 @@
 				"box" : 				{
 					"fontname" : "Verdana Bold",
 					"fontsize" : 12.0,
+					"frgb" : 0.0,
 					"id" : "obj-46",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -999,6 +1067,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-63",
 					"linecount" : 2,
 					"maxclass" : "comment",
@@ -1153,6 +1222,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 13.0,
+					"frgb" : 0.0,
 					"id" : "obj-20",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -1166,6 +1236,7 @@
 				"box" : 				{
 					"fontname" : "Arial",
 					"fontsize" : 18.0,
+					"frgb" : 0.0,
 					"id" : "obj-21",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -1179,6 +1250,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-22",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -1211,7 +1283,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 391.0, 91.0, 60.0, 18.0 ],
+					"patching_rect" : [ 387.0, 91.0, 60.0, 18.0 ],
 					"text" : "5 - 6/4.0"
 				}
 
@@ -1262,6 +1334,7 @@
 				"box" : 				{
 					"fontname" : "Verdana",
 					"fontsize" : 11.0,
+					"frgb" : 0.0,
 					"id" : "obj-33",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -1327,10 +1400,22 @@
 				}
 
 			}
+, 			{
+				"box" : 				{
+					"bgcolor" : [ 0.839216, 0.886275, 0.917647, 1.0 ],
+					"id" : "obj-23",
+					"maxclass" : "panel",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 301.5, 11.0, 175.5, 41.0 ]
+				}
+
+			}
  ],
 		"lines" : [ 			{
 				"patchline" : 				{
 					"destination" : [ "obj-2", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
 					"midpoints" : [ 255.5, 369.0, 412.5, 369.0 ],
 					"source" : [ "obj-1", 0 ]
@@ -1340,6 +1425,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-34", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
 					"midpoints" : [ 28.5, 399.0, 14.0, 399.0, 14.0, 298.0, 27.5, 298.0 ],
 					"source" : [ "obj-10", 0 ]
@@ -1349,6 +1435,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-9", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
 					"midpoints" : [ 530.5, 227.0, 655.5, 227.0 ],
 					"source" : [ "obj-12", 0 ]
@@ -1358,8 +1445,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-5", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-14", 0 ]
 				}
 
@@ -1367,8 +1454,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-52", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-15", 0 ]
 				}
 
@@ -1376,6 +1463,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-3", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
 					"midpoints" : [ 412.5, 401.0, 514.0, 401.0, 514.0, 286.0, 389.5, 286.0 ],
 					"source" : [ "obj-2", 0 ]
@@ -1385,6 +1473,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 290.5, 197.0, 278.5, 197.0 ],
 					"source" : [ "obj-27", 0 ]
@@ -1394,8 +1483,9 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
-					"midpoints" : [ 400.5, 114.0, 278.5, 114.0 ],
+					"midpoints" : [ 396.5, 114.0, 278.5, 114.0 ],
 					"source" : [ "obj-28", 0 ]
 				}
 
@@ -1403,6 +1493,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 291.5, 167.0, 278.5, 167.0 ],
 					"source" : [ "obj-29", 0 ]
@@ -1412,6 +1503,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 291.5, 141.0, 278.5, 141.0 ],
 					"source" : [ "obj-30", 0 ]
@@ -1421,6 +1513,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 328.5, 114.0, 278.5, 114.0 ],
 					"source" : [ "obj-31", 0 ]
@@ -1430,8 +1523,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-41", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-32", 0 ]
 				}
 
@@ -1439,8 +1532,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-38", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
-					"midpoints" : [  ],
 					"source" : [ "obj-37", 0 ]
 				}
 
@@ -1448,6 +1541,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-41", 1 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 278.5, 253.0, 467.5, 253.0 ],
 					"source" : [ "obj-38", 0 ]
@@ -1457,6 +1551,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-51", 1 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 22.5, 263.0, 156.5, 263.0 ],
 					"source" : [ "obj-45", 0 ]
@@ -1466,8 +1561,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-51", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-49", 0 ]
 				}
 
@@ -1475,6 +1570,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-45", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 52.5, 185.0, 22.5, 185.0 ],
 					"source" : [ "obj-53", 0 ]
@@ -1484,6 +1580,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-45", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
 					"midpoints" : [ 34.5, 178.5, 22.5, 178.5 ],
 					"source" : [ "obj-55", 0 ]
@@ -1493,8 +1590,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-45", 0 ],
+					"disabled" : 0,
 					"hidden" : 0,
-					"midpoints" : [  ],
 					"source" : [ "obj-57", 0 ]
 				}
 
@@ -1502,8 +1599,8 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-10", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-6", 0 ]
 				}
 
@@ -1511,11 +1608,26 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-11", 0 ],
+					"disabled" : 0,
 					"hidden" : 1,
-					"midpoints" : [  ],
 					"source" : [ "obj-9", 0 ]
 				}
 
+			}
+ ],
+		"dependency_cache" : [ 			{
+				"name" : "jruby.seealso.maxpat",
+				"bootpath" : "/Users/adam/workspace/jruby_for_max/jruby_for_max",
+				"patcherrelativepath" : ".",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "jruby.help.open-example.maxpat",
+				"bootpath" : "/Users/adam/workspace/jruby_for_max/jruby_for_max",
+				"patcherrelativepath" : ".",
+				"type" : "JSON",
+				"implicit" : 1
 			}
  ]
 	}

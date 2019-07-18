@@ -73,7 +73,6 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 		declareAttribute( "context", "getcontext", "context" );
 		declareAttribute( "id", "getid", "id" );
 		declareAttribute( "autoinit" );
-		declareAttribute( "ruby_version", "getruby_version", "ruby_version" );
 	}
 
 	private final MaxQelem getInitializerQelem() {

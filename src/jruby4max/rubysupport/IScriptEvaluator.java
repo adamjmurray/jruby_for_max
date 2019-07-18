@@ -50,7 +50,5 @@ public interface IScriptEvaluator {
 
 	Object eval( CharSequence rubyCode );
 	
-	String version();
-
 	void exit();
 }

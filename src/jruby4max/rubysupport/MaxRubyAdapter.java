@@ -116,10 +116,6 @@ public class MaxRubyAdapter {
 		}
 	}
 	
-	public String getVersion() {
-		return ruby.version();
-	}
-
 	public void notifyDeleted() {
 		ScriptEvaluatorManager.removeRubyEvaluator( maxObject );
 	}

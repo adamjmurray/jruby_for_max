@@ -49,6 +49,8 @@ public interface IScriptEvaluator {
 	void setScriptFile( File scriptFile );
 
 	Object eval( CharSequence rubyCode );
+	
+	String version();
 
 	void exit();
 }

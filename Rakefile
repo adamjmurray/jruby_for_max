@@ -2,9 +2,9 @@ require 'rake/clean'
 require 'tempfile'
 require 'rbconfig'
 
-PROJECT_VERSION = '1.0.2'
+PROJECT_VERSION = '1.0.3'
 BUILD_DATE = Time.now.utc.strftime '%B %d, %Y (%H:%M GMT)'
-MANIFEST = 
+MANIFEST =
 "Library: JRuby for Max
 Version: #{PROJECT_VERSION}
 Built-Date: #{BUILD_DATE}
@@ -31,7 +31,7 @@ TESTS     = FileList['test/**/*.java']
 CLASSPATH = FileList["#{LIB}/**/*.jar"].exclude(/^#{JAR}$/)
 TESTS_CLASSPATH = CLASSPATH.clone.add(BUILD)
 
-WINDOWS = Config::CONFIG['host_os'] =~ /mswin/
+WINDOWS = RbConfig::CONFIG['host_os'] =~ /mswin/
 CLASSPATH_SEPARATOR = if WINDOWS then ';' else ':' end
 
 ##############################################################################
@@ -60,14 +60,14 @@ task :package => [:jar] do
   puts "Preparing distribution"
   package_lib = File.join PACKAGE,'lib'
   mkdir_p package_lib
-  
+
   # Collect the files
   FileList['*.txt', '*.example'].each do |filename|
     cp filename, PACKAGE
   end
   FileList["#{LIB}/jruby.jar", JAR_FILE].each do |filename|
     cp filename, package_lib
-  end  
+  end
   cp_r PATCHES, PACKAGE
   cp_r LICENSE, PACKAGE
 end
@@ -125,7 +125,7 @@ end
 
 def javac classpath, src_files, dst_folder
   mkdir_p dst_folder
-  `javac -classpath #{classpath.join CLASSPATH_SEPARATOR} -d #{dst_folder} -g -source 1.5 -target 1.5 #{src_files}`
+  `javac -classpath #{classpath.join CLASSPATH_SEPARATOR} -d #{dst_folder} -g #{src_files} -Xlint:deprecation`
 end
 
 def jar filename, manifest, dst_folder
@@ -144,8 +144,7 @@ class FileList
         File.open(filename, 'w') do |io|
           io.write contents
         end
-      end    
+      end
     end
   end
 end
-

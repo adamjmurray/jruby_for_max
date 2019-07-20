@@ -89,7 +89,7 @@ end
 
 # Sets the tooltips for the inlets of this [mxj jruby] object
 def inlet_assist(*params)
-  $max_object.setInletAssist params.to_java(:string)  
+  $max_object.setInletAssist params.to_java(:string)
 end
 
 # Sets the tooltips for the outlets of this [mxj jruby] object
@@ -112,7 +112,7 @@ def max_object(namespace=nil)
     context = $max_object.context
     id = names[0]
   end
-  $max_object_map[context][id]    
+  $max_object_map[context][id]
 end
 
 
@@ -121,25 +121,25 @@ end
 
 # Print the arguments to the Max console separated by newlines
 def puts(*params)
-  yield_atoms(*params) {|atom| java.lang.System.out.println(atom)}
+  yield_atoms(*params) {|atom| $max_object.getSystemOut.println(atom) }
   nil
-end  
+end
 
 # Prints the arguments to the Max console
 def print(*params)
-  yield_atoms(*params) {|atom| java.lang.System.out.print(atom)}
+  yield_atoms(*params) {|atom| $max_object.getSystemOut.print(atom) }
   nil
-end  
+end
 
 # Prints an error message to the Max console
 def error(*params)
-  yield_atoms(*params) {|atom| java.lang.System.err.println(atom)}
+  yield_atoms(*params) {|atom| $max_object.getSystemErr.println(atom) }
   nil
 end
 
 # Flush the Max console, use after print()
 def flush
-  java.lang.System.out.println
+  $max_object.getSystemOut.println
   nil
 end
 
@@ -171,4 +171,3 @@ def yield_atoms( *params, &block )
     end
   end
 end
-

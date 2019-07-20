@@ -166,6 +166,14 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 	public void err( String message ) {
 		error( this.getClass().getName() + ": " + message );
 	}
+	
+	public PrintStream getSystemOut() {
+		return System.out;
+	}
+	
+	public PrintStream getSystemErr() {
+		return System.err;
+	}
 
 	public String toString() {
 		return getClass().getName() + "#<" + Integer.toHexString( hashCode() ) + ">";

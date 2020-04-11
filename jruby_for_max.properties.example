@@ -15,14 +15,18 @@ ruby.loadpaths =
 
 
 # jruby.home = /Users/adam/lib/jruby-1.5.5
-# If you want to install a lot of gems: instead of adding a loadpath for each one, 
+# If you want to install a lot of gems: instead of adding a loadpath for each one,
 # you can install them into a separate jruby installation and set jruby.home to
 # run against that jruby instead of the built-in one.
 # This variable is not set by default.
 
+# gem.home = /Users/javier/.rvm/gems/jruby-9.2.7.0@global
+# GEM locations where to install new gems
 
+# gem.path = /Users/javier/.rvm/gems/jruby-9.2.7.0@global
+# GEM locations where to find them to use them
 
 ruby.initializers = jruby_initialize.rb
-# A semicolon-separated list of files. 
+# A semicolon-separated list of files.
 # These files will be run in the order listed whenever a new jruby context is initialized.
 # Default value is jruby_initialize.rb

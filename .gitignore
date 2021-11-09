@@ -7,3 +7,5 @@ jruby4max.jar
 out
 *.iml
 .idea
+.project
+.classpath

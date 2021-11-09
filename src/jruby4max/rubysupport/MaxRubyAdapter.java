@@ -1,5 +1,13 @@
 package jruby4max.rubysupport;
 
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+
+import org.jruby.RubyArray;
+import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
+
 /*
 Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
@@ -29,19 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
+
 import jruby4max.maxsupport.Atomizer;
 import jruby4max.util.GlobalVariableStore;
 import jruby4max.util.LineBuilder;
 import jruby4max.util.Logger;
 import jruby4max.util.Utils;
-import org.jruby.CompatVersion;
-import org.jruby.RubyArray;
-import org.jruby.RubyHash;
-import org.jruby.RubySymbol;
-
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
 
 /**
  * The bridge between Max and Ruby.
@@ -66,20 +67,17 @@ public class MaxRubyAdapter {
 
 	private String id;
 
-	private CompatVersion rubyVersion;
-
-	public MaxRubyAdapter( MaxObject maxObject, String context, String id, CompatVersion rubyVersion ) {
+	public MaxRubyAdapter( MaxObject maxObject, String context, String id) {
 		this.maxObject = maxObject;
 		if( maxObject instanceof Logger ) {
 			this.logger = (Logger)maxObject;
 		}
 		this.maxContext = context;
 		this.id = id;
-		this.rubyVersion = rubyVersion;
 	}
 
 	private void getEvaluator() {
-		ruby = ScriptEvaluatorManager.getRubyEvaluator( maxContext, id, maxObject, rubyVersion );
+		ruby = ScriptEvaluatorManager.getRubyEvaluator( maxContext, id, maxObject );
 		ruby.declareGlobal( "max_ruby_adapter", this );
 		ruby.declareGlobal( "global_variable_store", GlobalVariableStore.getInstance() );
 	}
@@ -117,7 +115,7 @@ public class MaxRubyAdapter {
 			this.id = id;
 		}
 	}
-
+	
 	public void notifyDeleted() {
 		ScriptEvaluatorManager.removeRubyEvaluator( maxObject );
 	}

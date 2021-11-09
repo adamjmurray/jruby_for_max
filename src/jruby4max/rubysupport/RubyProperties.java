@@ -1,12 +1,17 @@
 package jruby4max.rubysupport;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 /*
 Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -28,13 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import com.cycling74.max.MaxSystem;
-import jruby4max.util.Utils;
-import org.jruby.CompatVersion;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import jruby4max.util.Utils;
 
 /**
  * Manages all global settings for Ruby evaluation.
@@ -56,7 +56,7 @@ public class RubyProperties {
 		try {
 			String propsPath = MaxSystem.locateFile( "jruby_for_max.properties" );
 			if( propsPath == null ) {
-				//MaxSystem.error("jruby4max.ruby.properties not found! Maybe jruby4max objects was not installed correctly?");
+				MaxSystem.error("jruby_for_max.properties not found! Maybe jruby4max objects was not installed correctly? Created a default instance.");
 				properties = new Properties();
 			}
 			else {
@@ -115,19 +115,6 @@ public class RubyProperties {
 		}
 		return loadpaths;
 	}
-
-	public static CompatVersion getRubyVersion( String version ) {
-		if( "1.9".equals( version ) ) {
-			return CompatVersion.RUBY1_9;
-		}
-		else if( "1.8".equals( version ) ) {
-			return CompatVersion.RUBY1_8;
-		}
-		else return null;
-	}
-
-	public static String DEFAULT_RUBY_VERSION_STRING = "1.9";
-	public static CompatVersion DEFAULT_RUBY_VERSION = CompatVersion.RUBY1_9;
 
     public static String defaultGemHome() {
         return Utils.pathToContainingFolder(MaxSystem.locateFile("jruby.jar")) + File.separatorChar + "jruby_gems";

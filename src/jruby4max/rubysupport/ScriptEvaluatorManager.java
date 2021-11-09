@@ -1,5 +1,9 @@
 package jruby4max.rubysupport;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /*
 Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
@@ -28,11 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import jruby4max.util.MappedSet;
-import org.jruby.CompatVersion;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Factory for Ruby evaluators that manages shared contexts.
@@ -81,7 +80,7 @@ public class ScriptEvaluatorManager {
 	 *
 	 * @return an implementation of IScriptEvaluator
 	 */
-	public static IScriptEvaluator getRubyEvaluator( String maxContext, String id, Object maxObject, CompatVersion rubyVersion ) {
+	public static IScriptEvaluator getRubyEvaluator( String maxContext, String id, Object maxObject) {
 
 		Map<String, Object> idMap = maxObjectMap.get( maxContext );
 		if( idMap == null ) {
@@ -99,7 +98,7 @@ public class ScriptEvaluatorManager {
 
 		IScriptEvaluator evaluator = evaluatorContexts.get( evaluatorContext );
 		if( evaluator == null ) {
-			evaluator = new ScriptEvaluator( rubyVersion );
+			evaluator = new ScriptEvaluator();
 			evaluatorContexts.put( evaluatorContext, evaluator );
 			evaluatorContextCounter.put( evaluatorContext, 1 );
 			Set<Object> maxObjects = objectsUsingEvaluator.addValue( evaluatorContext, maxObject );

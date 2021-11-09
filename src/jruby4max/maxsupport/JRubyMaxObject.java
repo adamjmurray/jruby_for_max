@@ -1,5 +1,7 @@
 package jruby4max.maxsupport;
 
+import java.io.PrintStream;
+
 /*
 Copyright (c) 2008, Adam Murray (adam@compusition.com). All rights reserved.
 
@@ -31,14 +33,11 @@ import com.cycling74.max.Atom;
 import com.cycling74.max.Executable;
 import com.cycling74.max.MaxObject;
 import com.cycling74.max.MaxQelem;
+
 import jruby4max.rubysupport.IdInUseException;
 import jruby4max.rubysupport.MaxRubyAdapter;
-import jruby4max.rubysupport.RubyProperties;
 import jruby4max.util.Logger;
 import jruby4max.util.Utils;
-import org.jruby.CompatVersion;
-
-import java.io.PrintStream;
 
 /**
  * Superclass for objects that support Ruby scripting.
@@ -50,9 +49,6 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 	protected String context = null;
 	protected String id = defaultId();
 	private boolean autoinit = false;
-
-	protected Atom[] rubyVersionValue = Atom.newAtom( new String[]{ RubyProperties.DEFAULT_RUBY_VERSION_STRING } );
-	protected CompatVersion rubyVersion = RubyProperties.DEFAULT_RUBY_VERSION;
 
 	protected MaxRubyAdapter ruby;
 
@@ -77,7 +73,6 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 		declareAttribute( "context", "getcontext", "context" );
 		declareAttribute( "id", "getid", "id" );
 		declareAttribute( "autoinit" );
-		declareAttribute( "ruby_version", "getruby_version", "ruby_version" );
 	}
 
 	private final MaxQelem getInitializerQelem() {
@@ -101,12 +96,12 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 		public void execute() {
 			initialized = true;
 			try {
-				ruby = new MaxRubyAdapter( self, context, id, rubyVersion );
+				ruby = new MaxRubyAdapter( self, context, id );
 			} catch(IdInUseException e) {
 				String availableId = e.getMessage();
 				error( "id " + id + " not available. Using: " + availableId );
 				id = availableId;
-				ruby = new MaxRubyAdapter( self, context, id, rubyVersion );
+				ruby = new MaxRubyAdapter( self, context, id );
 			}
 			if( autoinit ) {
 				ruby.init();
@@ -171,6 +166,14 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 	public void err( String message ) {
 		error( this.getClass().getName() + ": " + message );
 	}
+	
+	public PrintStream getSystemOut() {
+		return System.out;
+	}
+	
+	public PrintStream getSystemErr() {
+		return System.err;
+	}
 
 	public String toString() {
 		return getClass().getName() + "#<" + Integer.toHexString( hashCode() ) + ">";
@@ -221,27 +224,4 @@ public abstract class JRubyMaxObject extends MaxObject implements Logger {
 	private String defaultId() {
 		return Integer.toHexString( hashCode() );
 	}
-
-	public Atom[] getruby_version() {
-		return rubyVersionValue;
-	}
-
-  // Using Atom[] is annoying but it avoids an annoying warning in the max menu "coerced float to String" when doing @ruby_version 1.9
-  public void ruby_version(Atom[] rubyVersionValue) {
-    if (initialized) {
-      err("ruby_version cannot be changed. Use @ruby_version when creating the object.");
-      return;
-    }
-    if (rubyVersionValue == null || rubyVersionValue.length < 1) return;
-
-    String rubyVersionString = rubyVersionValue[0].toString();
-    // @ruby_version 1.9 comes through as "1.900000" so we have to chop off the trailing zeros
-    rubyVersionString = rubyVersionString.replaceFirst("(.*?)0+", "$1");
-
-    CompatVersion rubyVersion = RubyProperties.getRubyVersion(rubyVersionString);
-    if (rubyVersion != null) {
-      this.rubyVersion = rubyVersion;
-      this.rubyVersionValue = Atom.newAtom(new String[]{rubyVersionString});
-    } else err("Invalid ruby_version '" + rubyVersionString + "'. Only 1_8 and 1_9 supported.");
-  }
 }
